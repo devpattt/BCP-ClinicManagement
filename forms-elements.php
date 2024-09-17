@@ -55,9 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -214,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </ul>
       </li><!-- End System Nav -->
 
-
+      <hr class="sidebar-divider">
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
@@ -263,6 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </nav>
     </div><!-- End Page Title -->
 
+  
     <section class="section">
       <div class="row">
         <div class="col-lg-6">
@@ -325,65 +323,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <div class="col-lg-6">
 
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title">Additional Informations</h5>
-    
-    <!-- Advanced Form Elements -->
-    <form id="form2" method="post" action="forms-elements.php">
-    <div class="row mb-3">
-        <label for="date" class="col-sm-2 col-form-label">Date</label>
-        <div class="col-sm-10">
-          <input type="date" class="form-control" id="date" name="date" required>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <label for="time" class="col-sm-2 col-form-label">Time</label>
-        <div class="col-sm-10">
-          <input type="time" class="form-control" id="time" name="time" required>
-        </div>
-      </div>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Additional Informations</h5>
+                
+                <!-- Advanced Form Elements -->
+                <form id="form2" method="post" action="forms-elements.php">
+                <div class="row mb-3">
+                    <label for="date" class="col-sm-2 col-form-label">Date</label>
+                    <div class="col-sm-10">
+                      <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="time" class="col-sm-2 col-form-label">Time</label>
+                    <div class="col-sm-10">
+                      <input type="time" class="form-control" id="time" name="time" required>
+                    </div>
+                  </div>
 
-      <div class="row mb-3">
-          <label for="condition" class="col-sm-2 col-form-label">Condition</label>
-          <div class="col-sm-10">
-          <select class="form-select" style="border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border: 1px solid black;" id="condition" name="condition" aria-label="Select Condition" required>  
-              <option selected disabled>Open this select menu</option>
-              <option value="fever">Fever</option>
-              <option value="cough">Cough</option>
-              <option value="headache">Headache</option>
-              <option value="stomachache">Stomach Ache</option>
-              <option value="injury">Injury</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
+                  <div class="row mb-3">
+                      <label for="condition" class="col-sm-2 col-form-label">Condition</label>
+                      <div class="col-sm-10">
+                      <select class="form-select" style="border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border: 1px solid black;" id="condition" name="condition" aria-label="Select Condition" required>  
+                          <option selected disabled>Open this select menu</option>
+                          <option value="fever">Fever</option>
+                          <option value="cough">Cough</option>
+                          <option value="headache">Headache</option>
+                          <option value="stomachache">Stomach Ache</option>
+                          <option value="injury">Injury</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
 
-        <div class="row mb-3">
-          <label for="note" class="col-sm-2 col-form-label">Note</label>
-            <div class="col-sm-10">
-              <textarea class="form-control" style="height: 100px" id="note" name="note" placeholder="Enter Recommendations" required></textarea>
-            </div>
-      </div>
+                    <div class="row mb-3">
+                      <label for="note" class="col-sm-2 col-form-label">Note</label>
+                        <div class="col-sm-10">
+                          <textarea class="form-control" style="height: 100px" id="note" name="note" placeholder="Enter Recommendations" required></textarea>
+                        </div>
+                  </div>
 
-      <div class="row mb-3">
-        <label class="col-sm-2 col-form-label"></label>
-        <div class="col-sm-10">
-          <button id="submitBtn" type="submit" class="btn btn-primary">Submit Form</button>
+                  <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label"></label>
+                    <div class="col-sm-10">
+                      <button id="submitBtn" type="submit" class="btn btn-primary">Submit Form</button>
+                            </div>
+                          </div>
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </form>
-            
+              </section>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-</div>
-</div>
-</div>
-</div>
-</section>
+    </section>
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
@@ -410,6 +408,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var dateInput = document.getElementById('date');
+    
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = String(today.getMonth() + 1).padStart(2, '0');  
+    var day = String(today.getDate()).padStart(2, '0');
+
+    var todayDate = year + '-' + month + '-' + day;
+    dateInput.setAttribute('min', todayDate);
+  });
+
+  document.getElementById('age').addEventListener('input', function() {
+    var ageInput = document.getElementById('age');
+    var ageValue = ageInput.value;
+    }
+  );
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Set the minimum date for the date input
+    var dateInput = document.getElementById('date');
+    var today = new Date();
+    var year = today.getFullYear();
+    var month = String(today.getMonth() + 1).padStart(2, '0');  
+    var day = String(today.getDate()).padStart(2, '0');
+    var todayDate = year + '-' + month + '-' + day;
+    dateInput.setAttribute('min', todayDate);
+});
+
+document.getElementById('submitBtn').addEventListener('click', function(event) {
+    event.preventDefault(); 
+
+    var form1 = document.getElementById('form1');
+    var form2 = document.getElementById('form2');
+
+    // Function to check if all inputs in a form are filled
+    function areAllInputsFilled(form) {
+        for (var i = 0; i < form.elements.length; i++) {
+            var element = form.elements[i];
+            if (element.tagName === 'INPUT' && element.type !== 'button' && !element.value) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Validate both forms
+    if (!areAllInputsFilled(form1) || !areAllInputsFilled(form2)) {
+        alert('Please fill all the fields in both forms.');
+        return;
+    }
+
+    var combinedData = new FormData();
+
+    // Append data from form1
+    for (var i = 0; i < form1.elements.length; i++) {
+        var element = form1.elements[i];
+        if (element.name) {
+            combinedData.append(element.name, element.value);
+        }
+    }
+
+    // Append data from form2
+    for (var i = 0; i < form2.elements.length; i++) {
+        var element = form2.elements[i];
+        if (element.name) {
+            combinedData.append(element.name, element.value);
+        }
+    }
+
+    fetch('forms-elements.php', {
+        method: 'POST',
+        body: combinedData
+    })
+    .then(response => response.text())
+    .then(result => {
+        alert('Forms submitted successfully!');
+        window.location.href = 'forms-elements.php'; // Redirect after successful submission
+    })
+    .catch(error => alert('An error occurred: ' + error));
+});
+
+
+
+</script>
+
 
 </body>
 
