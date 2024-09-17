@@ -161,10 +161,6 @@ session_start()
 
       <hr class="sidebar-divider">
      
-
-
-      <hr class="sidebar-divider">
-
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
