@@ -8,7 +8,7 @@
 
 .datatable-top,
 .datatable-bottom {
-	padding: 8px 10px;
+	padding: 3px 5px;
 }
 
 .datatable-top > nav:first-child,
@@ -26,15 +26,15 @@
 }
 
 .datatable-selector {
-	padding: 6px;
+	padding: 3px;
 }
 
 .datatable-input {
-	padding: 6px 12px;
+	padding: 3px 9px;
 }
 
 .datatable-info {
-	margin: 7px 0;
+	margin: 4px 0;
 }
 
 /* PAGER */
@@ -49,7 +49,7 @@
 }
 
 .datatable-pagination li.datatable-hidden {
-    visibility: hidden;
+	visibility: hidden;
 }
 
 .datatable-pagination a,
@@ -61,7 +61,7 @@
 	position: relative;
 	text-decoration: none;
 	color: #333;
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .datatable-pagination a:hover,
@@ -87,8 +87,8 @@
 .datatable-pagination .datatable-disabled button,
 .datatable-pagination .datatable-disabled button:focus,
 .datatable-pagination .datatable-disabled button:hover {
-    pointer-events: none;
-    cursor: default;
+	pointer-events: none;
+	cursor: default;
 }
 
 .datatable-pagination .datatable-disabled a,
@@ -109,7 +109,7 @@
 /* TABLE */
 .datatable-table {
 	max-width: 100%;
-	width: 100%;
+	width: 1000%;
 	border-spacing: 0;
 	border-collapse: separate;
 }
@@ -121,7 +121,7 @@
 .datatable-table > thead > tr > td,
 .datatable-table > thead > tr > th {
 	vertical-align: top;
-	padding: 8px 10px;
+	padding: 3px 5px;
 }
 
 .datatable-table > thead > tr > th {
@@ -148,13 +148,13 @@
 
 .datatable-table th button,
 .datatable-pagination-list button {
-    color: inherit;
-    border: 0;
-    background-color: inherit;
-    cursor: pointer;
-    text-align: inherit;
-    font-weight: inherit;
-    font-size: inherit;
+	color: inherit;
+	border: 0;
+	background-color: inherit;
+	cursor: pointer;
+	text-align: inherit;
+	font-weight: inherit;
+	font-size: inherit;
 }
 
 .datatable-sorter, .datatable-filter {
@@ -196,21 +196,21 @@
 }
 
 .datatable-filter::before {
-    content: "";
-    position: absolute;
-    right: 4px;
-    opacity: 0.2;
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
+	content: "";
+	position: absolute;
+	right: 4px;
+	opacity: 0.2;
+	width: 0;
+	height: 0;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
 	border-radius: 50%;
-    border-top: 10px solid #000;
-    top: 25%;
+	border-top: 10px solid #000;
+	top: 25%;
 }
 
 .datatable-filter-active .datatable-filter::before {
-    opacity: 0.6;
+	opacity: 0.6;
 }
 
 .datatable-empty {
@@ -229,5 +229,5 @@ table.datatable-table:focus tr.datatable-cursor > td:first-child {
 
 table.datatable-table:focus {
 	outline: solid 1px black;
-    outline-offset: -1px;
+	outline-offset: -1px;
 }

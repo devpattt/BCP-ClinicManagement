@@ -1,3 +1,60 @@
+
+<?php
+session_start();
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$servername = "localhost";
+$username = "root"; 
+$password = ""; 
+$dbname = "bcpclinic_db";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['accountId']) && isset($_POST['password'])) {
+        $accountId = $conn->real_escape_string($_POST['accountId']);
+        $password = $conn->real_escape_string($_POST['password']);
+
+        // Check admin credentials
+        $sql = "SELECT * FROM head_db WHERE `accountID` = '$accountId' AND `password` = '$password'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $_SESSION['accountId'] = $accountId;
+            $_SESSION['role'] = 'admin'; // Set role to admin
+            header("Location: admin.php");
+            exit();
+        }
+
+        // Check nurse credentials
+        $sql = "SELECT * FROM nurse_db WHERE `accountID` = '$accountId' AND `password` = '$password'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $_SESSION['accountId'] = $accountId;
+            $_SESSION['role'] = 'nurse'; // Set role to nurse
+            header("Location: index.php");
+            exit();
+        }
+
+        $error = "Invalid Account ID or Password";
+    } else {
+        $error = "Please enter both Account ID and Password";
+    }
+}
+
+$conn->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -53,22 +110,23 @@
 
                   <div class="pt-4 pb-2">
                     <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
-                    <p class="text-center small">Enter your username & password to login</p>
+                    <p class="text-center small">Enter your Account ID & Password to login</p>
                   </div>
+                  
 
-                  <form class="row g-3 needs-validation" novalidate>
+                  <form id="loginForm" action="pages-login.php" method="post">
 
                     <div class="col-12">
-                      <label for="yourUsername" class="form-label">Username</label>
+                      <label for="accountId" class="form-label">Account ID</label>
                       <div class="input-group has-validation">
-                        <input type="text" name="username" class="form-control" id="yourUsername" required>
+                        <input type="text" name="username" class="form-control" id="accountId" required>
                         <div class="invalid-feedback">Please enter your username.</div>
                       </div>
                     </div>
 
                     <div class="col-12">
-                      <label for="yourPassword" class="form-label">Password</label>
-                      <input type="password" name="password" class="form-control" id="yourPassword" required>
+                      <label for="password" class="form-label">Password</label>
+                      <input type="password" name="password" class="form-control" id="password" required>
                       <div class="invalid-feedback">Please enter your password!</div>
                     </div>
 
