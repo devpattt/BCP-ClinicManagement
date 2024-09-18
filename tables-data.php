@@ -37,8 +37,8 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
+            <img src="assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
+            <span class="d-none d-md-block dropdown-toggle ps-2">Patrick Nobleza</span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -108,14 +108,14 @@
 
       <div style="display: flex; flex-direction: column; align-items: center; padding: 16px;">
         <div style="display: flex; align-items: center; justify-content: center; width: 96px; height: 96px; border-radius: 50%; background-color: #334155; color: #e2e8f0; font-size: 48px; font-weight: bold; text-transform: uppercase; line-height: 1;">
-            LC
+            PN
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 24px; text-align: center;">
             <div style="font-weight: 500; color: #fff;">
-                Name
+                Nobleza, Patrck F.
             </div>
             <div style="margin-top: 4px; font-size: 14px; color: #fff;">
-                ID
+                21015518
             </div>
         </div>
     </div>
@@ -210,26 +210,6 @@
     <section class="section">
       <div class="row">
         <div class="col-lg-12">
-
-        <!--  <div class="datatable-wrapper datatable-loading no-footer sortable searchable fixed-columns">
-          <div class="datatable-top">
-            <div class="datatable-dropdown">
-          <label>
-                  <select class="datatable-selector" name="per-page">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="15">15</option>
-                    <option value="-1">All</option>
-                </select>
-            " entries per page "
-               </label>
-            </div>
-          </div>
-
-        <div class="datatable-search">
-          <input class="datatable-input" placeholder="Search..." type="search" name="search" title="Search within table">
-         </div>
-        </div> -->
 
         <table class="datatable table table-bordered border-primary">
               <thead>
