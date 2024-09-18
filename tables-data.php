@@ -25,7 +25,7 @@
     <div class="d-flex align-items-center justify-content-between">
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div>
-    <nav class="header-nav ms-auto">
+    < class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
 
         <li class="nav-item dropdown pe-3">
@@ -81,11 +81,10 @@
               </a>
             </li>
 
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
+          </ul>
+        </li>
       </ul>
-    </nav><!-- End Icons Navigation -->
+    </nav>
 
   </header><!-- End Header -->
 
