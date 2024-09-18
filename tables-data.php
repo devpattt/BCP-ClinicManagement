@@ -85,8 +85,7 @@
         </li>
       </ul>
     </nav>
-
-  </header><!-- End Header -->
+  </header>
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
