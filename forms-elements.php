@@ -183,33 +183,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
-
       <hr class="sidebar-divider">
 
-      <li class="nav-heading">Clinic Management System</li>
+        <li class="nav-heading">Clinic Management System</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-        <li>
-            <a href="clinic-dashboard.php">
-              <i class="bi bi-circle"></i><span>Dashboard</span>
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-layout-text-window-reverse"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="forms-elements.php" class="active">
-              <i class="bi bi-circle"></i><span>Add Records</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.php">
-              <i class="bi bi-circle"></i><span>Patient Records</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End System Nav -->
+              <a href="clinic-dashboard.php">
+                <i class="bi bi-circle" ></i><span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="forms-elements.php" class="active">
+                <i class="bi bi-circle"></i><span>Add Records</span>
+              </a>
+            </li>
+            <li>
+              <a href="tables-data.php">
+                <i class="bi bi-circle"></i><span>Patient Records</span>
+              </a>
+            </li>
+            <li>
+              <a href="pages-blank.php">
+                <i class="bi bi-circle" ></i><span>Medical Suppies</span>
+              </a>
+            </li>
+            <li>
+              <a href="pages-blank.php">
+                <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+              </a>
+            </li>
+            <li>
+          </ul>
+        </li>
+
 
       <hr class="sidebar-divider">
       <li class="nav-heading">Pages</li>
