@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link " href="index.html">
+        <a class="nav-link " href="blankindex.php">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </a>
             </li>
             <li>
-              <a href="pages-blank.php">
+              <a href="blankanomaly.php">
                 <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
               </a>
             </li>
@@ -222,39 +222,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </li>
 
 
-      <hr class="sidebar-divider">
-      <li class="nav-heading">Pages</li>
+        <hr class="sidebar-divider">
+     
+     <li class="nav-heading">Pages</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
+     <li class="nav-item">
+       <a class="nav-link collapsed" href="users-profile.html">
+         <i class="bi bi-person"></i>
+         <span>Profile</span>
+       </a>
+     </li><!-- End Profile Page Nav -->
 
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-card-list"></i>
-          <span>Register</span>
-        </a>
-      </li><!-- End Register Page Nav -->
+     <li class="nav-item">
+       <a class="nav-link collapsed" href="head-register.php">
+         <i class="bi bi-card-list"></i>
+         <span>Head Register</span>
+       </a>
+     </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+     <li class="nav-item">
+       <a class="nav-link collapsed" href="nurse-register.php">
+         <i class="bi bi-card-list"></i>
+         <span>Nurse Register</span>
+       </a>
+     </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-blank.html">
-          <i class="bi bi-file-earmark"></i>
-          <span>Blank</span>
-        </a>
-      </li><!-- End Blank Page Nav -->
+     <li class="nav-item">
+       <a class="nav-link collapsed" href="pages-login.php">
+         <i class="bi bi-box-arrow-in-right"></i>
+         <span>Login</span>
+       </a>
+     </li>
 
-    </ul>
+  
+     <li class="nav-item">
+       <a class="nav-link collapsed" href="pages-blank.html">
+         <i class="bi bi-file-earmark"></i>
+         <span>Blank</span>
+       </a>
+     </li><!-- End Blank Page Nav -->
+
+   </ul>
+
 
   </aside><!-- End Sidebar-->
 
