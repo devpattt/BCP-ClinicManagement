@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows > 0) {
             $_SESSION['accountId'] = $accountId;
-            $_SESSION['role'] = 'admin'; // Set role to admin
-            header("Location: admin.php");
+            $_SESSION['role'] = 'admin'; 
+            header("Location: blankindex.php");
             exit();
         }
 
@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows > 0) {
             $_SESSION['accountId'] = $accountId;
-            $_SESSION['role'] = 'nurse'; // Set role to nurse
-            header("Location: index.php");
+            $_SESSION['role'] = 'nurse'; 
+            header("Location: blankindex.php");
             exit();
         }
 
@@ -59,7 +59,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Login page for PrecisionCare Hospital's Clinic Management System.">
+    <meta name="description" content="Clinic Management System.">
     <title>Login - CMS</title>
 </head>
 <style>
