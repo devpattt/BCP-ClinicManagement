@@ -2,7 +2,6 @@
 session_start()
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +45,7 @@ session_start()
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
+              <h6>Admin</h6>
               <span>Web Designer</span>
             </li>
             <li>
@@ -126,7 +125,7 @@ session_start()
     <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link " href="index.html">
+        <a class="nav-link " href="blankindex.php">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -138,7 +137,7 @@ session_start()
 
         <li class="nav-item">
           <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-layout-text-window-reverse"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+            <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
           </a>
           <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
           <li>
@@ -162,7 +161,7 @@ session_start()
               </a>
             </li>
             <li>
-                <a href="pages-blank.php">
+                <a href="blankanomaly.php">
                   <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
                 </a>
               </li>
@@ -183,9 +182,16 @@ session_start()
 
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
+        <a class="nav-link collapsed" href="head-register.php">
           <i class="bi bi-card-list"></i>
-          <span>Register</span>
+          <span>Head Register</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="nurse-register.php">
+          <i class="bi bi-card-list"></i>
+          <span>Nurse Register</span>
         </a>
       </li>
 
@@ -485,17 +491,6 @@ session_start()
     </section>
 
   </main><!-- End #main -->
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
-    <div class="copyright">
-      &copy; Copyright <strong><span>XXXXXX</span></strong>. All Rights Reserved
-    </div>
-    <div class="credits">
-      BCP
-    </div>
-  </footer><!-- End Footer -->
-
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
