@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ssss", $fullname, $email, $accountId, $hashedPassword);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Admin account created successfully!'); window.location.href='heads-register.php';</script>";
+        echo "<script>alert('Admin account created successfully!'); window.location.href='head-register.php';</script>";
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -323,4 +323,4 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 </body>
-</html>
+</html>  
