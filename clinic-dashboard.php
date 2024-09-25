@@ -165,6 +165,11 @@ session_start()
                   <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
                 </a>
               </li>
+              <li>
+                <a href="">
+                  <i class="bi bi-circle" ></i><span>Account Monitor</span>
+                </a>
+              </li>
           </ul>
         </li>
         
