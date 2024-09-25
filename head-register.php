@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ssss", $fullname, $email, $accountId, $hashedPassword);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Admin account created successfully!'); window.location.href='head-register.php';</script>";
+        echo "<script>alert('Registration success!'); window.location.href='head-register.php';</script>";
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -108,58 +108,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   </div>
 
                   <form class="row g-3 needs-validation" novalidate id="registrationForm" method="POST">
-                    <div class="col-12">
-                      <label for="fullname" class="form-label">Fullname</label>
-                      <input type="text" name="fullname" class="form-control" id="fullname" required>
-                      <div class="invalid-feedback">Please, enter a name!</div>
-                    </div>
-
-                    <div class="col-12">
-                      <label for="email" class="form-label">Email</label>
-                      <input type="email" name="email" class="form-control" id="email" required>
-                      <div class="invalid-feedback">Please enter a valid email address!</div>
-                    </div>
-
-                    <div class="col-12">
-                      <label for="AccountId" class="form-label">AccountId</label>
-                      <input type="text" name="AccountId" class="form-control" id="AccountId" required>
-                      <div class="invalid-feedback">Account ID must be exactly 6 digits!</div>
-                    </div>
-
-                    <div class="col-12">
-                      <label for="password" class="form-label">Password</label>
-                      <div class="input-group">
-                        <input type="password" name="password" class="form-control" id="password" required>
-                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                          <i class="fa fa-eye"></i>
-                        </button>
+                      <div class="col-12">
+                        <label for="fullname" class="form-label">Fullname</label>
+                        <input type="text" name="fullname" class="form-control" id="fullname" required>
+                        <div class="invalid-feedback">Please, enter a name!</div>
                       </div>
-                      <div class="invalid-feedback" id="password-error">Password must contain at least 8 characters, one uppercase letter, and one special character!</div>
-                    </div>
 
-                    <div class="col-12">
-                      <label for="cpassword" class="form-label">Confirm password</label>
-                      <div class="input-group">
-                        <input type="password" name="cpassword" class="form-control" id="cpassword" required>
-                        <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
-                          <i class="fa fa-eye"></i>
-                        </button>
+                      <div class="col-12">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" id="email" required oninput="checkEmail()">
+                        <div id="emailError" class="invalid-feedback"></div>
                       </div>
-                      <div class="invalid-feedback" id="confirm-password-error">Passwords do not match!</div>
-                    </div>
 
-                    <div class="col-12">
-                      <div class="form-check">
-                        <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
-                        <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
-                        <div class="invalid-feedback">You must agree before submitting.</div>
+                      <div class="col-12">
+                        <label for="AccountId" class="form-label">AccountId</label>
+                        <input type="text" name="AccountId" class="form-control" id="AccountId" required oninput="checkAccountId()">
+                        <div id="accountIdError" class="invalid-feedback"></div>
                       </div>
-                    </div>
 
-                    <div class="col-12">
-                      <button class="btn btn-primary w-100" type="button" id="submitBtn">Create Account</button>
-                    </div>
-                  </form>
+                      <div class="col-12">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                          <input type="password" name="password" class="form-control" id="password" required>
+                          <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                            <i class="fa fa-eye"></i>
+                          </button>
+                        </div>
+                        <div class="invalid-feedback" id="password-error">Password must contain at least 8 characters, one uppercase letter, and one special character!</div>
+                      </div>
+
+                      <div class="col-12">
+                        <label for="cpassword" class="form-label">Confirm password</label>
+                        <div class="input-group">
+                          <input type="password" name="cpassword" class="form-control" id="cpassword" required>
+                          <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                            <i class="fa fa-eye"></i>
+                          </button>
+                        </div>
+                        <div class="invalid-feedback" id="confirm-password-error">Passwords do not match!</div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="form-check">
+                          <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
+                          <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
+                          <div class="invalid-feedback">You must agree before submitting.</div>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <button class="btn btn-primary w-100" type="button" id="submitBtn">Create Account</button>
+                      </div>
+                    </form>
                 </div>
               </div>
             </div>
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
     var form = document.getElementById("registrationForm");
 
     // Validate on input
@@ -234,20 +234,28 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Check if passwords match
-    function checkPasswordMatch() {
-        var password = document.getElementById("password").value;
-        var confirmPassword = document.getElementById("cpassword").value;
-        var errorDiv = document.getElementById("confirm-password-error");
+        function checkPasswordMatch() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("cpassword").value;
+            var errorDiv = document.getElementById("confirm-password-error");
 
-        if (password !== confirmPassword) {
-            document.getElementById("cpassword").classList.add("is-invalid");
-            errorDiv.textContent = "Passwords do not match!";
-            errorDiv.style.display = 'block';
-        } else {
-            document.getElementById("cpassword").classList.remove("is-invalid");
-            errorDiv.style.display = 'none';
+            // Check if password field is valid before checking match
+            if (password && confirmPassword) {
+                if (password !== confirmPassword) {
+                    document.getElementById("cpassword").classList.add("is-invalid");
+                    errorDiv.textContent = "Passwords do not match!";
+                    errorDiv.style.display = 'block';
+                } else {
+                    document.getElementById("cpassword").classList.remove("is-invalid");
+                    errorDiv.style.display = 'none';
+                }
+            } else {
+                // If password or confirmPassword is empty, clear error
+                document.getElementById("cpassword").classList.remove("is-invalid");
+                errorDiv.style.display = 'none';
+            }
         }
-    }
+
 
     // Validate the password format
     function validatePassword() {
@@ -320,6 +328,66 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
+
+function checkEmail() {
+    const email = document.getElementById('email').value;
+    const emailError = document.getElementById('emailError');
+
+    if (email) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'assets/validation/check_email.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function() {
+            if (this.status === 200) {
+                const response = JSON.parse(this.responseText);
+                if (response.exists) {
+                    emailError.textContent = 'Email is already registered! Please use a different one.';
+                    emailError.classList.add('text-danger');
+                    document.getElementById('email').classList.add('is-invalid');
+                } else {
+                    emailError.textContent = '';
+                    document.getElementById('email').classList.remove('is-invalid');
+                }
+            }
+        };
+
+        xhr.send('email=' + encodeURIComponent(email));
+    } else {
+        emailError.textContent = '';
+        document.getElementById('email').classList.remove('is-invalid');
+    }
+}
+
+function checkAccountId() {
+    const accountId = document.getElementById('AccountId').value;
+    const accountIdError = document.getElementById('accountIdError');
+
+    if (accountId) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'assets/validation/check_account_id.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        
+        xhr.onload = function() {
+            if (this.status === 200) {
+                const response = JSON.parse(this.responseText);
+                if (response.exists) {
+                    accountIdError.textContent = 'AccountId is already taken!';
+                    accountIdError.classList.add('text-danger');
+                    document.getElementById('AccountId').classList.add('is-invalid');
+                } else {
+                    accountIdError.textContent = '';
+                    document.getElementById('AccountId').classList.remove('is-invalid');
+                }
+            }
+        };
+
+        xhr.send('AccountId=' + encodeURIComponent(accountId));
+    } else {
+        accountIdError.textContent = '';
+        document.getElementById('AccountId').classList.remove('is-invalid');
+    }
+}
 </script>
 
 </body>
