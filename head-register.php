@@ -91,6 +91,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   .modal-content {
     border-radius: 8px;
   }
+
+  .form-control, .form-check-input {
+    border: 1px solid #999797;
+  }
+
+  .form-check-label a {
+      color: black;
+  }
+
+  .logo-img {
+    max-width: 75px; /* Change this value to increase or decrease the logo size */
+    height: auto;     /* Maintain the aspect ratio */
+  }
+
+  .card-title {
+    margin-top: -20px; /* Optional: adjust negative margin to pull the text closer */
+  }
 </style>
 
 <body>
@@ -102,7 +119,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
               <div class="card mb-3">
                 <div class="card-body">
-                  <div class="pt-4 pb-2">
+                  <div class="pt-4 pb-2"> 
+                    
+              <div class="d-flex justify-content-center py-4">
+                <img src="assets/img/bcp logo.png" alt="Logo" class="logo-img">
+              </div>
                     <h5 class="card-title text-center pb-0 fs-4">Health Department Registrations</h5>
                     <p class="text-center small">Please fill all the forms below</p>
                   </div>

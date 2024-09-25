@@ -1,58 +1,9 @@
 
-<?php
-session_start();
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
-$servername = "localhost";
-$username = "root"; 
-$password = ""; 
-$dbname = "bcpclinic_db";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['accountId']) && isset($_POST['password'])) {
-        $accountId = $conn->real_escape_string($_POST['accountId']);
-        $password = $conn->real_escape_string($_POST['password']);
-
-        // Check admin credentials
-        $sql = "SELECT * FROM head_db WHERE `accountID` = '$accountId' AND `password` = '$password'";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            $_SESSION['accountId'] = $accountId;
-            $_SESSION['role'] = 'admin'; 
-            header("Location: blankindex.php");
-            exit();
-        }
-
-        // Check nurse credentials
-        $sql = "SELECT * FROM nurse_db WHERE `accountID` = '$accountId' AND `password` = '$password'";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            $_SESSION['accountId'] = $accountId;
-            $_SESSION['role'] = 'nurse'; 
-            header("Location: blankindex.php");
-            exit();
-        }
-
-        $error = "Invalid Account ID or Password";
-    } else {
-        $error = "Please enter both Account ID and Password";
-    }
-}
-
-$conn->close();
-?>
 
 
 
@@ -87,6 +38,45 @@ $conn->close();
   .form-check-label a {
       color: black;
   }
+
+  .logo-img {
+    max-width: 75px; /* Change this value to increase or decrease the logo size */
+    height: auto;     /* Maintain the aspect ratio */
+  }
+
+  .card-title {
+    margin-top: -60px; /* Optional: adjust negative margin to pull the text closer */
+  }
+
+  .robot-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  }
+
+  .walking-robot {
+    width: 100px; /* Adjust size */
+  }
+
+
+  .robot {
+    font-size: 50px; /* Adjust size for your robot */
+    position: absolute;
+    bottom: 20px;
+    animation: walk 10s infinite linear;
+  }
+
+  @keyframes walk {
+    0% {
+      left: -100px;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
+
+
 </style>
 
 <body>
@@ -97,12 +87,9 @@ $conn->close();
           <div class="row justify-content-center">
             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
-              <div class="d-flex justify-content-center py-4">
-                <a href="blankindex.php" class="logo d-flex align-items-center w-auto">
-                  <img src="https://elc-public-images.s3.ap-southeast-1.amazonaws.com/bcp-olp-logo-mini2.png" alt="Logo">
-                  <span class="d-none d-lg-block">Clinic Management System</span>
-                </a>
-              </div>
+            <div class="d-flex justify-content-center py-4">
+              <img src="assets/img/bcp logo.png" alt="Logo" class="logo-img">
+            </div>
 
               <div class="card mb-3">
                 <div class="card-body">
@@ -151,6 +138,13 @@ $conn->close();
       </section>
     </div>
   </main>
+<!--
+  <div class="robot-container">
+  <video autoplay loop muted class="walking-robot">
+  <source src="assets/img/cute ai.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+  </div> -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
@@ -162,6 +156,21 @@ $conn->close();
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+<script>
+// Set the distance to move to 80% of the viewport width to keep it within frame
+//const moveDistance = window.innerWidth * 0.8; // Move 80% of the viewport width
+//const duration = 8; // Increase duration for a slower movement
+
+//gsap.to(".walking-robot", {
+  //x: moveDistance,
+  //duration: duration,
+  //repeat: -1,
+  //yoyo: true,
+//});
+
+</script>
+
 
 </body>
 </html>
