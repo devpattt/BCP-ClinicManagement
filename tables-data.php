@@ -147,7 +147,7 @@
         </a>
       </li>
       <li>  
-        <a href="pages-blank.php">
+      <a href="medical-supplies.php">
           <i class="bi bi-circle" ></i><span>Medical Supplies</span>
         </a>
       </li>
