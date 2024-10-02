@@ -1,59 +1,38 @@
 <?php
-session_start(); 
+// Include the database connection file
+include 'connection.php'; // Ensure this file contains the database connection code
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bcpclinic_db";
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate and sanitize inputs
+    $fullname = htmlspecialchars(trim($_POST['fullname']));
+    $student_number = htmlspecialchars(trim($_POST['student_number']));
+    $contact = htmlspecialchars(trim($_POST['contact']));
+    $gender = htmlspecialchars(trim($_POST['gender']));
+    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
+    $year_level = htmlspecialchars(trim($_POST['year_level']));
+    $condition = htmlspecialchars(trim($_POST['condition']));
+    $treatment = htmlspecialchars(trim($_POST['treatment']));
+    $note = htmlspecialchars(trim($_POST['note']));
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+    // Prepare the SQL statement
+    $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, gender, age, year_level, conditions, treatment, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssiiisss", $fullname, $student_number, $contact, $gender, $age, $year_level, $condition, $treatment, $note);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullname = $_POST['fullname'] ?? "";
-    $student_number = $_POST['student_number'] ?? "";
-    $contact = $_POST['contact'] ?? "";
-    $gender = $_POST['gender'] ?? "";
-    $age = $_POST['age'] ?? "";
-    $temperature = $_POST['temperature'] ?? "";
-    $date = $_POST['date'] ?? "";
-    $time = $_POST['time'] ?? "";
-    $condition = $_POST['condition'] ?? "";
-    $note = $_POST['note'] ?? "";
-
-    $query = "INSERT INTO patient_info (fullname, student_number, contact, gender, age, temperature, date, time, `condition`, note) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    $stmt = $conn->prepare($query);
-
-    if ($stmt) {
-        $stmt->bind_param('ssssisssss', $fullname, $student_number, $contact, $gender, $age, $temperature, $date, $time, $condition, $note);
-        
-        $stmt->execute();
-
-        if ($stmt->error) {
-            die('Insert Error: ' . $stmt->error);
-        } else {
-            echo 'Form submitted successfully!';
-        }
-
-        $stmt->close();
+    // Execute the statement and check for errors
+    if ($stmt->execute()) {
+        // Success: redirect or display a success message
+        echo '<script>alert("Record inserted successfully."); window.location.href="success_page.php";</script>';
     } else {
-        die('Prepare Error: ' . $conn->error);
+        // Error: display an error message
+        echo '<script>alert("Error: ' . $stmt->error . '");</script>';
     }
 
+    // Close the statement and connection
+    $stmt->close();
     $conn->close();
-
-    header("Location: forms-elements.php");
-    exit();
-} else {
-    echo 'No form submitted!';
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -185,41 +164,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </li><!-- End Dashboard Nav -->
       <hr class="sidebar-divider">
 
-        <li class="nav-heading">Clinic Management System</li>
+                <li class="nav-heading">Clinic Management System</li>
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-layout-text-window-reverse"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-          </a>
-          <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-          <li>
-              <a href="clinic-dashboard.php">
-                <i class="bi bi-circle" ></i><span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="forms-elements.php" class="active">
-                <i class="bi bi-circle"></i><span>Add Records</span>
-              </a>
-            </li>
-            <li>
-              <a href="tables-data.php">
-                <i class="bi bi-circle"></i><span>Patient Records</span>
-              </a>
-            </li>
-            <li>
-              <a href="pages-blank.php">
-                <i class="bi bi-circle" ></i><span>Medical Suppies</span>
-              </a>
-            </li>
-            <li>
-              <a href="blankanomaly.php">
-                <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
-              </a>
-            </li>
-            <li>
-          </ul>
-        </li>
+                <li class="nav-item">
+                  <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+                  </a>
+                  <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+                  <li>
+                      <a href="clinic-dashboard.php">
+                        <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="forms-elements.php" class="active">
+                        <i class="bi bi-circle"></i><span>Patient Registration</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="tables-data.php">
+                        <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+                      </a>
+                    </li>
+                    <li>  
+                      <a href="pages-blank.php">
+                        <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+                      </a>
+                    </li>
+                    <li>
+                        <a href="blankanomaly.php">
+                          <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="">
+                          <i class="bi bi-circle" ></i><span>Accounts Monitoring</span>
+                        </a>
+                      </li>
+                  </ul>
+                </li>
 
 
         <hr class="sidebar-divider">
@@ -283,137 +266,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   
     <section class="section">
-      <div class="row">
-        <div class="col-lg-6">
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Patient Information</h5>
 
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Patient informations</h5>
-
-                <!-- General Form Elements -->
-                <form id="form1" method="post" action="forms-elements.php">
-                  <div class="row mb-3">
-                    <label for="fullname" class="col-sm-2 col-form-label">Fullname</label>
-                    <div class="col-sm-10">
-                      <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Enter Fullname" required>
-                    </div>
-                  </div>
-                  <div class="row mb-3">
-                    <label for="student_number" class="col-sm-2 col-form-label">Student Number</label>
-                    <div class="col-sm-10">
-                      <input type="email" id="student_number" name="student_number" class="form-control" placeholder="Enter Student Number" required>
-                    </div>
-                  </div>
-                  <div class="row mb-3">
-                    <label for="contact" class="col-sm-2 col-form-label">Contact</label>
-                    <div class="col-sm-10">
-                      <input type="email" id="contact"  name="contact" class="form-control" placeholder="Enter Contact" required>
-                    </div>
-                  </div>
-                  <div class="row mb-3">
-                    <label for="gender" class="col-sm-2 col-form-label">Gender</label>
-                    <div class="col-sm-10">
-                      <select class="form-control" id="gender" name="gender" required>
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                        <option value="prefer_not_to_say">Prefer not to say</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="row mb-3">
-                      <label for="age" class="col-sm-2 col-form-label">Age</label>
-                      <div class="col-sm-10">
-                        <input type="number" class="form-control" id="age" name="age" placeholder="Enter Age" min="1" max="100" required>
-                      </div>
-                    </div>
-
-                  <div class="row mb-3">
-                    <label for="temperature" class="col-sm-2 col-form-label">Temp (°C)</label>
-                    <div class="col-sm-10">
-                      <input type="number" class="form-control" id="temperature" name="temperature" placeholder="Enter temperature" step="0.1" min="-50" max="50" required>
-                    </div>
-                  </div>
-
-                </form><!-- End General Form Elements -->
+          <!-- General Form Elements -->
+          <form id="form1" method="post" action="forms-elements.php">
+            <div class="row mb-3">
+              <label for="fullname" class="col-sm-2 col-form-label">Fullname</label>
+              <div class="col-sm-10">
+                <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Enter Fullname" required>
               </div>
             </div>
-          </div>
-
-          <div class="col-lg-6">
-
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Additional Informations</h5>
-                
-                <!-- Advanced Form Elements -->
-                <form id="form2" method="post" action="forms-elements.php">
-                <div class="row mb-3">
-                    <label for="date" class="col-sm-2 col-form-label">Date</label>
-                    <div class="col-sm-10">
-                      <input type="date" class="form-control" id="date" name="date" required>
-                    </div>
-                  </div>
-                  <div class="row mb-3">
-                    <label for="time" class="col-sm-2 col-form-label">Time</label>
-                    <div class="col-sm-10">
-                      <input type="time" class="form-control" id="time" name="time" required>
-                    </div>
-                  </div>
-
-                  <div class="row mb-3">
-                      <label for="condition" class="col-sm-2 col-form-label">Condition</label>
-                      <div class="col-sm-10">
-                      <select class="form-select" style="border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border: 1px solid black;" id="condition" name="condition" aria-label="Select Condition" required>  
-                          <option selected disabled>Open this select menu</option>
-                          <option value="fever">Fever</option>
-                          <option value="cough">Cough</option>
-                          <option value="headache">Headache</option>
-                          <option value="stomachache">Stomach Ache</option>
-                          <option value="injury">Injury</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="row mb-3">
-                      <label for="note" class="col-sm-2 col-form-label">Note</label>
-                        <div class="col-sm-10">
-                          <textarea class="form-control" style="height: 100px" id="note" name="note" placeholder="Enter Recommendations" required></textarea>
-                        </div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label"></label>
-                    <div class="col-sm-10">
-                      <button id="submitBtn" type="submit" class="btn btn-primary">Submit Form</button>
-                            </div>
-                          </div>
-                        </form>
-                        
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
+            <div class="row mb-3">
+              <label for="student_number" class="col-sm-2 col-form-label">Student Number</label>
+              <div class="col-sm-10">
+                <input type="text" id="student_number" name="student_number" class="form-control" placeholder="Enter Student Number" required>
+              </div>
             </div>
-          </div>
+            <div class="row mb-3">
+              <label for="contact" class="col-sm-2 col-form-label">Emergency Contact</label>
+              <div class="col-sm-10">
+                <input type="text" id="contact" name="contact" class="form-control" placeholder="Enter Contact" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="gender" class="col-sm-2 col-form-label">Gender</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="gender" name="gender" required>
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="age" class="col-sm-2 col-form-label">Age</label>
+              <div class="col-sm-10">
+                <input type="number" class="form-control" id="age" name="age" placeholder="Enter Age" min="1" max="100" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="year_level" class="col-sm-2 col-form-label">Year Level</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="year_level" name="year_level" required>
+                  <option value="">Select Year Level</option>
+                  <option value="shs">Senior High School (SHS)</option>
+                  <option value="1st_year">1st Year</option>
+                  <option value="2nd_year">2nd Year</option>
+                  <option value="3rd_year">3rd Year</option>
+                  <option value="4th_year">4th Year</option>
+                </select>
+              </div>
+            </div>
+          </form><!-- End General Form Elements -->
         </div>
       </div>
-    </section>
-  </main><!-- End #main -->
+    </div>
 
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
-    <div class="copyright">
-      &copy; Copyright <strong><span>XXXXXX</span></strong>. All Rights Reserved
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Additional Information</h5>
+
+          <!-- Advanced Form Elements -->
+          <form id="form2" method="post" action="forms-elements.php">
+            <div class="row mb-3">
+              <label for="condition" class="col-sm-2 col-form-label">Condition/Diagnosis</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="condition" name="condition" placeholder="Enter Condition/Diagnosis" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="treatment" class="col-sm-2 col-form-label">Treatment Given</label>
+              <div class="col-sm-10">
+                <input type="text" id="treatment" name="treatment" class="form-control" placeholder="Enter Treatment" required>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="note" class="col-sm-2 col-form-label">Note</label>
+              <div class="col-sm-10">
+                <textarea class="form-control" style="height: 100px" id="note" name="note" placeholder="Enter Recommendations" required></textarea>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label class="col-sm-2 col-form-label"></label>
+              <div class="col-sm-10">
+                <button id="submitBtn" type="submit" class="btn btn-primary">Submit Form</button>
+              </div>
+            </div>
+          </form><!-- End Advanced Form Elements -->
+        </div>
+      </div>
     </div>
-    <div class="credits">
-      BCP
+  </div>
+</section>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Success</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Record inserted successfully.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
     </div>
-  </footer><!-- End Footer -->
+  </div>
+</div>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -462,6 +431,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var todayDate = year + '-' + month + '-' + day;
     dateInput.setAttribute('min', todayDate);
 });
+
 
 document.getElementById('submitBtn').addEventListener('click', function(event) {
     event.preventDefault(); 
