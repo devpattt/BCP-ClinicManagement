@@ -122,40 +122,45 @@
 
       <hr class="sidebar-divider">
 
-      <li class="nav-heading">Clinic Management System</li>
+        <li class="nav-heading">Clinic Management System</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="system-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-        <li>
-            <a href="clinic-dashboard.php">
-              <i class="bi bi-circle" ></i><span>Dashboard</span>
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+            <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="forms-elements.php">
-              <i class="bi bi-circle"></i><span>Add Records</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.php">
-              <i class="bi bi-circle"></i><span>Patient Records</span>
-            </a>
-          </li>
-          <li>
-            <a href="pages-blank.php">
-              <i class="bi bi-circle" ></i><span>Medical Suppies</span>
-            </a>
-          </li>
-          <li>
-              <a href="pages-blank.php">
-                <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+              <a href="clinic-dashboard.php"  class="active">
+                <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
               </a>
             </li>
-        </ul>
-      </li>
+            <li>
+              <a href="forms-elements.php">
+                <i class="bi bi-circle"></i><span>Patient Registration</span>
+              </a>
+            </li>
+            <li>
+              <a href="tables-data.php">
+                <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+              </a>
+            </li>
+            <li>  
+              <a href="pages-blank.php">
+                <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+              </a>
+            </li>
+            <li>
+                <a href="blankanomaly.php">
+                  <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+                </a>
+              </li>
+              <li>
+                <a href="">
+                  <i class="bi bi-circle" ></i><span>Accounts Monitoring</span>
+                </a>
+              </li>
+          </ul>
+        </li>
       
 
      
