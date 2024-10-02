@@ -226,7 +226,7 @@
       <div class="row">
         <div class="col-lg-12">
 
-        <table class="datatable table table-bordered border-primary">
+        <table class="datatable table">
               <thead>
                   <tr>
                     <th scope="col">ID</th>
