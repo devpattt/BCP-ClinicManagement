@@ -142,22 +142,22 @@ session_start()
           <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
           <li>
               <a href="clinic-dashboard.php"  class="active">
-                <i class="bi bi-circle" ></i><span>Dashboard</span>
+                <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
               </a>
             </li>
             <li>
               <a href="forms-elements.php">
-                <i class="bi bi-circle"></i><span>Add Records</span>
+                <i class="bi bi-circle"></i><span>Patient Registration</span>
               </a>
             </li>
             <li>
               <a href="tables-data.php">
-                <i class="bi bi-circle"></i><span>Patient Records</span>
+                <i class="bi bi-circle"></i><span>Patient Medical Records</span>
               </a>
             </li>
-            <li>
+            <li>  
               <a href="pages-blank.php">
-                <i class="bi bi-circle" ></i><span>Medical Suppies</span>
+                <i class="bi bi-circle" ></i><span>Medical Supplies</span>
               </a>
             </li>
             <li>
@@ -167,7 +167,7 @@ session_start()
               </li>
               <li>
                 <a href="">
-                  <i class="bi bi-circle" ></i><span>Account Monitor</span>
+                  <i class="bi bi-circle" ></i><span>Accounts Monitoring</span>
                 </a>
               </li>
           </ul>
