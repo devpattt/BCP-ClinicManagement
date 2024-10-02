@@ -1,34 +1,21 @@
 <?php
+include 'connection.php';
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bcpclinic_db";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Determine the date range
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'today';
 
 switch ($filter) {
     case 'month':
-        $currentSql = "SELECT COUNT(*) as count FROM patient_info WHERE MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE())";
-        $previousSql = "SELECT COUNT(*) as count FROM patient_info WHERE MONTH(date) = MONTH(CURDATE() - INTERVAL 1 MONTH) AND YEAR(date) = YEAR(CURDATE() - INTERVAL 1 MONTH)";
+        $currentSql = "SELECT COUNT(*) as count FROM bcp_sms3_patients WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())";
+        $previousSql = "SELECT COUNT(*) as count FROM bcp_sms3_patients WHERE MONTH(created_at) = MONTH(CURDATE() - INTERVAL 1 MONTH) AND YEAR(created_at) = YEAR(CURDATE() - INTERVAL 1 MONTH)";
         break;
     case 'year':
-        $currentSql = "SELECT COUNT(*) as count FROM patient_info WHERE YEAR(date) = YEAR(CURDATE())";
-        $previousSql = "SELECT COUNT(*) as count FROM patient_info WHERE YEAR(date) = YEAR(CURDATE() - INTERVAL 1 YEAR)";
+        $currentSql = "SELECT COUNT(*) as count FROM bcp_sms3_patients WHERE YEAR(created_at) = YEAR(CURDATE())";
+        $previousSql = "SELECT COUNT(*) as count FROM bcp_sms3_patients WHERE YEAR(created_at) = YEAR(CURDATE() - INTERVAL 1 YEAR)";
         break;
     case 'today':
     default:
-        $currentSql = "SELECT COUNT(*) as count FROM patient_info WHERE DATE(date) = CURDATE()";
-        $previousSql = "SELECT COUNT(*) as count FROM patient_info WHERE DATE(date) = CURDATE() - INTERVAL 1 DAY";
+        $currentSql = "SELECT COUNT(*) as count FROM bcp_sms3_patients WHERE DATE(created_at) = CURDATE()";
+        $previousSql = "SELECT COUNT(*) as count FROM bcp_sms3_patients WHERE DATE(created_at) = CURDATE() - INTERVAL 1 DAY";
         break;
 }
 
@@ -54,10 +41,10 @@ if ($previousCount > 0) {
 
     if ($percentage < 0) {
         $response['percentage'] = abs($response['percentage']);
-        $response['increase'] = 'text-danger'; // Use red for decrease
+        $response['increase'] = 'text-danger'; 
     }
 } else if ($response['count'] > 0) {
-    $response['percentage'] = 100; // If no previous data but current data exists
+    $response['percentage'] = 100; 
 }
 
 $conn->close();
