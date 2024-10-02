@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "bcpclinic_db";
+$dbname = "bcp_sms3_cms";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
