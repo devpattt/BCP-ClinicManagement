@@ -238,7 +238,6 @@
                     <th scope="col">Year level</th> 
                     <th scope="col">Conditions</th>
                     <th scope="col">Treatment</th> 
-                    <th scope="col">Note</th> 
                     <th scope="col">Recorded at</th> 
 
                   </tr>
@@ -257,7 +256,7 @@
                         }
 
                         // Updated SQL query to include both date and time
-                        $sql = "SELECT id, fullname, student_number, contact, gender, age, year_level, conditions, treatment, note, 
+                        $sql = "SELECT id, fullname, student_number, contact, sgender, age, year_level, conditions, treatment, 
                                 DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at 
                                 FROM bcp_sms3_patients";
 
@@ -270,12 +269,11 @@
                                 echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["student_number"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["contact"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["gender"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["sgender"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["age"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["conditions"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["treatment"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["note"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>"; // Use the formatted timestamp here
                                 echo "</tr>";
                             }

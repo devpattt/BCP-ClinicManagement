@@ -8,25 +8,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullname = htmlspecialchars(trim($_POST['fullname']));
     $student_number = htmlspecialchars(trim($_POST['student_number']));
     $contact = htmlspecialchars(trim($_POST['contact']));
-    $gender = htmlspecialchars(trim($_POST['gender']));
+    $sgender = htmlspecialchars(trim($_POST['sgender']));
     $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
     $year_level = htmlspecialchars(trim($_POST['year_level']));
     $condition = htmlspecialchars(trim($_POST['condition']));
     $treatment = htmlspecialchars(trim($_POST['treatment']));
-    $note = htmlspecialchars(trim($_POST['note']));
 
-    // Prepare the SQL statement
-    $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, gender, age, year_level, conditions, treatment, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssiiisss", $fullname, $student_number, $contact, $gender, $age, $year_level, $condition, $treatment, $note);
+   // Prepare the SQL statement
+  $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, sgender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt->bind_param("sssiiisss", $fullname, $student_number, $contact, $sgender, $age, $year_level, $condition, $treatment);
 
+
+  echo "Gender: " . $sgender; // Check if the gender value is captured correctly
+  
     // Execute the statement and check for errors
     if ($stmt->execute()) {
-        // Success: redirect or display a success message
-        echo '<script>alert("Record inserted successfully."); window.location.href="success_page.php";</script>';
-    } else {
-        // Error: display an error message
-        echo '<script>alert("Error: ' . $stmt->error . '");</script>';
-    }
+      echo "Record inserted successfully.";
+  } else {
+      echo "Error inserting record: " . $stmt->error;
+  }
+  
 
     // Close the statement and connection
     $stmt->close();
@@ -293,9 +294,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
             </div>
             <div class="row mb-3">
-              <label for="gender" class="col-sm-2 col-form-label">Gender</label>
+              <label for="sgender" class="col-sm-2 col-form-label">Gender</label>
               <div class="col-sm-10">
-                <select class="form-control" id="gender" name="gender" required>
+                <select class="form-control" id="sgender" name="sgender" required>
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -345,12 +346,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <label for="treatment" class="col-sm-2 col-form-label">Treatment Given</label>
               <div class="col-sm-10">
                 <input type="text" id="treatment" name="treatment" class="form-control" placeholder="Enter Treatment" required>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <label for="note" class="col-sm-2 col-form-label">Note</label>
-              <div class="col-sm-10">
-                <textarea class="form-control" style="height: 100px" id="note" name="note" placeholder="Enter Recommendations" required></textarea>
               </div>
             </div>
             <div class="row mb-3">
