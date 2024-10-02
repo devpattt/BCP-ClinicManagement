@@ -124,40 +124,45 @@
 
       <hr class="sidebar-divider">
 
-      <li class="nav-heading">Clinic Management System</li>
+  <li class="nav-heading">Clinic Management System</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+  <li class="nav-item">
+    <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+      <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+    </a>
+    <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+    <li>
+        <a href="clinic-dashboard.php">
+          <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
         </a>
-        <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-        <li>
-            <a href="clinic-dashboard.php">
-              <i class="bi bi-circle" ></i><span>Dashboard</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-elements.php">
-              <i class="bi bi-circle"></i><span>Add Records</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.php"  class="active">
-              <i class="bi bi-circle"></i><span>Patient Records</span>
-            </a>
-          </li>
-          <li>
-            <a href="pages-blank.php">
-              <i class="bi bi-circle" ></i><span>Medical Suppies</span>
-            </a>
-          </li>
-          <li>
-              <a href="blankanomaly.php">
-                <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
-              </a>
-            </li>
-        </ul>
       </li>
+      <li>
+        <a href="forms-elements.php">
+          <i class="bi bi-circle"></i><span>Patient Registration</span>
+        </a>
+      </li>
+      <li>
+        <a href="tables-data.php" class="active">
+          <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+        </a>
+      </li>
+      <li>  
+        <a href="pages-blank.php">
+          <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+        </a>
+      </li>
+      <li>
+          <a href="blankanomaly.php">
+            <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+          </a>
+        </li>
+        <li>
+          <a href="">
+            <i class="bi bi-circle" ></i><span>Accounts Monitoring</span>
+          </a>
+        </li>
+    </ul>
+  </li>
 
       <hr class="sidebar-divider">
      
@@ -230,49 +235,58 @@
                     <th scope="col">Contact</th>
                     <th scope="col">Gender</th> 
                     <th scope="col">Age</th> 
-                    <th scope="col">Time</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Temperature</th> 
-                    <th scope="col">Condition</th> 
+                    <th scope="col">Year level</th> 
+                    <th scope="col">Conditions</th>
+                    <th scope="col">Treatment</th> 
+                    <th scope="col">Note</th> 
+                    <th scope="col">Recorded at</th> 
+
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                  $servername = "localhost"; 
-                  $username = "root"; 
-                  $password = ""; 
-                  $dbname = "bcpclinic_db"; 
+                        <?php
+                        $servername = "localhost"; 
+                        $username = "root"; 
+                        $password = ""; 
+                        $dbname = "bcp_sms3_cms"; 
 
-                  $conn = new mysqli($servername, $username, $password, $dbname);
+                        $conn = new mysqli($servername, $username, $password, $dbname);
 
-                  if ($conn->connect_error) {
-                      die("Connection failed: " . $conn->connect_error);
-                  }
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
 
-                  $sql = "SELECT id, fullname, student_number, contact, gender, age, time, date, temperature,  `condition` FROM patient_info";
-                  $result = $conn->query($sql);
+                        // Updated SQL query to include both date and time
+                        $sql = "SELECT id, fullname, student_number, contact, gender, age, year_level, conditions, treatment, note, 
+                                DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at 
+                                FROM bcp_sms3_patients";
 
-                  if ($result->num_rows > 0) {
-                      while($row = $result->fetch_assoc()) {
-                          echo "<tr>";
-                          echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["student_number"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["contact"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["gender"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["age"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["time"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["date"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["temperature"]) . "</td>";
-                          echo "<td>" . htmlspecialchars($row["condition"]) . "</td>";
-                          echo "</tr>";
-                      }
-                  } else {
-                      echo "<tr><td colspan='9'>No records found</td></tr>";
-                  }
-                  $conn->close();
-                  ?>
-                </tbody>
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["student_number"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["contact"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["gender"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["age"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["conditions"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["treatment"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["note"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>"; // Use the formatted timestamp here
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='11'>No records found</td></tr>";
+                        }
+                        $conn->close();
+                        ?>
+                      </tbody>
+
+
               </table>  
             </div>
           </div>
