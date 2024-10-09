@@ -256,14 +256,12 @@
                         }
 
                         // Updated SQL query to include both date and time
-                        $sql = "SELECT id, fullname, student_number, contact, s_gender, age, year_level, conditions, treatment, 
-                                DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at 
-                                FROM bcp_sms3_patients";
-
-                        $result = $conn->query($sql);
-
+                        $stmt = $conn->prepare("SELECT id, fullname, student_number, contact, s_gender, age, year_level, conditions, treatment, DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at FROM bcp_sms3_patients");
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        
                         if ($result->num_rows > 0) {
-                            while($row = $result->fetch_assoc()) {
+                            while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
                                 echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
@@ -274,13 +272,14 @@
                                 echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["conditions"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["treatment"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>"; // Use the formatted timestamp here
+                                echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>";
                                 echo "</tr>";
                             }
                         } else {
                             echo "<tr><td colspan='11'>No records found</td></tr>";
                         }
-                        $conn->close();
+                        $stmt->close();
+                        
                         ?>
                       </tbody>
 
