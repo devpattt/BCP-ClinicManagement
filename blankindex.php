@@ -131,7 +131,7 @@
           <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
           <li>
               <a href="clinic-dashboard.php"  class="active">
-                <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
+                <i class="bi bi-circle" ></i><span>Report and Analytics</span>
               </a>
             </li>
             <li>

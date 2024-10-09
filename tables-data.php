@@ -133,7 +133,7 @@
     <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
     <li>
         <a href="clinic-dashboard.php">
-          <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
+          <i class="bi bi-circle" ></i><span>Report and Analytics</span>
         </a>
       </li>
       <li>
@@ -256,7 +256,7 @@
                         }
 
                         // Updated SQL query to include both date and time
-                        $sql = "SELECT id, fullname, student_number, contact, sgender, age, year_level, conditions, treatment, 
+                        $sql = "SELECT id, fullname, student_number, contact, s_gender, age, year_level, conditions, treatment, 
                                 DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at 
                                 FROM bcp_sms3_patients";
 
@@ -269,7 +269,7 @@
                                 echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["student_number"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["contact"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["sgender"]) . "</td>";
+                                echo "<td>" . htmlspecialchars($row["s_gender"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["age"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["conditions"]) . "</td>";

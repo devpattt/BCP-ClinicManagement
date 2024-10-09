@@ -142,7 +142,7 @@ session_start()
           <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
           <li>
               <a href="clinic-dashboard.php"  class="active">
-                <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
+                <i class="bi bi-circle" ></i><span>Report and Analytics</span>
               </a>
             </li>
             <li>
@@ -160,16 +160,16 @@ session_start()
                 <i class="bi bi-circle" ></i><span>Medical Supplies</span>
               </a>
             </li>
-            <li>
-                <a href="blankanomaly.php">
-                  <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
-                </a>
-              </li>
-              <li>
                 <a href="">
                   <i class="bi bi-circle" ></i><span>Accounts Monitoring</span>
                 </a>
               </li>
+              <li>
+                <a href="blankanomaly.php">
+                  <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+                </a>
+              </li>
+              <li></li>
           </ul>
         </li>
         

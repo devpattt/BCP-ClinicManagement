@@ -8,32 +8,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullname = htmlspecialchars(trim($_POST['fullname']));
     $student_number = htmlspecialchars(trim($_POST['student_number']));
     $contact = htmlspecialchars(trim($_POST['contact']));
-    $sgender = htmlspecialchars(trim($_POST['sgender']));
+    $s_gender = htmlspecialchars(trim($_POST['s_gender']));
     $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
     $year_level = htmlspecialchars(trim($_POST['year_level']));
     $condition = htmlspecialchars(trim($_POST['condition']));
     $treatment = htmlspecialchars(trim($_POST['treatment']));
 
-   // Prepare the SQL statement
-  $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, sgender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("sssiiisss", $fullname, $student_number, $contact, $sgender, $age, $year_level, $condition, $treatment);
+    // Check if gender is valid
+    $allowed_genders = ['Male', 'Female', 'Other', 'Prefer_not_to_say'];
+    if (!in_array($s_gender, $allowed_genders)) {
+        die("Invalid gender selected.");
+    }
 
+    // Prepare the SQL statement
+    $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact,s_gender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssissss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
 
-  echo "Gender: " . $sgender; // Check if the gender value is captured correctly
-  
-    // Execute the statement and check for errors
     if ($stmt->execute()) {
-      echo "Record inserted successfully.";
-  } else {
-      echo "Error inserting record: " . $stmt->error;
-  }
-  
+        // Inject JavaScript to show the modal on success
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            });
+        </script>";
+    } else {
+        echo "Error inserting record: " . $stmt->error;
+    }
 
     // Close the statement and connection
     $stmt->close();
     $conn->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,8 +63,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/css/style.css" rel="stylesheet">
+
+
+
 </head>
+
+<style>   
+#validationAlert {
+    display: none; /* Hide by default */
+    position: fixed; /* Fix position to the viewport */
+    top: 90px; /* Space from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust position to center horizontally */
+    max-width: 300px; /* Set a maximum width for the alert */
+    padding: 15px; /* Add some padding for comfort */
+    background-color: #f8d7da; /* Background color for alert */
+    color: #721c24; /* Text color */
+    border: 1px solid #f5c6cb; /* Border for the alert */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 1000; /* Ensure it appears above other content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+}
+#successAlert {
+    display: none; /* Hide by default */
+    position: fixed; /* Fix position to the viewport */
+    top: 90px; /* Space from the top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust position to center horizontally */
+    max-width: 300px; /* Set a maximum width for the alert */
+    padding: 15px; /* Add some padding for comfort */
+    background-color: #4CAF50; /* Background color for alert (green) */
+    color: #FFFFFF; /* Text color (white) */
+    border: 1px solid #4CAF50; /* Border color matches background */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 1000; /* Ensure it appears above other content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+}
+
+ </style>
 <body>
 
   <!-- ======= Header ======= -->
@@ -174,7 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
                   <li>
                       <a href="clinic-dashboard.php">
-                        <i class="bi bi-circle" ></i><span> Clinic Dashboard</span>
+                        <i class="bi bi-circle" ></i><span>Report and Analytics</span>
                       </a>
                     </li>
                     <li>
@@ -294,14 +340,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
             </div>
             <div class="row mb-3">
-              <label for="sgender" class="col-sm-2 col-form-label">Gender</label>
+              <label for="s_gender" class="col-sm-2 col-form-label">Gender</label>
               <div class="col-sm-10">
-                <select class="form-control" id="sgender" name="sgender" required>
+                <select class="form-control" id="s_gender" name="s_gender" required>
                   <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                  <option value="prefer_not_to_say">Prefer not to say</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Prefer_not_to_say">Prefer not to say</option>
                 </select>
               </div>
             </div>
@@ -361,23 +407,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </section>
 
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Success</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Record inserted successfully.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-      </div>
+ <!-- Validation Alert -->
+ <div id="validationAlert" class="alert alert-danger">
+        Please fill all the fields in both forms.
     </div>
-  </div>
+
+<!-- Success Alert -->
+<div id="successAlert" class="alert alert-success" style="display: none;">
+    Forms submitted successfully!
 </div>
+
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -413,20 +452,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   );
 
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Set the minimum date for the date input
+  document.addEventListener('DOMContentLoaded', function() {
+    // Setting the minimum date for the date input
     var dateInput = document.getElementById('date');
-    var today = new Date();
-    var year = today.getFullYear();
-    var month = String(today.getMonth() + 1).padStart(2, '0');  
-    var day = String(today.getDate()).padStart(2, '0');
-    var todayDate = year + '-' + month + '-' + day;
-    dateInput.setAttribute('min', todayDate);
-});
+    if (dateInput) {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = String(today.getMonth() + 1).padStart(2, '0');  
+        var day = String(today.getDate()).padStart(2, '0');
+        var todayDate = year + '-' + month + '-' + day;
+        dateInput.setAttribute('min', todayDate);
+    }
 
+    // Age input validation
+    var ageInput = document.getElementById('age');
+    if (ageInput) {
+        ageInput.addEventListener('input', function() {
+            var ageValue = this.value;
+            // Add further validation if needed
+        });
+    }
+});
 
 document.getElementById('submitBtn').addEventListener('click', function(event) {
     event.preventDefault(); 
@@ -445,9 +491,33 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
         return true;
     }
 
+    // Function to show validation alert
+    function showValidationAlert(message) {
+        const validationAlert = document.getElementById('validationAlert');
+        validationAlert.innerText = message; // Set the alert message
+        validationAlert.style.display = 'block'; // Show the alert
+
+        // Hide the alert after 3 seconds (3000 milliseconds)
+        setTimeout(() => {
+            validationAlert.style.display = 'none'; // Hide the alert
+        }, 3000);
+    }
+
+    // Function to show success alert
+    function showSuccessAlert() {
+        const successAlert = document.getElementById('successAlert');
+        successAlert.style.display = 'block'; // Show the success alert
+
+        // Hide the success alert after 3 seconds (3000 milliseconds)
+        setTimeout(() => {
+            successAlert.style.display = 'none'; // Hide the success alert
+            window.location.href = 'forms-elements.php'; // Redirect after hiding the alert
+        }, 3000);
+    }
+
     // Validate both forms
     if (!areAllInputsFilled(form1) || !areAllInputsFilled(form2)) {
-        alert('Please fill all the fields in both forms.');
+        showValidationAlert('Please fill all the fields in both forms.');
         return;
     }
 
@@ -475,12 +545,10 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
     })
     .then(response => response.text())
     .then(result => {
-        alert('Forms submitted successfully!');
-        window.location.href = 'forms-elements.php'; // Redirect after successful submission
+        showSuccessAlert(); // Show success alert
     })
-    .catch(error => alert('An error occurred: ' + error));
+    .catch(error => showValidationAlert('An error occurred: ' + error)); // Use the alert for error
 });
-
 
 
 </script>
