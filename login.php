@@ -1,63 +1,83 @@
-
 <?php
 session_start();
+include 'connection.php';
+require 'phpmailer/src/PHPMailer.php';
+require 'phpmailer/src/Exception.php';
+require 'phpmailer/src/SMTP.php';
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-$servername = "localhost";
-$username = "root"; 
-$password = ""; 
-$dbname = "bcpclinic_db";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $accountId = $_POST['accountId']; 
+    $password = $_POST['password'];
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+    $sql = "SELECT * FROM bcp_sms3_users WHERE accountId = ?";
+    $stmt = $conn->prepare($sql);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['accountId']) && isset($_POST['password'])) {
-        $accountId = $conn->real_escape_string($_POST['accountId']);
-        $password = $conn->real_escape_string($_POST['password']);
-
-        // Check admin credentials
-        $sql = "SELECT * FROM head_db WHERE `accountID` = '$accountId' AND `password` = '$password'";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            $_SESSION['accountId'] = $accountId;
-            $_SESSION['role'] = 'admin'; 
-            header("Location: blankindex.php");
-            exit();
-        }
-
-        // Check nurse credentials
-        $sql = "SELECT * FROM nurse_db WHERE `accountID` = '$accountId' AND `password` = '$password'";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            $_SESSION['accountId'] = $accountId;
-            $_SESSION['role'] = 'nurse'; 
-            header("Location: blankindex.php");
-            exit();
-        }
-
-        $error = "Invalid Account ID or Password";
-    } else {
-        $error = "Please enter both Account ID and Password";
+    // Check if prepare failed
+    if (!$stmt) {
+        die("SQL Prepare Error: " . $conn->error);
     }
-}
 
-$conn->close();
+    $stmt->bind_param("i", $accountId); // Binding accountId as an integer
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verify password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct
+            $otp = rand(100000, 999999);  // 6-digit OTP
+            $_SESSION['otp'] = $otp;      // Save OTP in session
+            $_SESSION['email'] = $user['Email'];  // Save user email for OTP sending
+
+            // Send OTP via email
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'bcpclinicmanagement@gmail.com';  // Your Gmail email
+                $mail->Password   = 'fvzf ldba jroq xzjf'; // Your app password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
+
+                $mail->setFrom('bcpclinicmanagement@gmail.com', 'Clinic Management System');
+                $mail->addAddress($user['Email']);  // Send OTP to user's email
+
+                // Email content
+                $mail->isHTML(true);
+                $mail->Subject = '2 Factor Authentication';
+                $mail->Body    = 'Your OTP code is <b>' . $otp . '</b>';
+                $mail->AltBody = 'Your OTP code is ' . $otp;
+
+                $mail->send();
+                echo "<script>showModal();</script>"; // Show OTP modal
+            } catch (Exception $e) {
+                echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
+        } else {
+            // Invalid login attempt
+            $error = "Invalid account credentials!";
+        }
+    } else {
+        $error = "Invalid account ID!";
+    }
+
+    // Close statement and connection
+    $stmt->close();
+    $conn->close();
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="assets/img/bcp logo.png" rel="icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Clinic Management System.">
     <title>Login - CMS</title>
@@ -159,6 +179,92 @@ button {
 button:hover {
     background-color: #555;
 }
+
+/* Style for the modal background (dimming effect) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+    justify-content: center; /* Center the modal horizontally */
+    align-items: center; /* Center the modal vertically */
+}
+
+/* Modal content box */
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px; /* Modal width */
+    margin: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s; /* Smooth appear animation */
+    position: relative;
+}
+
+/* Close button in the top-right corner */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #333;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Label and input styles */
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Button styling */
+button {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Animation for smooth appearance */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 </style>
 <body>
     <div class="logo">
@@ -169,9 +275,10 @@ button:hover {
     <div class="login-container">
         <h2>Log Into Your Account</h2>
         <?php if (!empty($error)): ?>
-                <div class="error-message" style="color: red;">
-                    <?= $error ?>
-            <?php endif; ?>
+            <div class="error-message" style="color: red;">
+                <?= $error ?>
+            </div>
+        <?php endif; ?>
         <form id="loginForm" action="login.php" method="post">
             <label for="accountId">Account ID</label>
             <input type="text" id="accountId" name="accountId" required aria-label="Account ID">
@@ -185,8 +292,31 @@ button:hover {
 
             <button type="submit">LOGIN</button>
         </form>
-    </div>
 
-    <script src="js/script.js"></script>
+        <!-- OTP Modal -->
+        <div id="otpModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h2>Enter OTP</h2>
+                <form id="otpForm" action="verify_otp.php" method="post">
+                    <label for="otp">OTP:</label>
+                    <input type="text" id="otp" name="otp" required><br><br>
+                    <button type="submit">Verify OTP</button>
+                </form>
+            </div>
+        </div>
+
+        <script src="js/script.js"></script>
+
+        <script>
+            function showModal() {
+                document.getElementById('otpModal').style.display = 'flex';
+            }
+
+            function closeModal() {
+                document.getElementById('otpModal').style.display = 'none';
+            }
+        </script>
+    </div>
 </body>
-</html>
+</html> 

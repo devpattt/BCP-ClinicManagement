@@ -36,15 +36,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Hash the password for security
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
+    
     // Prepare and execute SQL query using prepared statements to avoid SQL injection
-    $stmt = $conn->prepare("INSERT INTO heads_db (fullname, email, account_id, password) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO bcp_sms3_users (Fname, Email, accountId, password) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $fullname, $email, $accountId, $hashedPassword);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Registration success!'); window.location.href='head-register.php';</script>";
-    } else {
-        echo "Error: " . $stmt->error;
+        // Only echo the script to trigger the modal if the execution was successful
+        echo "<script>
+                window.onload = function() {
+                    var modal = new bootstrap.Modal(document.getElementById('successModal'));
+                    modal.show();
+                };
+              </script>";
     }
 
     // Close the statement and connection
@@ -54,16 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Clinic Management System</title>
-  <link href="assets/img/bcp_logo.png" rel="icon">
+  <link href="assets/img/bcp logo.png" rel="icon">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/css/style.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
 </head>
 
 <style> 
@@ -209,7 +216,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </main>
 
+<!-- Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Registration Success</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Your registration was successful!
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="window.location.href='head-register.php';" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
     var form = document.getElementById("registrationForm");
@@ -409,6 +438,21 @@ function checkAccountId() {
         document.getElementById('AccountId').classList.remove('is-invalid');
     }
 }
+
+let emailTimer, accountIdTimer;
+document.getElementById('email').addEventListener('input', function() {
+    clearTimeout(emailTimer);
+    emailTimer = setTimeout(checkEmail, 500); // Trigger after 500ms of inactivity
+});
+
+document.getElementById('AccountId').addEventListener('input', function() {
+    clearTimeout(accountIdTimer);
+    accountIdTimer = setTimeout(checkAccountId, 500); // Trigger after 500ms of inactivity
+});
+
+
+
+
 </script>
 
 </body>

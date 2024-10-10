@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 09, 2024 at 11:43 AM
+-- Generation Time: Oct 10, 2024 at 11:59 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,19 @@ SET time_zone = "+00:00";
 --
 -- Database: `bcp_sms3_cms`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bcp_sms3_admin`
+--
+
+CREATE TABLE `bcp_sms3_admin` (
+  `id` int(25) NOT NULL,
+  `accountId` int(25) NOT NULL,
+  `email` varchar(25) NOT NULL,
+  `password` varchar(25) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -76,6 +89,31 @@ CREATE TABLE `bcp_sms3_supplies` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `bcp_sms3_users`
+--
+
+CREATE TABLE `bcp_sms3_users` (
+  `ID` int(11) NOT NULL,
+  `Fname` varchar(25) NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `accountId` int(6) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bcp_sms3_users`
+--
+
+INSERT INTO `bcp_sms3_users` (`ID`, `Fname`, `Email`, `accountId`, `password`) VALUES
+(15, 'Doc Jane Ann Hernandez', 'patsandesu@gmail.com', 666666, '$2y$10$pSLsFEuf'),
+(16, 'Doc Jane Ann Hernandez', 'patsandesu@gmail.com', 666666, '$2y$10$6kYKq/PE'),
+(17, 'Doc Jane Ann Hernandez', 'patsandesu@gmail.com', 555555, '$2y$10$wWN0k19z'),
+(18, 'Jobert Ken', 'patsandesu@gmail.com', 888888, '$2y$10$CwCDp9mg'),
+(19, 'Doc Jane Ann Hernandez', 'patsandesu@gmail.com', 123456, '$2y$10$0VJBKHAxN..WwWwGAxtk5OgYCI1z0tabBneDzs8n5s6NUs8FQJQkq');
+
+-- --------------------------------------------------------
+
+--
 -- Stand-in structure for view `patient_view`
 -- (See below for the actual view)
 --
@@ -96,6 +134,12 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 
 --
+-- Indexes for table `bcp_sms3_admin`
+--
+ALTER TABLE `bcp_sms3_admin`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `bcp_sms3_patients`
 --
 ALTER TABLE `bcp_sms3_patients`
@@ -108,8 +152,20 @@ ALTER TABLE `bcp_sms3_supplies`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `bcp_sms3_users`
+--
+ALTER TABLE `bcp_sms3_users`
+  ADD PRIMARY KEY (`ID`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `bcp_sms3_admin`
+--
+ALTER TABLE `bcp_sms3_admin`
+  MODIFY `id` int(25) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bcp_sms3_patients`
@@ -122,6 +178,12 @@ ALTER TABLE `bcp_sms3_patients`
 --
 ALTER TABLE `bcp_sms3_supplies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `bcp_sms3_users`
+--
+ALTER TABLE `bcp_sms3_users`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
