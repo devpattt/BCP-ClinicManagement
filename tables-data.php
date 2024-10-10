@@ -254,8 +254,6 @@
                         if ($conn->connect_error) {
                             die("Connection failed: " . $conn->connect_error);
                         }
-
-                        // Updated SQL query to include both date and time
                         $stmt = $conn->prepare("SELECT id, fullname, student_number, contact, s_gender, age, year_level, conditions, treatment, DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at FROM bcp_sms3_patients");
                         $stmt->execute();
                         $result = $stmt->get_result();
