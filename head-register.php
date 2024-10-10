@@ -3,46 +3,39 @@ session_start();
 include 'connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Sanitize and validate inputs
     $fullname = filter_input(INPUT_POST, 'fullname', FILTER_SANITIZE_STRING);
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $accountId = filter_input(INPUT_POST, 'AccountId', FILTER_SANITIZE_NUMBER_INT);
     $password = $_POST['password'];
     $confirmPassword = $_POST['cpassword'];
 
-    // Check if email is valid
     if (!$email) {
         echo "<script>alert('Invalid email address!');</script>";
         exit;
     }
 
-    // Check if account ID is exactly 6 digits
     if (!preg_match('/^\d{6}$/', $accountId)) {
         echo "<script>alert('Account ID must be exactly 6 digits!');</script>";
         exit;
     }
 
-    // Check if password contains uppercase letters and special characters
     if (!preg_match('/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/', $password)) {
         echo "<script>alert('Password must contain at least 8 characters, one uppercase letter, and one special character!');</script>";
         exit;
     }
 
-    // Check if passwords match
     if ($password !== $confirmPassword) {
         echo "<script>alert('Passwords do not match!');</script>";
         exit;
     }
 
-    // Hash the password for security
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    
+
     // Prepare and execute SQL query using prepared statements to avoid SQL injection
     $stmt = $conn->prepare("INSERT INTO bcp_sms3_users (Fname, Email, accountId, password) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $fullname, $email, $accountId, $hashedPassword);
 
     if ($stmt->execute()) {
-        // Only echo the script to trigger the modal if the execution was successful
         echo "<script>
                 window.onload = function() {
                     var modal = new bootstrap.Modal(document.getElementById('successModal'));
@@ -51,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </script>";
     }
 
-    // Close the statement and connection
     $stmt->close();
     $conn->close();
 }

@@ -15,59 +15,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "SELECT * FROM bcp_sms3_users WHERE accountId = ?";
     $stmt = $conn->prepare($sql);
 
-    // Check if prepare failed
     if (!$stmt) {
         die("SQL Prepare Error: " . $conn->error);
     }
 
-    $stmt->bind_param("i", $accountId); // Binding accountId as an integer
+    $stmt->bind_param("i", $accountId); 
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // Verify password
         if (password_verify($password, $user['password'])) {
-            // Password is correct
-            $otp = rand(100000, 999999);  // 6-digit OTP
-            $_SESSION['otp'] = $otp;      // Save OTP in session
-            $_SESSION['email'] = $user['Email'];  // Save user email for OTP sending
+           
+            $otp = rand(100000, 999999);  
+            $_SESSION['otp'] = $otp;     
+            $_SESSION['email'] = $user['Email'];  
 
-            // Send OTP via email
             $mail = new PHPMailer(true);
             try {
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'bcpclinicmanagement@gmail.com';  // Your Gmail email
-                $mail->Password   = 'fvzf ldba jroq xzjf'; // Your app password
+                $mail->Username   = 'bcpclinicmanagement@gmail.com'; 
+                $mail->Password   = 'fvzf ldba jroq xzjf'; 
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 
                 $mail->setFrom('bcpclinicmanagement@gmail.com', 'Clinic Management System');
-                $mail->addAddress($user['Email']);  // Send OTP to user's email
+                $mail->addAddress($user['Email']);  
 
-                // Email content
                 $mail->isHTML(true);
                 $mail->Subject = '2 Factor Authentication';
                 $mail->Body    = 'Your OTP code is <b>' . $otp . '</b>';
                 $mail->AltBody = 'Your OTP code is ' . $otp;
 
                 $mail->send();
-                echo "<script>showModal();</script>"; // Show OTP modal
+                echo "<script>showModal();</script>"; 
             } catch (Exception $e) {
                 echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
             }
         } else {
-            // Invalid login attempt
+            
             $error = "Invalid account credentials!";
         }
     } else {
         $error = "Invalid account ID!";
     }
 
-    // Close statement and connection
     $stmt->close();
     $conn->close();
 }
@@ -180,35 +175,34 @@ button:hover {
     background-color: #555;
 }
 
-/* Style for the modal background (dimming effect) */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none; 
+    position: fixed; 
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
-    justify-content: center; /* Center the modal horizontally */
-    align-items: center; /* Center the modal vertically */
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    justify-content: center; 
+    align-items: center;
 }
 
-/* Modal content box */
+
 .modal-content {
     background-color: #fefefe;
     padding: 20px;
     border-radius: 10px;
     width: 100%;
-    max-width: 400px; /* Modal width */
+    max-width: 400px; 
     margin: auto;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    animation: fadeIn 0.3s; /* Smooth appear animation */
+    animation: fadeIn 0.3s; 
     position: relative;
 }
 
-/* Close button in the top-right corner */
+
 .close-btn {
     position: absolute;
     top: 10px;
@@ -226,7 +220,7 @@ button:hover {
     cursor: pointer;
 }
 
-/* Label and input styles */
+
 label {
     display: block;
     margin-bottom: 10px;
@@ -243,7 +237,7 @@ input[type="text"] {
     box-sizing: border-box;
 }
 
-/* Button styling */
+
 button {
     background-color: #333;
     color: white;
@@ -253,7 +247,7 @@ button {
     cursor: pointer;
     width: 100%;
     font-size: 16px;
-}
+}   
 
 button:hover {
     background-color: #555;
