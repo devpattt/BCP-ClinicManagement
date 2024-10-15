@@ -10,6 +10,8 @@ body {
     margin: 0;
 }
 
+
+
 /* Specific Styles for OTP Modal */
 #otpModal {
     display: none; /* Hidden by default */
