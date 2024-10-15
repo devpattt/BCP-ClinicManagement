@@ -1,5 +1,12 @@
 <?php
 session_start();
+
+// Check if user is already logged in
+if (isset($_SESSION['accountId'])) {
+    header("Location: clinic-dashboard.php"); // Redirect to a protected page
+    exit();
+}
+
 include 'connection.php';
 require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/Exception.php';
