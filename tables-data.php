@@ -93,36 +93,13 @@
 
     <ul class="sidebar-nav" id="sidebar-nav">
 
-      <div class="flex items-center w-full p-1 pl-6" style="display: flex; align-items: center; padding: 3px; width: 40px; background-color: transparent; height: 4rem;">
-        <div class="flex items-center justify-center" style="display: flex; align-items: center; justify-content: center;">
-            <img src="https://elc-public-images.s3.ap-southeast-1.amazonaws.com/bcp-olp-logo-mini2.png" alt="Logo" style="width: 30px; height: auto;">
-        </div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; align-items: center; padding: 16px;">
-        <div style="display: flex; align-items: center; justify-content: center; width: 96px; height: 96px; border-radius: 50%; background-color: #334155; color: #e2e8f0; font-size: 48px; font-weight: bold; text-transform: uppercase; line-height: 1;">
-            PN
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 24px; text-align: center;">
-            <div style="font-weight: 500; color: #fff;">
-                Nobleza, Patrck F.
-            </div>
-            <div style="margin-top: 4px; font-size: 14px; color: #fff;">
-                21015518
-            </div>
-        </div>
-    </div>
+     
+    <ul class="sidebar-nav" id="sidebar-nav">
+    <div class="logo-container" style="text-align: center; margin-bottom: 10px;">
+    <img src="assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
+  </div>
 
     <hr class="sidebar-divider">
-
-      <li class="nav-item">
-        <a class="nav-link " href="blankindex.php">
-          <i class="bi bi-grid"></i>
-          <span>Dashboard</span>
-        </a>
-      </li><!-- End Dashboard Nav -->
-
-      <hr class="sidebar-divider">
 
   <li class="nav-heading">Clinic Management System</li>
 
@@ -156,56 +133,11 @@
             <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
           </a>
         </li>
-        <li>
-          <a href="">
-            <i class="bi bi-circle" ></i><span>Accounts Monitoring</span>
-          </a>
-        </li>
     </ul>
   </li>
 
       <hr class="sidebar-divider">
-     
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="head-register.php">
-          <i class="bi bi-card-list"></i>
-          <span>Head Register</span>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="nurse-register.php">
-          <i class="bi bi-card-list"></i>
-          <span>Nurse Register</span>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.php">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li>
-
-   
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-blank.html">
-          <i class="bi bi-file-earmark"></i>
-          <span>Blank</span>
-        </a>
-      </li><!-- End Blank Page Nav -->
-
-    </ul>
+    
 
   </aside><!-- End Sidebar-->
 
@@ -237,7 +169,6 @@
                     <th scope="col">Age</th> 
                     <th scope="col">Year level</th> 
                     <th scope="col">Conditions</th>
-                    <th scope="col">Treatment</th> 
                     <th scope="col">Recorded at</th> 
 
                   </tr>
@@ -269,7 +200,6 @@
                                 echo "<td>" . htmlspecialchars($row["age"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["conditions"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["treatment"]) . "</td>";
                                 echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>";
                                 echo "</tr>";
                             }
