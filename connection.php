@@ -1,8 +1,8 @@
 <?php
 $servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "bcp_sms3_cms";
+$username = "clin_clinicb1";
+$password = "50keHz!cflu9wkwk";
+$dbname = "clin_bcp_sms3";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
