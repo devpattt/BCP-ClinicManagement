@@ -1,5 +1,10 @@
-<? 
-session_start()
+<?php
+session_start(); // Start the session
+
+if (!isset($_SESSION['accountId'])) { // Check if accountId is set in session
+    header("Location: index.php"); // Redirect to index.php if not set
+    exit(); // It's a good practice to call exit after a redirect
+}
 ?>
 
 <!DOCTYPE html>
