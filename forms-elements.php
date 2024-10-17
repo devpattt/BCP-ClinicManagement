@@ -1,5 +1,6 @@
 <?php
-// Include the database connection file
+session_start();
+
 include 'connection.php'; // Ensure this file contains the database connection code
 
 // Check if the form is submitted

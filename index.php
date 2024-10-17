@@ -1,9 +1,7 @@
 <?php
 session_start();
-
-// Check if user is already logged in
 if (isset($_SESSION['accountId'])) {
-    header("Location: clinic-dashboard.php"); // Redirect to a protected page
+    header("Location: clinic-dashboard.php");
     exit();
 }
 
@@ -38,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $user['password'])) {
             // OTP generation
             $otp = rand(100000, 999999);  
+            $_SESSION['accountId'] = $user['accountId'];  // Set accountId in session
             $_SESSION['otp'] = $otp;     
             $_SESSION['email'] = $user['Email'];  
 
@@ -116,26 +115,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <button type="submit">LOGIN</button>
         </form>
-
+        
         <div id="otpModal" class="modal">
             <div class="modal-content" id="otpModalContent">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
                 <h2>Verify Your Account</h2>
                 <p>We emailed you a 6-digit OTP code. Enter the code below to confirm your email address.</p>
+
+                <!-- Display OTP error -->
+                <?php if (!empty($_SESSION['otp_error'])): ?>
+                    <div class="error-message" style="color: red;">
+                        <?= $_SESSION['otp_error']; ?>
+                    </div>
+                    <?php unset($_SESSION['otp_error']); // Clear the error message after displaying ?>
+                <?php endif; ?>
+
                 <form id="otpForm" action="verify_otp.php" method="post">
                     <div class="otp-input">
-                        <input type="text" name="otp1" maxlength="1" oninput="moveToNext(this)">
-                        <input type="text" name="otp2" maxlength="1" oninput="moveToNext(this)">
-                        <input type="text" name="otp3" maxlength="1" oninput="moveToNext(this)">
-                        <input type="text" name="otp4" maxlength="1" oninput="moveToNext(this)">
-                        <input type="text" name="otp5" maxlength="1" oninput="moveToNext(this)">
-                        <input type="text" name="otp6" maxlength="1" oninput="moveToNext(this)">
+                        <input type="text" name="otp1" maxlength="1" oninput="moveToNext(this)" required>
+                        <input type="text" name="otp2" maxlength="1" oninput="moveToNext(this)" required>
+                        <input type="text" name="otp3" maxlength="1" oninput="moveToNext(this)" required>
+                        <input type="text" name="otp4" maxlength="1" oninput="moveToNext(this)" required>
+                        <input type="text" name="otp5" maxlength="1" oninput="moveToNext(this)" required>
+                        <input type="text" name="otp6" maxlength="1" oninput="moveToNext(this)" required>
                     </div>
                     <button type="submit">Verify Now</button>
                 </form>
             </div>
         </div>
-        
+
 
         <script src="js/script.js"></script>
 
@@ -144,6 +152,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php if (isset($_SESSION['otp_sent']) && $_SESSION['otp_sent']): ?>
                     showModal(); 
                     <?php unset($_SESSION['otp_sent']); // Clear the session variable after showing modal ?>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['show_otp_modal']) && $_SESSION['show_otp_modal']): ?>
+                    showModal(); 
+                    <?php unset($_SESSION['show_otp_modal']); // Clear the session variable after showing modal ?>
                 <?php endif; ?>
             };
 
@@ -154,6 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             function closeModal() {
                 document.getElementById('otpModal').style.display = 'none'; // Hide the modal
             }
+
             function moveToNext(input) {
                 if (input.nextElementSibling) {
                     input.nextElementSibling.focus(); // Move focus to the next input

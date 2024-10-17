@@ -1,11 +1,13 @@
 <?php
-session_start(); // Start the session
+session_start();
 
-if (!isset($_SESSION['accountId'])) { // Check if accountId is set in session
-    header("Location: index.php"); // Redirect to index.php if not set
-    exit(); // It's a good practice to call exit after a redirect
+// If the user is not logged in, redirect to the login page
+if (!isset($_SESSION['accountId'])) {
+    header("Location: index.php");
+    exit(); // Always exit after a header redirect to stop further code execution
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +90,7 @@ if (!isset($_SESSION['accountId'])) { // Check if accountId is set in session
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="index.php">
+              <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -151,12 +153,6 @@ if (!isset($_SESSION['accountId'])) { // Check if accountId is set in session
               <li></li>
           </ul>
         </li>
-        <li class="nav-item">
-        <a class="nav-link collapsed" href="head-register.php">
-          <i class="bi bi-card-list"></i>
-          <span>Head Register</span>
-        </a>
-      </li>
       <hr class="sidebar-divider">
   </aside><!-- End Sidebar-->
 
