@@ -825,6 +825,7 @@ h6 {
 /* Info Cards */
 .dashboard .info-card {
   padding-bottom: 10px;
+  background:#bfbebe;
 }
 
 .dashboard .info-card h6 {
