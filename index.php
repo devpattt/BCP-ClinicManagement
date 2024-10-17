@@ -13,7 +13,7 @@ require 'phpmailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$error = ''; // Initialize error variable
+$error = ''; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $accountId = $_POST['accountId']; 
@@ -34,13 +34,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user['password'])) {
-            // OTP generation
             $otp = rand(100000, 999999);  
             $_SESSION['accountId'] = $user['accountId'];  // Set accountId in session
             $_SESSION['otp'] = $otp;     
             $_SESSION['email'] = $user['Email'];  
 
-            // Sending the OTP via email
             $mail = new PHPMailer(true);
             try {
                 $mail->isSMTP();
