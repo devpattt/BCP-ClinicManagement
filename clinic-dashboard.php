@@ -6,6 +6,8 @@ if (!isset($_SESSION['accountId'])) {
     header("Location: index.php");
     exit(); // Always exit after a header redirect to stop further code execution
 }
+
+include 'fetchfname.php';
 ?>
 
 
@@ -45,15 +47,14 @@ if (!isset($_SESSION['accountId'])) {
 
         <li class="nav-item dropdown pe-3">
 
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-          </a><!-- End Profile Iamge Icon -->
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          <img src="assets/img/tanod.jpg" alt="Profile" class="rounded-circle">
+          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
+      </a><!-- End Profile Image Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Admin</h6>
-              <span>Web Designer</span>
+              <h6>Administrator</h6>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -290,65 +291,59 @@ if (!isset($_SESSION['accountId'])) {
                   </ul>
                 </div>
 
-                <div class="card-body">
-                  <h5 class="card-title">Reports <span>/Today</span></h5>
+    <div class="card-body">
+    <h5 class="card-title">Reports <span>/This Month</span></h5>
 
-                  <!-- Line Chart -->
-                  <div id="reportsChart"></div>
+    <!-- Bar Chart -->
+    <div id="reportsChart"></div>
 
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#reportsChart"), {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('fetch_visits.php') // URL to your PHP file
+                .then(response => response.json())
+                .then(data => {
+                    const categories = data.map(entry => entry.month); // Extracting visit months
+                    const counts = data.map(entry => entry.count); // Extracting visit counts
+
+                    // Create the chart
+                    new ApexCharts(document.querySelector("#reportsChart"), {
                         series: [{
-                          name: 'Name',
-                          data: [31, 40, 28, 51, 42, 82, 56],
-                        }, {
-                          name: 'Name',
-                          data: [11, 32, 45, 32, 34, 52, 41]
-                        }, {
-                          name: 'Name',
-                          data: [15, 11, 32, 18, 9, 24, 11]
+                            name: 'Student Visits',
+                            data: counts // Using counts fetched from the database
                         }],
                         chart: {
-                          height: 350,
-                          type: 'area',
-                          toolbar: {
-                            show: false
-                          },
+                            height: 350,
+                            type: 'bar', // Change the type to 'bar'
+                            toolbar: {
+                                show: false
+                            },
                         },
-                        markers: {
-                          size: 4
-                        },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                        fill: {
-                          type: "gradient",
-                          gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
-                          }
-                        },
+                        colors: ['#4154f1'],
                         dataLabels: {
-                          enabled: false
-                        },
-                        stroke: {
-                          curve: 'smooth',
-                          width: 2
+                            enabled: true
                         },
                         xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+                            categories: categories, // Using visit months as categories
+                            title: {
+                                text: 'Months' // Title for x-axis
+                            },
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Number of Visits' // Title for y-axis
+                            },
                         },
                         tooltip: {
-                          x: {
-                            format: 'dd/MM/yy HH:mm'
-                          },
-                        }
-                      }).render();
-                    });
-                  </script>
-                  <!-- End Line Chart -->
+                            shared: true,
+                            intersect: false,
+                        },
+                    }).render();
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+    <!-- End Bar Chart -->
+</div>
 
                 </div>
 
