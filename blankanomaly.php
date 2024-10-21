@@ -1,7 +1,6 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -154,7 +153,7 @@
           <li class="breadcrumb-item active">Blank</li>
         </ol>
       </nav>
-    </div><!-- End Page Title -->
+    </div>
 
     <section class="section">
       <div class="row">
