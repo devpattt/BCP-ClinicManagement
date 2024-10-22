@@ -86,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     display: none;
   }
 
-  /* Modal styling */
   .modal-content {
     border-radius: 8px;
   }
