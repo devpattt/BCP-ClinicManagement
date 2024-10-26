@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
     // Prepare and execute SQL query using prepared statements to avoid SQL injection
     $stmt = $conn->prepare("INSERT INTO bcp_sms3_users (Fname, Email, accountId, password) VALUES (?, ?, ?, ?)");
