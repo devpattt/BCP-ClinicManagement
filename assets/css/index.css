@@ -1,6 +1,6 @@
 body {
     background-color: #f4f4f4;
-    /*background-image: url('assets/img/bcp\ bg.jpg');*/
+    background-image: url('assets/img/bcp\ bg.jpg');
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
@@ -10,94 +10,90 @@ body {
     margin: 0;
 }
 
-
-
-/* Specific Styles for OTP Modal */
 #otpModal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
-    justify-content: center; /* Center the modal */
-    align-items: center; /* Center the modal */
+    width: 100%; 
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); 
+    justify-content: center; 
+    align-items: center; 
 }
 
 #otpModalContent {
-    background-color: #fff; /* White background */
-    padding: 20px; /* Some padding */
-    border-radius: 10px; /* Rounded corners */
-    width: 90%; /* Responsive width */
-    max-width: 400px; /* Max width */
-    margin: auto; /* Center the modal */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Shadow for depth */
-    position: relative; /* Position relative to allow absolute positioning of close button */
-    animation: fadeIn 0.3s; /* Animation for fade in effect */
+    background-color: #fff; 
+    padding: 20px; 
+    border-radius: 10px;
+    width: 90%; 
+    max-width: 400px; 
+    margin: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
+    position: relative; 
+    animation: fadeIn 0.3s; 
 }
 
 .close-btn {
-    position: absolute; /* Position the close button */
-    top: 15px; /* Distance from the top */
-    right: 20px; /* Distance from the right */
-    color: #999; /* Color of close button */
-    font-size: 22px; /* Font size */
-    font-weight: bold; /* Bold text */
-    cursor: pointer; /* Pointer cursor */
-    transition: color 0.3s; /* Transition for hover effect */
+    position: absolute; 
+    top: 15px;
+    right: 20px; 
+    color: #999; 
+    font-size: 22px;
+    font-weight: bold; 
+    cursor: pointer;
+    transition: color 0.3s;
 }
 
 .close-btn:hover,
 .close-btn:focus {
-    color: #333; /* Change color on hover */
+    color: #333; 
 }
 
 h2 {
-    color: #333; /* Header color */
-    text-align: center; /* Center the header */
+    color: #333; 
+    text-align: center; 
 }
 
 p {
-    text-align: center; /* Center paragraph text */
-    color: #555; /* Paragraph color */
+    text-align: center; 
+    color: #555; 
 }
 
 .otp-input {
-    display: flex; /* Use flex to align inputs */
-    justify-content: space-between; /* Space between inputs */
-    margin: 20px 0; /* Margin above and below */
+    display: flex; 
+    justify-content: space-between; 
+    margin: 20px 0; 
 }
 
 .otp-input input[type="text"] {
-    width: 50px; /* Set a fixed width for each input */
-    height: 50px; /* Set a fixed height */
-    font-size: 24px; /* Larger font for visibility */
-    text-align: center; /* Center text */
-    border: 1px solid #ccc; /* Border */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 50px; 
+    height: 50px; 
+    font-size: 24px; 
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
 }
 
 button {
-    background-color: #333; /* Button background */
-    color: white; /* Button text color */
-    padding: 10px; /* Padding */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor */
-    width: 100%; /* Full width */
-    font-size: 16px; /* Font size */
-    transition: background-color 0.3s; /* Transition for hover effect */
+    background-color: #333; 
+    color: white;
+    padding: 10px; 
+    border: none; 
+    border-radius: 5px;
+    cursor: pointer; 
+    width: 100%; 
+    font-size: 16px; 
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #555; /* Darker background on hover */
+    background-color: #555; 
 }
 
-/* Animation for smooth appearance */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -189,7 +185,7 @@ button:hover {
 }
 
 .modal {
-    display: none; /* keep this */
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -200,7 +196,7 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-    transition: display 0.3s; /* Optional for smooth transition */
+    transition: display 0.3s; 
 }
 
 .modal-content {
@@ -266,7 +262,6 @@ button:hover {
     background-color: #555;
 }
 
-/* Animation for smooth appearance */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }

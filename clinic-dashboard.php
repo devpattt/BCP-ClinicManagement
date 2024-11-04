@@ -1,10 +1,9 @@
 <?php
 session_start();
 
-// If the user is not logged in, redirect to the login page
 if (!isset($_SESSION['accountId'])) {
     header("Location: index.php");
-    exit(); // Always exit after a header redirect to stop further code execution
+    exit(); 
 }
 
 include 'fetchfname.php';
