@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['password'])) {
             $otp = rand(100000, 999999);  
-            $_SESSION['accountId'] = $user['accountId'];  // Set accountId in session
+            $_SESSION['accountId'] = $user['accountId']; 
             $_SESSION['otp'] = $otp;     
             $_SESSION['email'] = $user['Email'];  
 
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'bcpclinicmanagement@gmail.com'; 
-                $mail->Password   = 'fvzf ldba jroq xzjf'; // Your SMTP password
+                $mail->Password   = 'fvzf ldba jroq xzjf'; 
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail->AltBody = 'Your OTP code is ' . $otp;
 
                 if ($mail->send()) {
-                    $_SESSION['otp_sent'] = true; // Set session variable to indicate OTP was sent
+                    $_SESSION['otp_sent'] = true; 
                 } else {
                     $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
                 }
@@ -120,12 +120,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h2>Verify Your Account</h2>
                 <p>We emailed you a 6-digit OTP code. Enter the code below to confirm your email address.</p>
 
-                <!-- Display OTP error -->
                 <?php if (!empty($_SESSION['otp_error'])): ?>
                     <div class="error-message" style="color: red;">
                         <?= $_SESSION['otp_error']; ?>
                     </div>
-                    <?php unset($_SESSION['otp_error']); // Clear the error message after displaying ?>
+                    <?php unset($_SESSION['otp_error']); ?>
                 <?php endif; ?>
 
                 <form id="otpForm" action="verify_otp.php" method="post">
@@ -149,26 +148,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             window.onload = function() {
                 <?php if (isset($_SESSION['otp_sent']) && $_SESSION['otp_sent']): ?>
                     showModal(); 
-                    <?php unset($_SESSION['otp_sent']); // Clear the session variable after showing modal ?>
+                    <?php unset($_SESSION['otp_sent']); ?>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['show_otp_modal']) && $_SESSION['show_otp_modal']): ?>
                     showModal(); 
-                    <?php unset($_SESSION['show_otp_modal']); // Clear the session variable after showing modal ?>
+                    <?php unset($_SESSION['show_otp_modal']);?>
                 <?php endif; ?>
             };
 
             function showModal() {
-                document.getElementById('otpModal').style.display = 'flex'; // Show the modal
+                document.getElementById('otpModal').style.display = 'flex'; 
             }
 
             function closeModal() {
-                document.getElementById('otpModal').style.display = 'none'; // Hide the modal
+                document.getElementById('otpModal').style.display = 'none'; 
             }
 
             function moveToNext(input) {
                 if (input.nextElementSibling) {
-                    input.nextElementSibling.focus(); // Move focus to the next input
+                    input.nextElementSibling.focus(); 
                 }
             }
 
