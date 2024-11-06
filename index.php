@@ -13,10 +13,10 @@ require 'phpmailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$error = ''; 
+$error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $accountId = $_POST['accountId']; 
+    $accountId = $_POST['accountId'];
     $password = $_POST['password'];
 
     $sql = "SELECT * FROM bcp_sms3_users WHERE accountId = ?";
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("SQL Prepare Error: " . $conn->error);
     }
 
-    $stmt->bind_param("i", $accountId); 
+    $stmt->bind_param("i", $accountId);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -34,23 +34,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user['password'])) {
-            $otp = rand(100000, 999999);  
-            $_SESSION['accountId'] = $user['accountId']; 
-            $_SESSION['otp'] = $otp;     
-            $_SESSION['email'] = $user['Email'];  
+            $otp = rand(100000, 999999);
+            $_SESSION['accountId'] = $user['accountId'];
+            $_SESSION['otp'] = $otp;
+            $_SESSION['email'] = $user['Email'];
 
             $mail = new PHPMailer(true);
             try {
                 $mail->isSMTP();
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
-                $mail->Username   = 'bcpclinicmanagement@gmail.com'; 
-                $mail->Password   = 'fvzf ldba jroq xzjf'; 
+                $mail->Username   = 'bcpclinicmanagement@gmail.com';
+                $mail->Password   = 'fvzf ldba jroq xzjf';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
 
                 $mail->setFrom('bcpclinicmanagement@gmail.com', 'Clinic Management System');
-                $mail->addAddress($user['Email']);  
+                $mail->addAddress($user['Email']);
 
                 $mail->isHTML(true);
                 $mail->Subject = '2 Factor Authentication';
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail->AltBody = 'Your OTP code is ' . $otp;
 
                 if ($mail->send()) {
-                    $_SESSION['otp_sent'] = true; 
+                    $_SESSION['otp_sent'] = true;
                 } else {
                     $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
                 }
@@ -90,9 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="logo">
         <img src="assets/img/bcp logo.png" alt="Logo">
-        <p>Clinic Management System</p> 
+        <p>Clinic Management System</p>
     </div>
-    
+
     <div class="login-container">
         <h2>Log Into Your Account</h2>
         <?php if (!empty($error)): ?>
@@ -100,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?= $error ?>
             </div>
         <?php endif; ?>
+        
         <form id="loginForm" action="index.php" method="post">
             <label for="accountId">Account ID</label>
             <input type="text" id="accountId" name="accountId" required aria-label="Account ID">
@@ -113,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <button type="submit">LOGIN</button>
         </form>
-        
+
         <div id="otpModal" class="modal">
             <div class="modal-content" id="otpModalContent">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -141,36 +142,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
 
-
         <script src="js/script.js"></script>
 
         <script>
             window.onload = function() {
                 <?php if (isset($_SESSION['otp_sent']) && $_SESSION['otp_sent']): ?>
-                    showModal(); 
+                    showModal();
                     <?php unset($_SESSION['otp_sent']); ?>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['show_otp_modal']) && $_SESSION['show_otp_modal']): ?>
-                    showModal(); 
-                    <?php unset($_SESSION['show_otp_modal']);?>
+                    showModal();
+                    <?php unset($_SESSION['show_otp_modal']); ?>
                 <?php endif; ?>
             };
 
             function showModal() {
-                document.getElementById('otpModal').style.display = 'flex'; 
+                document.getElementById('otpModal').style.display = 'flex';
             }
 
             function closeModal() {
-                document.getElementById('otpModal').style.display = 'none'; 
+                document.getElementById('otpModal').style.display = 'none';
             }
 
             function moveToNext(input) {
                 if (input.nextElementSibling) {
-                    input.nextElementSibling.focus(); 
+                    input.nextElementSibling.focus();
                 }
             }
-
         </script>
     </div>
 </body>

@@ -1,6 +1,9 @@
 body {
     background-color: #f4f4f4;
-    background-image: url('assets/img/bcp\ bg.jpg');
+    /* background-image: url('../img/AI\ .png');
+    /* background-size: cover; */
+     /*  background-position: center; */
+     /*  background-repeat: no-repeat;*/
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
