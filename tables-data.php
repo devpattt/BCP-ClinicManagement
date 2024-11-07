@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['accountId'])) {
+  header("Location: index.php");
+  exit(); 
+}
+
+include 'connection.php';
+include 'fetchfname.php';
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,14 +45,13 @@
     <li class="nav-item dropdown pe-3">
 
       <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-        <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-        <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-      </a><!-- End Profile Iamge Icon -->
+        <img src="assets/img/tanod.jpg" alt="Profile" class="rounded-circle">
+        <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
+      </a>
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <span>Administrator</span>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -149,8 +160,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Tables</li>
-          <li class="breadcrumb-item active">Data</li>
+          <li class="breadcrumb-item active">Patient Medical Records</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
