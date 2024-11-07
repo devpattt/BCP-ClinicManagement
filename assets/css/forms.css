@@ -1,0 +1,32 @@
+
+#validationAlert {
+    display: none; 
+    position: fixed; 
+    top: 90px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    max-width: 300px; 
+    padding: 15px; 
+    background-color: #f8d7da; 
+    color: #721c24; 
+    border: 1px solid #f5c6cb; 
+    border-radius: 5px; 
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+#successAlert {
+    display: none; 
+    position: fixed; 
+    top: 90px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    max-width: 300px;
+    padding: 15px; 
+    background-color: #4CAF50; 
+    color: #FFFFFF; 
+    border: 1px solid #4CAF50; 
+    border-radius: 5px; 
+    z-index: 1000; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
