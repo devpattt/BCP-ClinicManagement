@@ -1,52 +1,48 @@
 <?php
 session_start();
 
-include 'connection.php';
-
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate and sanitize inputs
-    $fullname = htmlspecialchars(trim($_POST['fullname']));
-    $student_number = htmlspecialchars(trim($_POST['student_number']));
-    $contact = htmlspecialchars(trim($_POST['contact']));
-    $s_gender = htmlspecialchars(trim($_POST['s_gender']));
-    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
-    $year_level = htmlspecialchars(trim($_POST['year_level']));
-    $condition = htmlspecialchars(trim($_POST['condition']));
-    $treatment = htmlspecialchars(trim($_POST['treatment']));
-
-    // Check if gender is valid
-    $allowed_genders = ['Male', 'Female', 'Other', 'Prefer_not_to_say'];
-    if (!in_array($s_gender, $allowed_genders)) {
-        die("Invalid gender selected.");
-    }
-
-    // Prepare the SQL statement
-    $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact,s_gender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssissss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
-
-    if ($stmt->execute()) {
-        // Inject JavaScript to show the modal on success
-        echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                successModal.show();
-            });
-        </script>";
-    } else {
-        echo "Error inserting record: " . $stmt->error;
-    }
-
-    // Close the statement and connection
-    $stmt->close();
-    $conn->close();
+if (!isset($_SESSION['accountId'])) {
+  header("Location: index.php");
+  exit(); 
 }
-?>
 
+include 'connection.php';
+include 'fetchfname.php';
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+          $fullname = htmlspecialchars(trim($_POST['fullname']));
+           $student_number = htmlspecialchars(trim($_POST['student_number']));
+             $contact = htmlspecialchars(trim($_POST['contact']));
+               $s_gender = htmlspecialchars(trim($_POST['s_gender']));
+                 $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
+                   $year_level = htmlspecialchars(trim($_POST['year_level']));
+                     $condition = htmlspecialchars(trim($_POST['condition']));
+                        $treatment = htmlspecialchars(trim($_POST['treatment']));
+                          $allowed_genders = ['Male', 'Female', 'Other', 'Prefer_not_to_say'];
+
+            if (!in_array($s_gender, $allowed_genders)) {
+                die("Invalid gender selected.");
+            }
+              $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact,s_gender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+              $stmt->bind_param("sssissss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
+
+            if ($stmt->execute()) {
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
+                    });
+                </script>";
+            } else {
+                echo "Error inserting record: " . $stmt->error;
+            }
+            $stmt->close();
+            $conn->close();
+        }
+?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -66,52 +62,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/css/style.css" rel="stylesheet">
-
-
-
+  <link href="assets/css/forms.css" rel="stylesheet">
 </head>
-
-<style>   
-#validationAlert {
-    display: none; /* Hide by default */
-    position: fixed; /* Fix position to the viewport */
-    top: 90px; /* Space from the top */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust position to center horizontally */
-    max-width: 300px; /* Set a maximum width for the alert */
-    padding: 15px; /* Add some padding for comfort */
-    background-color: #f8d7da; /* Background color for alert */
-    color: #721c24; /* Text color */
-    border: 1px solid #f5c6cb; /* Border for the alert */
-    border-radius: 5px; /* Rounded corners */
-    z-index: 1000; /* Ensure it appears above other content */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
-}
-#successAlert {
-    display: none; /* Hide by default */
-    position: fixed; /* Fix position to the viewport */
-    top: 90px; /* Space from the top */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust position to center horizontally */
-    max-width: 300px; /* Set a maximum width for the alert */
-    padding: 15px; /* Add some padding for comfort */
-    background-color: #4CAF50; /* Background color for alert (green) */
-    color: #FFFFFF; /* Text color (white) */
-    border: 1px solid #4CAF50; /* Border color matches background */
-    border-radius: 5px; /* Rounded corners */
-    z-index: 1000; /* Ensure it appears above other content */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
-}
-
- </style>
 <body>
-
-  <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
       <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div><!-- End Logo -->
+    </div>
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -119,14 +77,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-          </a><!-- End Profile Iamge Icon -->
+            <img src="assets/img/tanod.jpg" alt="Profile" class="rounded-circle">
+            <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
+          </a>
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
+              <span>Administrator</span>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -168,14 +125,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span>Sign Out</span>
               </a>
             </li>
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
+          </ul>
+        </li>
       </ul>
-    </nav><!-- End Icons Navigation -->
-
-  </header><!-- End Header -->
+    </nav>
+  </header>
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
@@ -240,8 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Forms</li>
-          <li class="breadcrumb-item active">Elements</li>
+          <li class="breadcrumb-item active">Registration Forms</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -252,7 +205,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="col-lg-6">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Patient Information</h5>
+          <h5 class="card-title">Patient Basic Information</h5>
 
           <!-- General Form Elements -->
           <form id="form1" method="post" action="forms-elements.php">
@@ -269,7 +222,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               </div>
             </div>
             <div class="row mb-3">
-              <label for="contact" class="col-sm-2 col-form-label">Emergency Contact</label>
+              <label for="contact" class="col-sm-2 col-form-label">Contact</label>
               <div class="col-sm-10">
                 <input type="text" id="contact" name="contact" class="form-control" placeholder="Enter Contact" required>
               </div>
@@ -313,14 +266,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="col-lg-6">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Additional Information</h5>
+          <h5 class="card-title">Additional Diagnostic Informations</h5>
 
           <!-- Advanced Form Elements -->
           <form id="form2" method="post" action="forms-elements.php">
             <div class="row mb-3">
-              <label for="condition" class="col-sm-2 col-form-label">Condition/Diagnosis</label>
+              <label for="condition" class="col-sm-2 col-form-label">Condition</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="condition" name="condition" placeholder="Enter Condition/Diagnosis" required>
+                <input type="text" class="form-control" id="condition" name="condition" placeholder="Enter Symptoms" required>
               </div>
             </div>
             <div class="row mb-3">
