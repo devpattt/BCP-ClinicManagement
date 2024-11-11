@@ -2,31 +2,24 @@
 include 'connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve and sanitize input
     $name = htmlspecialchars(trim($_POST['name']));
     $description = htmlspecialchars(trim($_POST['description']));
     $quantity = htmlspecialchars(trim($_POST['quantity']));
     $unit = htmlspecialchars(trim($_POST['unit']));
-
-    // Prepare and bind
     $stmt = $conn->prepare("INSERT INTO bcp_sms3_supplies (name, description, quantity, unit) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssis", $name, $description, $quantity, $unit); // Correct the types
+    $stmt->bind_param("ssis", $name, $description, $quantity, $unit);
 
-    // Execute and check for success
-    if ($stmt->execute()) {
-        echo json_encode(['status' => 'success', 'message' => 'Record inserted successfully.']);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Error inserting record: ' . $stmt->error]);
-    }
+      if ($stmt->execute()) {
+          echo json_encode(['status' => 'success', 'message' => 'Record inserted successfully.']);
+      } else {
+          echo json_encode(['status' => 'error', 'message' => 'Error inserting record: ' . $stmt->error]);
+      }
 
     $stmt->close();
     $conn->close();
-    exit; // Make sure to exit after sending a response
+    exit; 
 }
 ?>
-
-<!-- Your HTML form and other content here -->
-
 
 <!DOCTYPE html>
 <html lang="en">
