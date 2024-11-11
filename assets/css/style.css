@@ -43,6 +43,33 @@ h6 {
 }
 
 /*--------------------------------------------------------------
+# Ai Card
+--------------------------------------------------------------*/
+
+.ai-insights-card .insight-list {
+  padding: 0;
+  margin: 0;
+}
+
+.ai-insights-card .insight-item {
+  background-color: #f8d7da;  /* Light red background for alert */
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #721c24;  /* Dark red text color for visibility */
+  border: 1px solid #f5c6cb;  /* Border to match the alert background */
+}
+
+.ai-insights-card .insight-item .alert-icon {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+
+/*--------------------------------------------------------------
 # Page Title
 --------------------------------------------------------------*/
 .pagetitle {
