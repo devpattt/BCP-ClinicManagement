@@ -111,11 +111,6 @@ include 'fetchfname.php';
     <div class="logo-container" style="text-align: center; margin-bottom: 10px;">
     <img src="assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
 </div>
-
-
-      
-
-  
         <hr class="sidebar-divider">
 
         <li class="nav-heading">Clinic Management System</li>
@@ -171,7 +166,7 @@ include 'fetchfname.php';
   <div class="row">
 
     <!-- Full-Width Container for Cards -->
-    <div class="col-lg-12">
+    <div class="col-lg-24">
       <div class="row d-flex justify-content-between">
 
         <!-- Card 1: Patient Today -->
@@ -266,10 +261,94 @@ include 'fetchfname.php';
             </div>
           </div>
         </div>
-
       </div>
     </div>
 </section>
+
+<div class="row">
+  <!-- Medical Supplies Distribution Card -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Medical Supplies Distribution</h5>
+        <!-- Pie Chart Container -->
+        <div id="medicalSuppliesChart"></div>
+      </div>
+    </div>
+  </div>
+
+<!-- AI Insights Card -->
+<div class="col-lg-6">
+  <div class="card ai-insights-card">
+    <div class="card-body">
+      <h5 class="card-title">AI Insights</h5>
+      <div class="insight-list">
+        <!-- Example insights, dynamically populated -->
+        <div class="insight-item">
+          <span class="alert-icon">⚠️</span>
+          <span>This Dashboard is under developement</span>
+        </div>
+        <div class="insight-item">
+          <span class="alert-icon">⚠️</span>
+          <span>This Dashboard is under developement</span>
+        </div>
+        <div class="insight-item">
+          <span class="alert-icon">⚠️</span>
+          <span>This Dashboard is under developement</span>
+        </div>
+        <div class="insight-item">
+          <span class="alert-icon">⚠️</span>
+          <span>This Dashboard is under developement</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- End Customers Card -->
 
@@ -431,6 +510,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateProfileName(); // Call the function to update the profile name on page load
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Sample data for medical supplies
+    const supplyData = [
+        { label: "Bandages", quantity: 120 },
+        { label: "Pain Relievers", quantity: 80 },
+        { label: "Antibiotics", quantity: 50 },
+        { label: "Syringes", quantity: 30 },
+        { label: "Gloves", quantity: 60 }
+    ];
+
+    // Extract labels and quantities
+    const labels = supplyData.map(supply => supply.label);
+    const quantities = supplyData.map(supply => supply.quantity);
+
+    // Create the pie chart
+    new ApexCharts(document.querySelector("#medicalSuppliesChart"), {
+        series: quantities,
+        chart: {
+            type: 'pie',
+            height: 350
+        },
+        labels: labels,
+        colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
+        legend: {
+            position: 'bottom'
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: (val, opts) => opts.w.config.series[opts.seriesIndex]
+        },
+        tooltip: {
+            y: {
+                formatter: (val) => `${val} units`
+            }
+        }
+    }).render();
+});
+
 
   </script>
 
