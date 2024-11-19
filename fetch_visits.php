@@ -6,19 +6,14 @@ $username = "root";
 $password = "";
 $dbname = "bcp_sms3_cms";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Set the start and end date for your range
-$startDate = new DateTime('2024-01-01'); // Start date
-$endDate = new DateTime(); // Current date
-
-// Query to get visit data based on the created_at month
+$startDate = new DateTime('2024-01-01'); 
+$endDate = new DateTime(); 
 $sql = "SELECT DATE_FORMAT(created_at, '%Y-%m') as visit_month, COUNT(*) as visit_count FROM bcp_sms3_patients GROUP BY visit_month ORDER BY visit_month";
 $result = $conn->query($sql);
 
@@ -29,7 +24,6 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Prepare data for all months
 $allMonthsData = [];
 $monthNames = [
     '01' => 'January', '02' => 'February', '03' => 'March',
@@ -41,16 +35,15 @@ $monthNames = [
 for ($date = clone $startDate; $date <= $endDate; $date->modify('+1 month')) {
     $formattedMonth = $date->format('Y-m');
     $year = $date->format('Y');
-    $monthNumber = $date->format('m'); // Get the month number
+    $monthNumber = $date->format('m'); 
 
     $allMonthsData[] = [
-        'month' => $monthNames[$monthNumber] . " $year", // Use month name with the year
-        'count' => isset($visitData[$formattedMonth]) ? $visitData[$formattedMonth] : 0 // Default to 0 if no visits
+        'month' => $monthNames[$monthNumber] . " $year", 
+        'count' => isset($visitData[$formattedMonth]) ? $visitData[$formattedMonth] : 0
     ];
 }
 
 $conn->close();
 
-// Return JSON response
 echo json_encode($allMonthsData);
 ?>
