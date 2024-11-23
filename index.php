@@ -53,9 +53,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail->addAddress($user['Email']);
 
                 $mail->isHTML(true);
-                $mail->Subject = '2 Factor Authentication';
-                $mail->Body    = 'Your OTP code is <b>' . $otp . '</b>';
-                $mail->AltBody = 'Your OTP code is ' . $otp;
+                $mail->Subject = 'Your Secure 2-Factor Authentication (2FA) Code';
+                $mail->Body    = 'Hello,<br><br>Your One-Time Password (OTP) for secure access is: <b style="font-size: 18px; color: #007BFF;">' . $otp . '</b>.<br><br>'
+                               . 'This code is valid for the next 5 minutes. Please do not share it with anyone for your security.<br><br>'
+                               . 'If you did not request this code, please ignore this email or contact support immediately.<br><br>'
+                               . 'Thank you for using our services.<br>'
+                               . '<i>Your Trusted Team</i>';
+                $mail->AltBody = 'Hello, '
+                               . 'Your One-Time Password (OTP) for secure access is: ' . $otp . '. '
+                               . 'This code is valid for the next 5 minutes. Please do not share it with anyone for your security. '
+                               . 'If you did not request this code, please ignore this email or contact support immediately. '
+                               . 'Thank you for using our services. '
+                               . '- Your Trusted Team';
+                
 
                 if ($mail->send()) {
                     $_SESSION['otp_sent'] = true;
