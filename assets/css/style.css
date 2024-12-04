@@ -240,6 +240,11 @@ h6 {
 }
 
 /* Card */
+
+#today-increase, #month-increase, #year-increase {
+  color: rgb(255, 255, 255) !important;
+}
+
 .card {
   margin-bottom: 30px;
   border: none;
@@ -259,12 +264,12 @@ h6 {
   padding: 20px 0 15px 0;
   font-size: 18px;
   font-weight: 500;
-  color: #012970;
+  color: #ffffff;
   font-family: "Inter", sans-serif;
 }
 
 .card-title span {
-  color: #899bbd;
+  color: #ffffff;
   font-size: 14px;
   font-weight: 400;
 }
@@ -848,12 +853,12 @@ h6 {
 /* Info Cards */
 .dashboard .info-card {
   padding-bottom: 10px;
-  background:#bfbebe;
+  background: #1e3a8a;
 }
 
 .dashboard .info-card h6 {
   font-size: 28px;
-  color: #012970;
+  color: #ffffff;
   font-weight: 700;
   margin: 0;
   padding: 0;
@@ -889,7 +894,7 @@ h6 {
 }
 
 .dashboard .activity .activity-item .activite-label {
-  color: #888;
+  color: #ffffff;
   position: relative;
   flex-shrink: 0;
   flex-grow: 0;
