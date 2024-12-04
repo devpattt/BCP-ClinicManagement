@@ -6,8 +6,8 @@ if (!isset($_SESSION['accountId'])) {
   exit(); 
 }
 
-include 'connection.php';
 include 'fetchfname.php';
+include 'connection.php';
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $fullname = htmlspecialchars(trim($_POST['fullname']));
@@ -24,7 +24,7 @@ include 'fetchfname.php';
                 die("Invalid gender selected.");
             }
               $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact,s_gender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-              $stmt->bind_param("sssissss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
+              $stmt->bind_param("ssssssss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
 
             if ($stmt->execute()) {
                 echo "<script>
@@ -288,27 +288,22 @@ include 'fetchfname.php';
                 <button id="submitBtn" type="submit" class="btn btn-primary">Submit Form</button>
               </div>
             </div>
-          </form><!-- End Advanced Form Elements -->
+          </form>
         </div>
       </div>
     </div>
   </div>
 </section>
 
- <!-- Validation Alert -->
  <div id="validationAlert" class="alert alert-danger">
         Please fill all the fields in both forms.
     </div>
-
-<!-- Success Alert -->
 <div id="successAlert" class="alert alert-success" style="display: none;">
     Forms submitted successfully!
 </div>
 
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
@@ -317,8 +312,6 @@ include 'fetchfname.php';
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
   <script>
@@ -341,7 +334,7 @@ include 'fetchfname.php';
   );
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Setting the minimum date for the date input
+
     var dateInput = document.getElementById('date');
     if (dateInput) {
         var today = new Date();
@@ -352,12 +345,10 @@ include 'fetchfname.php';
         dateInput.setAttribute('min', todayDate);
     }
 
-    // Age input validation
     var ageInput = document.getElementById('age');
     if (ageInput) {
         ageInput.addEventListener('input', function() {
             var ageValue = this.value;
-            // Add further validation if needed
         });
     }
 });
@@ -368,7 +359,6 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
     var form1 = document.getElementById('form1');
     var form2 = document.getElementById('form2');
 
-    // Function to check if all inputs in a form are filled
     function areAllInputsFilled(form) {
         for (var i = 0; i < form.elements.length; i++) {
             var element = form.elements[i];
@@ -379,31 +369,25 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
         return true;
     }
 
-    // Function to show validation alert
     function showValidationAlert(message) {
         const validationAlert = document.getElementById('validationAlert');
-        validationAlert.innerText = message; // Set the alert message
-        validationAlert.style.display = 'block'; // Show the alert
+        validationAlert.innerText = message;
+        validationAlert.style.display = 'block'; 
 
-        // Hide the alert after 3 seconds (3000 milliseconds)
         setTimeout(() => {
-            validationAlert.style.display = 'none'; // Hide the alert
+            validationAlert.style.display = 'none'; 
         }, 3000);
     }
 
-    // Function to show success alert
     function showSuccessAlert() {
         const successAlert = document.getElementById('successAlert');
-        successAlert.style.display = 'block'; // Show the success alert
-
-        // Hide the success alert after 3 seconds (3000 milliseconds)
+        successAlert.style.display = 'block'; 
         setTimeout(() => {
-            successAlert.style.display = 'none'; // Hide the success alert
-            window.location.href = 'forms-elements.php'; // Redirect after hiding the alert
+            successAlert.style.display = 'none'; 
+            window.location.href = 'forms-elements.php'; 
         }, 3000);
     }
 
-    // Validate both forms
     if (!areAllInputsFilled(form1) || !areAllInputsFilled(form2)) {
         showValidationAlert('Please fill all the fields in both forms.');
         return;
@@ -411,7 +395,6 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
 
     var combinedData = new FormData();
 
-    // Append data from form1
     for (var i = 0; i < form1.elements.length; i++) {
         var element = form1.elements[i];
         if (element.name) {
@@ -419,7 +402,6 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
         }
     }
 
-    // Append data from form2
     for (var i = 0; i < form2.elements.length; i++) {
         var element = form2.elements[i];
         if (element.name) {
@@ -433,9 +415,9 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
     })
     .then(response => response.text())
     .then(result => {
-        showSuccessAlert(); // Show success alert
+        showSuccessAlert(); 
     })
-    .catch(error => showValidationAlert('An error occurred: ' + error)); // Use the alert for error
+    .catch(error => showValidationAlert('An error occurred: ' + error)); 
 });
 
 
