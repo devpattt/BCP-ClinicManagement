@@ -122,30 +122,34 @@ button:hover {
 .login-container {  
     background-color: white;
     padding: 20px;
-    border-radius: 30px;
+    border-radius: 25px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 300px;
     text-align: center;
-    border: 2px solid #000000;
+    border: 1px solid #000000;
     margin: 0 auto;
 }
 
 h2 {
-    color: #333;
+    color: #000000;
     margin-bottom: 20px;
 }
 
 label {
     display: block;
     text-align: left;
-    color: #333;
+    color: #000000;
     margin: 10px 0 5px;
+}
+
+.text {
+    color: #000000;
 }
 
 #accountId, #password {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin: 3px;
+    margin: 2px;
     border: 1px solid black;
 }
 
@@ -167,7 +171,7 @@ input[type="password"] {
 .forgot-password a {
     color: #000000;
     text-decoration: none;
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .forgot-password a:hover {
