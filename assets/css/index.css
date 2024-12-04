@@ -1,9 +1,5 @@
 body {
     background-color: #f4f4f4;
-    /* background-image: url('../img/AI\ .png');
-    /* background-size: cover; */
-     /*  background-position: center; */
-     /*  background-repeat: no-repeat;*/
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
@@ -11,6 +7,23 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../img/bcp-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(5px); 
+    z-index: -1; 
 }
 
 #otpModal {
@@ -116,7 +129,7 @@ button:hover {
 .logo p {
     margin-top: 10px;
     font-size: 1.2em;
-    color: #333; 
+    color: #ffffff; 
 }
 
 .login-container {  
@@ -246,7 +259,7 @@ button {
     color: white;
     padding: 10px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     width: 100%;
     font-size: 16px;
