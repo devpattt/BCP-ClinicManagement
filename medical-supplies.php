@@ -277,12 +277,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
 </section>
-  </main><!-- End #main -->
+  </main>
 
-  
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
@@ -291,8 +289,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
   <script> 
@@ -305,7 +301,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 const percentage = data.percentage;
                 const increaseClass = data.increase;
                 
-                // Update HTML based on the filter
                 const elementId = filter === 'today' ? 'today' :
                                   filter === 'month' ? 'month' : 'year';
                 
@@ -317,12 +312,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             .catch(error => console.error('Error fetching data:', error));
     }
 
-    // Fetch today's data on page load
     fetchData('today');
     fetchData('month');
     fetchData('year');
 
-    // Add event listener to filter dropdown items
     document.querySelectorAll('.dropdown-menu .dropdown-menu-end .dropdown-menu-arrow').forEach(item => {
         item.addEventListener('click', function(event) {
             event.preventDefault();
@@ -334,7 +327,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 document.addEventListener('DOMContentLoaded', function() {
     function updateProfileName() {
-        fetch('fetch_uname.php') // URL to your PHP script
+        fetch('fetch_uname.php') 
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -344,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const nameSpan = document.getElementById('fname');
                 if (data.fname) {
-                    nameSpan.textContent = data.fname; // Update the span with the fetched name
+                    nameSpan.textContent = data.fname; 
                 } else if (data.error) {
                     console.error('Error from PHP script:', data.error);
                 } else {
@@ -354,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error fetching name:', error));
     }
 
-    updateProfileName(); // Call the function to update the profile name on page load
+    updateProfileName(); 
 });
   </script>
 

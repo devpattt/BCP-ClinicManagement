@@ -39,7 +39,7 @@ include 'fetchfname.php';
 
     <div class="d-flex align-items-center justify-content-between">
       <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div><!-- End Logo -->
+    </div>
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -49,7 +49,7 @@ include 'fetchfname.php';
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
           <img src="assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
           <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
-      </a><!-- End Profile Image Icon -->
+      </a>
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
@@ -95,14 +95,11 @@ include 'fetchfname.php';
                 <span>Sign Out</span>
               </a>
             </li>
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
+          </ul>
+        </li>
       </ul>
-    </nav><!-- End Icons Navigation -->
-
-  </header><!-- End Header -->
+    </nav>
+  </header>
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
@@ -265,46 +262,6 @@ include 'fetchfname.php';
     </div>
 </section>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- End Customers Card -->
 
             <!-- Reports -->
@@ -332,21 +289,21 @@ include 'fetchfname.php';
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            fetch('fetch_visits.php') // URL to your PHP file
+            fetch('fetch_visits.php') 
                 .then(response => response.json())
                 .then(data => {
-                    const categories = data.map(entry => entry.month); // Extracting visit months
-                    const counts = data.map(entry => entry.count); // Extracting visit counts
+                    const categories = data.map(entry => entry.month); 
+                    const counts = data.map(entry => entry.count); 
 
                     // Create the chart
                     new ApexCharts(document.querySelector("#reportsChart"), {
                         series: [{
                             name: 'Student Visits',
-                            data: counts // Using counts fetched from the database
+                            data: counts
                         }],
                         chart: {
                             height: 350,
-                            type: 'bar', // Change the type to 'bar'
+                            type: 'bar', 
                             toolbar: {
                                 show: false
                             },
@@ -356,14 +313,14 @@ include 'fetchfname.php';
                             enabled: true
                         },
                         xaxis: {
-                            categories: categories, // Using visit months as categories
+                            categories: categories, 
                             title: {
-                                text: 'Months' // Title for x-axis
+                                text: 'Months' 
                             },
                         },
                         yaxis: {
                             title: {
-                                text: 'Number of Visits' // Title for y-axis
+                                text: 'Number of Visits' 
                             },
                         },
                         tooltip: {
@@ -375,23 +332,16 @@ include 'fetchfname.php';
                 .catch(error => console.error('Error fetching data:', error));
         });
     </script>
-    <!-- End Bar Chart -->
 </div>
-
                 </div>
-
               </div>
-            </div><!-- End Reports -->
+            </div>
           </div>
-        </div><!-- End Left side columns -->
-        <!-- Right side columns -->
-        
+        </div>  
     </section>
+  </main>
 
-  </main><!-- End #main -->
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
@@ -400,8 +350,6 @@ include 'fetchfname.php';
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 
   <script> 
@@ -414,7 +362,6 @@ include 'fetchfname.php';
                 const percentage = data.percentage;
                 const increaseClass = data.increase;
                 
-                // Update HTML based on the filter
                 const elementId = filter === 'today' ? 'today' :
                                   filter === 'month' ? 'month' : 'year';
                 
@@ -425,13 +372,10 @@ include 'fetchfname.php';
             })
             .catch(error => console.error('Error fetching data:', error));
     }
-
-    // Fetch today's data on page load
     fetchData('today');
     fetchData('month');
     fetchData('year');
 
-    // Add event listener to filter dropdown items
     document.querySelectorAll('.dropdown-menu .dropdown-menu-end .dropdown-menu-arrow').forEach(item => {
         item.addEventListener('click', function(event) {
             event.preventDefault();
@@ -443,7 +387,7 @@ include 'fetchfname.php';
 
 document.addEventListener('DOMContentLoaded', function() {
     function updateProfileName() {
-        fetch('fetch_uname.php') // URL to your PHP script
+        fetch('fetch_uname.php') 
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -453,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const nameSpan = document.getElementById('fname');
                 if (data.fname) {
-                    nameSpan.textContent = data.fname; // Update the span with the fetched name
+                    nameSpan.textContent = data.fname; 
                 } else if (data.error) {
                     console.error('Error from PHP script:', data.error);
                 } else {
@@ -463,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error fetching name:', error));
     }
 
-    updateProfileName(); // Call the function to update the profile name on page load
+    updateProfileName(); 
 });
   </script>
 
