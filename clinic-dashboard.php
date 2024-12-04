@@ -193,7 +193,7 @@ include 'fetchfname.php';
                 <div class="ps-3">
                   <h6 id="today-count"></h6>
                   <span id="today-increase" class="text-success small pt-1 fw-bold">100%</span>
-                  <span class="text-muted small pt-2 ps-1">increase</span>
+                  <span id="today-increase" class="text-muted small pt-2 ps-1">increase</span>
                 </div>
               </div>
             </div>
@@ -224,7 +224,7 @@ include 'fetchfname.php';
                 <div class="ps-3">
                   <h6 id="month-count"></h6>
                   <span id="month-increase" class="text-success small pt-1 fw-bold">100%</span>
-                  <span class="text-muted small pt-2 ps-1">increase</span>
+                  <span id="month-increase" class="text-muted small pt-2 ps-1">increase</span>
                 </div>
               </div>
             </div>
@@ -255,7 +255,7 @@ include 'fetchfname.php';
                 <div class="ps-3">
                   <h6 id="year-count"></h6>
                   <span id="year-increase" class="text-success small pt-1 fw-bold">100%</span>
-                  <span class="text-muted small pt-2 ps-1">increase</span>
+                  <span id="year-increase" class="text-muted small pt-2 ps-1">increase</span>
                 </div>
               </div>
             </div>
