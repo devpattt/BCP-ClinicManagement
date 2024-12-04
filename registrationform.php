@@ -1,53 +1,52 @@
-<?php
+<?php 
 session_start();
+
 include 'connection.php';
+include 'fetchfname.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $fullname = filter_input(INPUT_POST, 'fullname', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    $accountId = filter_input(INPUT_POST, 'AccountId', FILTER_SANITIZE_NUMBER_INT);
-    $password = $_POST['password'];
-    $confirmPassword = $_POST['cpassword'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $fullname = htmlspecialchars(trim($_POST['fullname']));
+    $student_number = htmlspecialchars(trim($_POST['student_number']));
+    $contact = htmlspecialchars(trim($_POST['contact']));
+    $s_gender = htmlspecialchars(trim($_POST['s_gender']));
+    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
+    $year_level = htmlspecialchars(trim($_POST['year_level']));
+    $condition = htmlspecialchars(trim($_POST['condition']));
+    $treatment = htmlspecialchars(trim($_POST['treatment']));
+    
+    $allowed_genders = ['Male', 'Female', 'Other', 'Prefer_not_to_say'];
 
-    if (!$email) {
-        echo "<script>alert('Invalid email address!');</script>";
-        exit;
+    if (!in_array($s_gender, $allowed_genders)) {
+        die("Invalid gender selected.");
     }
 
-    if (!preg_match('/^\d{6}$/', $accountId)) {
-        echo "<script>alert('Account ID must be exactly 6 digits!');</script>";
-        exit;
+    // Check if connection is alive before preparing the statement
+    if (!$conn->ping()) {
+        die("Connection is closed. Please check your database connection.");
     }
 
-    if (!preg_match('/^(?=.*[A-Z])(?=.*[\W_]).{8,}$/', $password)) {
-        echo "<script>alert('Password must contain at least 8 characters, one uppercase letter, and one special character!');</script>";
-        exit;
-    }
-
-    if ($password !== $confirmPassword) {
-        echo "<script>alert('Passwords do not match!');</script>";
-        exit;
-    }
-
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-    // Prepare and execute SQL query using prepared statements to avoid SQL injection
-    $stmt = $conn->prepare("INSERT INTO bcp_sms3_users (Fname, Email, accountId, password) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $fullname, $email, $accountId, $hashedPassword);
+    // Prepare the SQL statement
+    $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, s_gender, age, year_level, conditions, treatment) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssisssss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
 
     if ($stmt->execute()) {
+        // Show success message
         echo "<script>
-                window.onload = function() {
-                    var modal = new bootstrap.Modal(document.getElementById('successModal'));
-                    modal.show();
-                };
+                document.addEventListener('DOMContentLoaded', function() {
+                    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    successModal.show();
+                });
               </script>";
+    } else {
+        echo "Error inserting record: " . $stmt->error;
     }
 
     $stmt->close();
     $conn->close();
 }
 ?>
+
 
 
 
