@@ -56,19 +56,20 @@ body {
 }
 
 h2 {
-    color: #333; 
+    color: #000000; 
     text-align: center; 
 }
 
 p {
     text-align: center; 
-    color: #555; 
+    color: #000000; 
 }
 
 .otp-input {
     display: flex; 
     justify-content: space-between; 
     margin: 20px 0; 
+
 }
 
 .otp-input input[type="text"] {
@@ -76,7 +77,7 @@ p {
     height: 50px; 
     font-size: 24px; 
     text-align: center;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     border-radius: 5px; 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
 }
@@ -104,7 +105,7 @@ button:hover {
 
 .logo {
     text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
 }
 
 .logo img {
@@ -121,11 +122,11 @@ button:hover {
 .login-container {  
     background-color: white;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 300px;
     text-align: center;
-    border: 1px solid #999797;
+    border: 2px solid #000000;
     margin: 0 auto;
 }
 
@@ -144,6 +145,7 @@ label {
 #accountId, #password {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 3px;
     border: 1px solid black;
 }
 
@@ -163,28 +165,13 @@ input[type="password"] {
 }
 
 .forgot-password a {
-    color: #007BFF;
+    color: #000000;
     text-decoration: none;
     font-size: 12px;
 }
 
 .forgot-password a:hover {
-    text-decoration: underline;
-}
-
-button {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    width: 100%;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background-color: #555;
+    text-decoration: none;
 }
 
 .modal {
@@ -251,7 +238,7 @@ input[type="text"] {
 
 
 button {
-    background-color: #333;
+    background-color: #1e3a8a;
     color: white;
     padding: 10px;
     border: none;
@@ -262,7 +249,7 @@ button {
 }   
 
 button:hover {
-    background-color: #555;
+    background-color: #264eba;
 }
 
 @keyframes fadeIn {
