@@ -162,7 +162,7 @@ include 'fetchfname.php';
       </nav>
     </div>
 
-    <section class="section dashboard">
+  <section class="section dashboard">
   <div class="row">
 
     <!-- Full-Width Container for Cards -->
@@ -265,51 +265,6 @@ include 'fetchfname.php';
     </div>
 </section>
 
-<div class="row">
-  <!-- Medical Supplies Distribution Card -->
-  <div class="col-lg-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Medical Supplies Distribution</h5>
-        <!-- Pie Chart Container -->
-        <div id="medicalSuppliesChart"></div>
-      </div>
-    </div>
-  </div>
-
-<!-- AI Insights Card -->
-<div class="col-lg-6">
-  <div class="card ai-insights-card">
-    <div class="card-body">
-      <h5 class="card-title">AI Insights</h5>
-      <div class="insight-list">
-        <!-- Example insights, dynamically populated -->
-        <div class="insight-item">
-          <span class="alert-icon">⚠️</span>
-          <span>This Dashboard is under developement</span>
-        </div>
-        <div class="insight-item">
-          <span class="alert-icon">⚠️</span>
-          <span>This Dashboard is under developement</span>
-        </div>
-        <div class="insight-item">
-          <span class="alert-icon">⚠️</span>
-          <span>This Dashboard is under developement</span>
-        </div>
-        <div class="insight-item">
-          <span class="alert-icon">⚠️</span>
-          <span>This Dashboard is under developement</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
 
 
 
@@ -370,7 +325,7 @@ include 'fetchfname.php';
                 </div>
 
     <div class="card-body">
-    <h5 class="card-title">Reports <span>/This Month</span></h5>
+    <h5 class="card-titles"><span>Monthly Patient Metrics</span></h5>
 
     <!-- Bar Chart -->
     <div id="reportsChart"></div>
@@ -510,46 +465,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateProfileName(); // Call the function to update the profile name on page load
 });
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Sample data for medical supplies
-    const supplyData = [
-        { label: "Bandages", quantity: 120 },
-        { label: "Pain Relievers", quantity: 80 },
-        { label: "Antibiotics", quantity: 50 },
-        { label: "Syringes", quantity: 30 },
-        { label: "Gloves", quantity: 60 }
-    ];
-
-    // Extract labels and quantities
-    const labels = supplyData.map(supply => supply.label);
-    const quantities = supplyData.map(supply => supply.quantity);
-
-    // Create the pie chart
-    new ApexCharts(document.querySelector("#medicalSuppliesChart"), {
-        series: quantities,
-        chart: {
-            type: 'pie',
-            height: 350
-        },
-        labels: labels,
-        colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
-        legend: {
-            position: 'bottom'
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: (val, opts) => opts.w.config.series[opts.seriesIndex]
-        },
-        tooltip: {
-            y: {
-                formatter: (val) => `${val} units`
-            }
-        }
-    }).render();
-});
-
-
   </script>
 
 </body>
