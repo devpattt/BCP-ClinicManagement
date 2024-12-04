@@ -167,143 +167,197 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </ul>
       </li>
 
-      <hr class="sidebar-divider">
+  <hr class="sidebar-divider">
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
-
     <div class="pagetitle">
       <h1>Medical Supplies Management</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="blankindex.php">Home</a></li>
-          <li class="breadcrumb-item active">Medical Supplies</li>
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Medical Supplies Management</li>
         </ol>
       </nav>
-    </div><!-- End Page Title -->
+    </div>
 
-    <section class="section">
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
+  <section class="section dashboard">
+  <div class="row">
+
+    <!-- Full-Width Container for Cards -->
+    <div class="col-lg-24">
+      <div class="row d-flex justify-content-between">
+
+        <!-- Card 1: Patient Today -->
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card info-card sales-card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul>
+            </div>
+
             <div class="card-body">
-              <h5 class="card-title">Manage Medical Supplies</h5>
-
-              <form id="supply-form">
-                <div class="row mb-3">
-                  <label for="name" class="col-sm-2 col-form-label">Supply Name</label>
-                  <div class="col-sm-10">
-                    <input type="text" class="form-control" id="name" required>
-                  </div>
+              <h5 class="card-title">Out of stocks products</h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-exclamation-triangle text-danger"></i>
                 </div>
-
-                <div class="row mb-3">
-                  <label for="description" class="col-sm-2 col-form-label">Description</label>
-                  <div class="col-sm-10">
-                    <textarea class="form-control" id="description" required></textarea>
-                  </div>
+                <div class="ps-3">
+                  <h6 id="today-count"></h6>
                 </div>
-
-                <div class="row mb-3">
-                  <label for="quantity" class="col-sm-2 col-form-label">Quantity</label>
-                  <div class="col-sm-10">
-                    <input type="number" class="form-control" id="quantity" required>
-                  </div>
-                </div>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Add Supply</button>
-                </div>
-              </form>
-
-              <section class="section">
-      <div class="row">
-        <div class="col-lg-12">
-
-        <table class="datatable table">
-              <thead>
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Full Name</th>
-                    <th scope="col">Student Number</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Gender</th> 
-                    <th scope="col">Age</th> 
-                    <th scope="col">Year level</th> 
-                    <th scope="col">Conditions</th>
-                    <th scope="col">Treatment</th> 
-                    <th scope="col">Recorded at</th> 
-
-                  </tr>
-                </thead>
-                <tbody>
-                        <?php
-                        $servername = "localhost"; 
-                        $username = "root"; 
-                        $password = ""; 
-                        $dbname = "bcp_sms3_cms"; 
-
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        if ($conn->connect_error) {
-                            die("Connection failed: " . $conn->connect_error);
-                        }
-
-                        // Updated SQL query to include both date and time
-                        $sql = "SELECT id, fullname, student_number, contact, sgender, age, year_level, conditions, treatment, 
-                                DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at 
-                                FROM bcp_sms3_patients";
-
-                        $result = $conn->query($sql);
-
-                        if ($result->num_rows > 0) {
-                            while($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["student_number"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["contact"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["sgender"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["age"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["conditions"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["treatment"]) . "</td>";
-                                echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>"; // Use the formatted timestamp here
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='11'>No records found</td></tr>";
-                        }
-                        $conn->close();
-                        ?>
-                      </tbody>
-              </table>  
+              </div>
             </div>
           </div>
-
         </div>
-      </div>
-    </section>
-                </table>
+
+        <!-- Card 2: Patient This Month -->
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card info-card revenue-card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title">Products on low stocks</h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-exclamation-triangle text-primary"></i>
+                </div>
+                <div class="ps-3">
+                  <h6 id="month-count"></h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Patient This Year -->
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card info-card customers-card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filter</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">This Month</a></li>
+                <li><a class="dropdown-item" href="#">This Year</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title">Numbers of Products to be arrived</h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-truck text-success"></i>
+                </div>
+                <div class="ps-3">
+                  <h6 id="year-count"></h6>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+</section>
   </main><!-- End #main -->
 
-  <a href="#" class="btn btn-primary btn-floating"><i class="bi bi-plus"></i></a>
+  
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
   <script src="assets/vendor/echarts/echarts.min.js"></script>
-  <script src="assets/vendor/quill/quill.min.js"></script>
+  <script src="assets/vendor/quill/quill.js"></script>
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-  <script>
-   
+
+  <script> 
+ document.addEventListener('DOMContentLoaded', function() {
+    function fetchData(filter) {
+        fetch(`hdfetch.php?filter=${filter}`)
+            .then(response => response.json())
+            .then(data => {
+                const count = data.count;
+                const percentage = data.percentage;
+                const increaseClass = data.increase;
+                
+                // Update HTML based on the filter
+                const elementId = filter === 'today' ? 'today' :
+                                  filter === 'month' ? 'month' : 'year';
+                
+                document.getElementById(`${elementId}-count`).textContent = count;
+                const increaseElement = document.getElementById(`${elementId}-increase`);
+                increaseElement.textContent = `${percentage}%`;
+                increaseElement.className = `${increaseClass} small pt-1 fw-bold`;
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Fetch today's data on page load
+    fetchData('today');
+    fetchData('month');
+    fetchData('year');
+
+    // Add event listener to filter dropdown items
+    document.querySelectorAll('.dropdown-menu .dropdown-menu-end .dropdown-menu-arrow').forEach(item => {
+        item.addEventListener('click', function(event) {
+            event.preventDefault();
+            const filter = this.getAttribute('data-filter');
+            fetchData(filter);
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    function updateProfileName() {
+        fetch('fetch_uname.php') // URL to your PHP script
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const nameSpan = document.getElementById('fname');
+                if (data.fname) {
+                    nameSpan.textContent = data.fname; // Update the span with the fetched name
+                } else if (data.error) {
+                    console.error('Error from PHP script:', data.error);
+                } else {
+                    console.error('Unexpected response format');
+                }
+            })
+            .catch(error => console.error('Error fetching name:', error));
+    }
+
+    updateProfileName(); // Call the function to update the profile name on page load
+});
   </script>
+
 </body>
 
 </html>
