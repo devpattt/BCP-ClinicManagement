@@ -125,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit">LOGIN</button>
         </form>
 
-        <div id="otpModal" class="modal">
+            <div id="otpModal" class="modal">
             <div class="modal-content" id="otpModalContent">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
                 <h2>Verify Your Account</h2>
@@ -140,12 +140,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <form id="otpForm" action="verify_otp.php" method="post">
                     <div class="otp-input">
-                        <input type="text" name="otp1" maxlength="1" oninput="moveToNext(this)" required>
-                        <input type="text" name="otp2" maxlength="1" oninput="moveToNext(this)" required>
-                        <input type="text" name="otp3" maxlength="1" oninput="moveToNext(this)" required>
-                        <input type="text" name="otp4" maxlength="1" oninput="moveToNext(this)" required>
-                        <input type="text" name="otp5" maxlength="1" oninput="moveToNext(this)" required>
-                        <input type="text" name="otp6" maxlength="1" oninput="moveToNext(this)" required>
+                        <input type="text" name="otp1" maxlength="1" oninput="handleInput(this)" onkeydown="handleKeyDown(this, event)" required>
+                        <input type="text" name="otp2" maxlength="1" oninput="handleInput(this)" onkeydown="handleKeyDown(this, event)" required>
+                        <input type="text" name="otp3" maxlength="1" oninput="handleInput(this)" onkeydown="handleKeyDown(this, event)" required>
+                        <input type="text" name="otp4" maxlength="1" oninput="handleInput(this)" onkeydown="handleKeyDown(this, event)" required>
+                        <input type="text" name="otp5" maxlength="1" oninput="handleInput(this)" onkeydown="handleKeyDown(this, event)" required>
+                        <input type="text" name="otp6" maxlength="1" oninput="handleInput(this)" onkeydown="handleKeyDown(this, event)" required>
                     </div>
                     <button type="submit">Verify Now</button>
                 </form>
@@ -155,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <script src="js/script.js"></script>
 
         <script>
-            window.onload = function() {
+            window.onload = function () {
                 <?php if (isset($_SESSION['otp_sent']) && $_SESSION['otp_sent']): ?>
                     showModal();
                     <?php unset($_SESSION['otp_sent']); ?>
@@ -175,12 +175,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById('otpModal').style.display = 'none';
             }
 
-            function moveToNext(input) {
-                if (input.nextElementSibling) {
+            function handleInput(input) {
+                if (input.value.length === 1 && input.nextElementSibling) {
                     input.nextElementSibling.focus();
                 }
             }
+
+            function handleKeyDown(input, event) {
+                if (event.key === 'Backspace') {
+                    if (input.value === '' && input.previousElementSibling) {
+                        input.previousElementSibling.focus();
+                    }
+                }
+                if (!/^[0-9]$/.test(event.key) && event.key !== 'Backspace') {
+                    event.preventDefault(); // Allow only numeric input
+                }
+            }
         </script>
+
     </div>
 </body>
 </html>
