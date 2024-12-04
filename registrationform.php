@@ -20,18 +20,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Invalid gender selected.");
     }
 
-    // Check if connection is alive before preparing the statement
     if (!$conn->ping()) {
         die("Connection is closed. Please check your database connection.");
     }
 
-    // Prepare the SQL statement
     $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, s_gender, age, year_level, conditions, treatment) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssisssss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
 
     if ($stmt->execute()) {
-        // Show success message
         echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     var successModal = new bootstrap.Modal(document.getElementById('successModal'));
@@ -73,12 +70,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     position: absolute;
     color: red;
     font-size: 12px;
-    top: 100%; /* Adjust position relative to the input */
+    top: 100%; 
   }
 
   .form-group {
-    position: relative; /* To contain the error message */
-    margin-bottom: 1.5rem; /* Adjust margin to accommodate messages */
+    position: relative; 
+    margin-bottom: 1.5rem; 
   }
 
   #password-error {
@@ -98,12 +95,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   .logo-img {
-    max-width: 75px; /* Change this value to increase or decrease the logo size */
-    height: auto;     /* Maintain the aspect ratio */
+    max-width: 75px; 
+    height: auto;    
   }
 
   .card-title {
-    margin-top: -20px; /* Optional: adjust negative margin to pull the text closer */
+    margin-top: -20px; 
   }
 </style>
 
@@ -233,14 +230,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     document.addEventListener("DOMContentLoaded", function () {
     var form = document.getElementById("registrationForm");
 
-    // Validate on input
     form.querySelectorAll("input").forEach(function (input) {
         input.addEventListener("input", function () {
             validateField(this);
         });
     });
 
-    // Function to validate fields dynamically
     function validateField(input) {
         var errorDiv = input.nextElementSibling;
         if (input.id === "email") {
@@ -273,13 +268,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         checkPasswordMatch();
     }
 
-    // Check if passwords match
         function checkPasswordMatch() {
             var password = document.getElementById("password").value;
             var confirmPassword = document.getElementById("cpassword").value;
             var errorDiv = document.getElementById("confirm-password-error");
 
-            // Check if password field is valid before checking match
             if (password && confirmPassword) {
                 if (password !== confirmPassword) {
                     document.getElementById("cpassword").classList.add("is-invalid");
@@ -290,14 +283,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     errorDiv.style.display = 'none';
                 }
             } else {
-                // If password or confirmPassword is empty, clear error
                 document.getElementById("cpassword").classList.remove("is-invalid");
                 errorDiv.style.display = 'none';
             }
         }
 
-
-    // Validate the password format
     function validatePassword() {
         var password = document.getElementById("password").value;
         var errorDiv = document.getElementById("password-error");
@@ -313,38 +303,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Validation logic on submit button click
     document.getElementById("submitBtn").addEventListener("click", function () {
         validateForm();
     });
 
-    // Validate the entire form before showing the modal
     function validateForm() {
-        // Ensure HTML5 form validation passes
         if (form.checkValidity()) {
-            // Perform additional password matching check
             validatePassword();
             checkPasswordMatch();
 
-            // If there are no visible errors
             if (!document.querySelector(".is-invalid")) {
-                // If all is valid, show the modal
                 var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'), {});
                 confirmationModal.show();
             } else {
-                form.reportValidity(); // Trigger form errors
+                form.reportValidity(); 
             }
         } else {
-            form.reportValidity(); // Trigger form errors if HTML5 validation fails
+            form.reportValidity();
         }
     }
 
-    // Modal confirm submit logic
+
     document.getElementById("confirmSubmit").addEventListener("click", function () {
-        form.submit(); // Proceed to submit the form once the user confirms
+        form.submit(); 
     });
 
-    // Password toggle visibility logic
     document.getElementById('togglePassword').addEventListener('click', function () {
         togglePasswordVisibility('password', this);
     });
@@ -353,7 +336,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         togglePasswordVisibility('cpassword', this);
     });
 
-    // Function to toggle password visibility
     function togglePasswordVisibility(inputId, toggleButton) {
         const passwordInput = document.getElementById(inputId);
         const icon = toggleButton.querySelector('i');
@@ -432,12 +414,12 @@ function checkAccountId() {
 let emailTimer, accountIdTimer;
 document.getElementById('email').addEventListener('input', function() {
     clearTimeout(emailTimer);
-    emailTimer = setTimeout(checkEmail, 500); // Trigger after 500ms of inactivity
+    emailTimer = setTimeout(checkEmail, 500); 
 });
 
 document.getElementById('AccountId').addEventListener('input', function() {
     clearTimeout(accountIdTimer);
-    accountIdTimer = setTimeout(checkAccountId, 500); // Trigger after 500ms of inactivity
+    accountIdTimer = setTimeout(checkAccountId, 500); 
 });
 
 
