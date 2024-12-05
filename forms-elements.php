@@ -285,7 +285,7 @@ include 'connection.php';
             <div class="row mb-3">
               <label class="col-sm-2 col-form-label"></label>
               <div class="col-sm-10">
-                <button id="submitBtn" type="submit" class="btn btn-primary">Submit Form</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;">Submit Form</button>
               </div>
             </div>
           </form>
