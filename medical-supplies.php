@@ -183,8 +183,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <section class="section dashboard">
   <div class="row">
-
-    <!-- Full-Width Container for Cards -->
     <div class="col-lg-24">
       <div class="row d-flex justify-content-between">
 
@@ -233,7 +231,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div class="card-body">
-              <h5 class="card-title">Products on low stocks</h5>
+              <h5 class="card-title">Supplies on low stocks</h5>
               <div class="d-flex align-items-center">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                 <i class="bi bi-exclamation-triangle text-primary"></i>
@@ -277,10 +275,120 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
 </section>
+
+<div class="container mt-5">
+        <button class="btn btn-primary mb-3" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-toggle="modal" data-bs-target="#addSupplyModal">Add Supply</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Minimum Stock</th>
+                    <th>Date Added</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="supplyTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Add Supply Modal -->
+    <div class="modal fade" id="addSupplyModal" tabindex="-1" aria-labelledby="addSupplyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="addSupplyForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addSupplyModalLabel">Add Supply</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="itemName" class="form-label">Item Name</label>
+                            <input type="text" class="form-control" id="itemName" name="item_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Consumables">Consumables</option>
+                                <option value="Sanitization">Sanitization</option>
+                                <option value="Diagnostics">Diagnostics</option>
+                                <option value="Emergency Supplies">Emergency Supplies</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="minimumStock" class="form-label">Minimum Stock</label>
+                            <input type="number" class="form-control" id="minimumStock" name="minimum_stock" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"  class="btn btn-secondary" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-dismiss="modal">Close</button>
+                        <button type="submit"  class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;">Add Supply</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Supply Modal -->
+    <div class="modal fade" id="updateSupplyModal" tabindex="-1" aria-labelledby="updateSupplyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="updateSupplyForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateSupplyModalLabel">Update Supply</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="updateId" name="id">
+                        <div class="mb-3">
+                            <label for="updateItemName" class="form-label">Item Name</label>
+                            <input type="text" class="form-control" id="updateItemName" name="item_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateCategory" class="form-label">Category</label>
+                            <select class="form-select" id="updateCategory" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Consumables">Consumables</option>
+                                <option value="Sanitization">Sanitization</option>
+                                <option value="Diagnostics">Diagnostics</option>
+                                <option value="Emergency Supplies">Emergency Supplies</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateQuantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="updateQuantity" name="quantity" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="updateMinimumStock" class="form-label">Minimum Stock</label>
+                            <input type="number" class="form-control" id="updateMinimumStock" name="minimum_stock" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"  class="btn btn-secondary" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-dismiss="modal">Close</button>
+                        <button type="submit"  class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;" >Update Supply</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
   </main>
 
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/supplies.js"></script>
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
@@ -292,39 +400,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="assets/js/main.js"></script>
 
   <script> 
- document.addEventListener('DOMContentLoaded', function() {
-    function fetchData(filter) {
-        fetch(`hdfetch.php?filter=${filter}`)
+document.addEventListener("DOMContentLoaded", () => {
+    const updateLowStockCounts = () => {
+        fetch('fetchlowstocks.php')
             .then(response => response.json())
             .then(data => {
-                const count = data.count;
-                const percentage = data.percentage;
-                const increaseClass = data.increase;
-                
-                const elementId = filter === 'today' ? 'today' :
-                                  filter === 'month' ? 'month' : 'year';
-                
-                document.getElementById(`${elementId}-count`).textContent = count;
-                const increaseElement = document.getElementById(`${elementId}-increase`);
-                increaseElement.textContent = `${percentage}%`;
-                increaseElement.className = `${increaseClass} small pt-1 fw-bold`;
+                const { lowStockCount } = data;
+
+                document.getElementById('month-count').textContent = lowStockCount;
+
+                if (lowStockCount === 0) {
+                    document.getElementById('today-count').textContent = "0";
+                } else {
+                    document.getElementById('today-count').textContent = `${lowStockCount}`;
+                }
             })
-            .catch(error => console.error('Error fetching data:', error));
-    }
+            .catch(error => console.error('Error fetching low-stock data:', error));
+    };
 
-    fetchData('today');
-    fetchData('month');
-    fetchData('year');
+    updateLowStockCounts();
 
-    document.querySelectorAll('.dropdown-menu .dropdown-menu-end .dropdown-menu-arrow').forEach(item => {
-        item.addEventListener('click', function(event) {
-            event.preventDefault();
-            const filter = this.getAttribute('data-filter');
-            fetchData(filter);
-        });
-    });
+    setInterval(updateLowStockCounts, 30000); 
 });
-
 document.addEventListener('DOMContentLoaded', function() {
     function updateProfileName() {
         fetch('fetch_uname.php') 
@@ -349,6 +446,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateProfileName(); 
 });
+
+
   </script>
 
 </body>
