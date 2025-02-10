@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user['password'])) {
-            $otp = rand(100000, 999999);
+            $otp = rand(100000, 999999); 
             $_SESSION['accountId'] = $user['accountId'];
             $_SESSION['otp'] = $otp;
             $_SESSION['email'] = $user['Email'];
@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
                 if (!/^[0-9]$/.test(event.key) && event.key !== 'Backspace') {
-                    event.preventDefault(); // Allow only numeric input
+                    event.preventDefault();
                 }
             }
         </script>
