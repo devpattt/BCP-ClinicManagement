@@ -71,44 +71,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
       </a>
 
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
               <h6>Administrator</h6>
             </li>
             <li>
               <hr class="dropdown-divider">
             </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
             <li>
               <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
@@ -297,94 +267,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </table>
     </div>
 
-    <!-- Add Supply Modal -->
-    <div class="modal fade" id="addSupplyModal" tabindex="-1" aria-labelledby="addSupplyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form id="addSupplyForm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addSupplyModalLabel">Add Supply</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Add Supply Modal -->
+<div class="modal fade" id="addSupplyModal" tabindex="-1" aria-labelledby="addSupplyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="addSupplyForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSupplyModalLabel">Add Supply</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control custom-border" id="itemName" name="item_name" required>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="itemName" class="form-label">Item Name</label>
-                            <input type="text" class="form-control" id="itemName" name="item_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="category" class="form-label">Category</label>
-                            <select class="form-select" id="category" name="category" required>
-                                <option value="">Select Category</option>
-                                <option value="Medicine">Medicine</option>
-                                <option value="Equipment">Equipment</option>
-                                <option value="Consumables">Consumables</option>
-                                <option value="Sanitization">Sanitization</option>
-                                <option value="Diagnostics">Diagnostics</option>
-                                <option value="Emergency Supplies">Emergency Supplies</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="minimumStock" class="form-label">Minimum Stock</label>
-                            <input type="number" class="form-control" id="minimumStock" name="minimum_stock" required>
-                        </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select custom-border" id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Medicine">Medicine</option>
+                            <option value="Equipment">Equipment</option>
+                        </select>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button"  class="btn btn-secondary" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-dismiss="modal">Close</button>
-                        <button type="submit"  class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;">Add Supply</button>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control custom-border" id="quantity" name="quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="minimumStock" class="form-label">Minimum Stock</label>
+                        <input type="number" class="form-control custom-border" id="minimumStock" name="minimum_stock" required>
                     </div>
                 </div>
-            </form>
-        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;">Add Supply</button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- Update Supply Modal -->
-    <div class="modal fade" id="updateSupplyModal" tabindex="-1" aria-labelledby="updateSupplyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form id="updateSupplyForm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="updateSupplyModalLabel">Update Supply</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Update Supply Modal -->
+<div class="modal fade" id="updateSupplyModal" tabindex="-1" aria-labelledby="updateSupplyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="updateSupplyForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateSupplyModalLabel">Update Supply</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="updateId" name="id">
+                    <div class="mb-3">
+                        <label for="updateItemName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control custom-border" id="updateItemName" name="item_name" required>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="updateId" name="id">
-                        <div class="mb-3">
-                            <label for="updateItemName" class="form-label">Item Name</label>
-                            <input type="text" class="form-control" id="updateItemName" name="item_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="updateCategory" class="form-label">Category</label>
-                            <select class="form-select" id="updateCategory" name="category" required>
-                                <option value="">Select Category</option>
-                                <option value="Medicine">Medicine</option>
-                                <option value="Equipment">Equipment</option>
-                                <option value="Consumables">Consumables</option>
-                                <option value="Sanitization">Sanitization</option>
-                                <option value="Diagnostics">Diagnostics</option>
-                                <option value="Emergency Supplies">Emergency Supplies</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="updateQuantity" class="form-label">Quantity</label>
-                            <input type="number" class="form-control" id="updateQuantity" name="quantity" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="updateMinimumStock" class="form-label">Minimum Stock</label>
-                            <input type="number" class="form-control" id="updateMinimumStock" name="minimum_stock" required>
-                        </div>
+                    <div class="mb-3">
+                        <label for="updateCategory" class="form-label">Category</label>
+                        <select class="form-select custom-border" id="updateCategory" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Medicine">Medicine</option>
+                            <option value="Equipment">Equipment</option>
+                        </select>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button"  class="btn btn-secondary" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-dismiss="modal">Close</button>
-                        <button type="submit"  class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;" >Update Supply</button>
+                    <div class="mb-3">
+                        <label for="updateQuantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control custom-border" id="updateQuantity" name="quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateMinimumStock" class="form-label">Minimum Stock</label>
+                        <input type="number" class="form-control custom-border" id="updateMinimumStock" name="minimum_stock" required>
                     </div>
                 </div>
-            </form>
-        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;">Update Supply</button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
+
+<style>
+    .custom-border {
+        border: 2px solid black; 
+        border-radius: 4px; 
+    }
+
+    .custom-border:focus {
+        border-color: #333; 
+        box-shadow: 0 0 5px rgba(51, 51, 51, 0.5); 
+    }
+</style>
+
 
   </main>
 
