@@ -6,6 +6,7 @@ if (!isset($_SESSION['accountId'])) {
     exit(); 
 }
 
+include 'connection.php';
 include 'fetchfname.php';
 ?>
 
