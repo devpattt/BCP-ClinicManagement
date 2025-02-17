@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
         
         <form id="loginForm" action="index.php" method="post">
-            <label for="accountId">Account ID</label>
+            <label for="accountId">Username</label>
             <input type="text" id="accountId" name="accountId" required aria-label="Account ID">
 
             <label for="password">Password</label>

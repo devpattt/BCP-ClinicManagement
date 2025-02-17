@@ -9,7 +9,7 @@ if (isset($_SESSION['otp'])) {
     if ($_SESSION['otp'] == $entered_otp) {
         $_SESSION['loggedin'] = true; 
         unset($_SESSION['otp']); 
-        header('Location: clinic-dashboard.php'); 
+        header('Location: clinicdashboard.php'); 
         exit();
     } else {
         $_SESSION['otp_error'] = "Invalid OTP. Please try again.";
