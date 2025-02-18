@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $accountId = $_POST['accountId'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM bcp_sms3_users WHERE accountId = ?";
+    $sql = "SELECT * FROM bcp_sms3_users WHERE username = ?";
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
