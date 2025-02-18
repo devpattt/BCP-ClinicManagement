@@ -1,6 +1,6 @@
 <?php
 
-if (!isset($_SESSION['accountId'])) {
+if (!isset($_SESSION['username'])) {
     die("User is not logged in."); 
 }
 
@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 
 $user_id = $_SESSION['accountId'];
 
-$sql = "SELECT Fname FROM bcp_sms3_users WHERE accountId = ?";
+$sql = "SELECT fullname FROM bcp_sms3_users WHERE username = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -22,7 +22,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
-    $fullname = $row['Fname'];
+    $fullname = $row['fullname'];
 } else {
     $fullname = "User"; 
 }

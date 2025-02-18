@@ -35,9 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['password'])) {
             $otp = rand(100000, 999999); 
-            $_SESSION['accountId'] = $user['accountId'];
+            $_SESSION['accountId'] = $user['username'];
             $_SESSION['otp'] = $otp;
-            $_SESSION['email'] = $user['Email'];
+            $_SESSION['email'] = $user['email'];
 
             $mail = new PHPMailer(true);
             try {
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail->Port       = 587;
 
                 $mail->setFrom('bcpclinicmanagement@gmail.com', 'Clinic Management System');
-                $mail->addAddress($user['Email']);
+                $mail->addAddress($user['email']);
 
                 $mail->isHTML(true);
                 $mail->Subject = 'Your Secure 2-Factor Authentication (2FA) Code';
