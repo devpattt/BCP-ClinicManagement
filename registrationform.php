@@ -1,51 +1,6 @@
-<?php 
-session_start();
-
-include 'connection.php';
-include 'fetchfname.php';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $fullname = htmlspecialchars(trim($_POST['fullname']));
-    $student_number = htmlspecialchars(trim($_POST['student_number']));
-    $contact = htmlspecialchars(trim($_POST['contact']));
-    $s_gender = htmlspecialchars(trim($_POST['s_gender']));
-    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
-    $year_level = htmlspecialchars(trim($_POST['year_level']));
-    $condition = htmlspecialchars(trim($_POST['condition']));
-    $treatment = htmlspecialchars(trim($_POST['treatment']));
-    
-    $allowed_genders = ['Male', 'Female', 'Other', 'Prefer_not_to_say'];
-
-    if (!in_array($s_gender, $allowed_genders)) {
-        die("Invalid gender selected.");
-    }
-
-    if (!$conn->ping()) {
-        die("Connection is closed. Please check your database connection.");
-    }
-
-    $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, s_gender, age, year_level, conditions, treatment) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssisssss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
-
-    if ($stmt->execute()) {
-        echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                    successModal.show();
-                });
-              </script>";
-    } else {
-        echo "Error inserting record: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
-}
+<?php
+include ('phpassets/registration.php');
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/css/style.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-
 </head>
 
 <style> 
@@ -136,8 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                       </div>
 
                       <div class="col-12">
-                        <label for="AccountId" class="form-label">AccountId</label>
-                        <input type="text" name="AccountId" class="form-control" id="AccountId" required oninput="checkAccountId()">
+                        <label for="AccountId" class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" id="username" required oninput="checkAccountId()">
                         <div id="accountIdError" class="invalid-feedback"></div>
                       </div>
 
@@ -221,13 +175,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </div>
 
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
     var form = document.getElementById("registrationForm");
 
     form.querySelectorAll("input").forEach(function (input) {
@@ -250,10 +202,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if (input.id === "AccountId") {
-            var accountIdRegex = /^\d{6}$/;
+          var accountIdRegex = /^[a-zA-Z0-9]+$/;
             if (!accountIdRegex.test(input.value)) {
                 input.classList.add("is-invalid");
-                errorDiv.textContent = 'Account ID must be exactly 6 digits!';
+                errorDiv.textContent = 'Error';
                 errorDiv.style.display = 'block';
             } else {
                 input.classList.remove("is-invalid");
@@ -268,25 +220,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         checkPasswordMatch();
     }
 
-        function checkPasswordMatch() {
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("cpassword").value;
-            var errorDiv = document.getElementById("confirm-password-error");
+    function checkPasswordMatch() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("cpassword").value;
+        var errorDiv = document.getElementById("confirm-password-error");
 
-            if (password && confirmPassword) {
-                if (password !== confirmPassword) {
-                    document.getElementById("cpassword").classList.add("is-invalid");
-                    errorDiv.textContent = "Passwords do not match!";
-                    errorDiv.style.display = 'block';
-                } else {
-                    document.getElementById("cpassword").classList.remove("is-invalid");
-                    errorDiv.style.display = 'none';
-                }
+        if (password && confirmPassword) {
+            if (password !== confirmPassword) {
+                document.getElementById("cpassword").classList.add("is-invalid");
+                errorDiv.textContent = "Passwords do not match!";
+                errorDiv.style.display = 'block';
             } else {
                 document.getElementById("cpassword").classList.remove("is-invalid");
                 errorDiv.style.display = 'none';
             }
+        } else {
+            document.getElementById("cpassword").classList.remove("is-invalid");
+            errorDiv.style.display = 'none';
         }
+    }
 
     function validatePassword() {
         var password = document.getElementById("password").value;
@@ -322,7 +274,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             form.reportValidity();
         }
     }
-
 
     document.getElementById("confirmSubmit").addEventListener("click", function () {
         form.submit(); 
@@ -421,11 +372,7 @@ document.getElementById('AccountId').addEventListener('input', function() {
     clearTimeout(accountIdTimer);
     accountIdTimer = setTimeout(checkAccountId, 500); 
 });
-
-
-
-
 </script>
 
 </body>
-</html>  
+</html>
