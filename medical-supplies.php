@@ -2,10 +2,11 @@
 
 session_start();
 
-if (!isset($_SESSION['accountId'])) {
+if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit(); 
 }
+
 include 'connection.php';
 include 'fetchfname.php';
 
