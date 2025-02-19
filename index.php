@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION['accountId'])) {
+if (isset($_SESSION['username'])) {
     header("Location: clinic-dashboard.php");
     exit();
 }
@@ -16,7 +16,7 @@ use PHPMailer\PHPMailer\Exception;
 $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $accountId = $_POST['accountId'];
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     $sql = "SELECT * FROM bcp_sms3_users WHERE username = ?";
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("SQL Prepare Error: " . $conn->error);
     }
 
-    $stmt->bind_param("i", $accountId);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['password'])) {
             $otp = rand(100000, 999999); 
-            $_SESSION['accountId'] = $user['username'];
+            $_SESSION['username'] = $user['username'];
             $_SESSION['otp'] = $otp;
             $_SESSION['email'] = $user['email'];
 
@@ -112,8 +112,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
         
         <form id="loginForm" action="index.php" method="post">
-            <label for="accountId">Username</label>
-            <input type="text" id="accountId" name="accountId" required aria-label="Account ID">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required aria-label="Account ID">
 
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required aria-label="Password">
