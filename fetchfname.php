@@ -12,7 +12,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$user_id = $_SESSION['accountId'];
+$user_id = $_SESSION['username'];
 
 $sql = "SELECT fullname FROM bcp_sms3_users WHERE username = ?";
 $stmt = $conn->prepare($sql);

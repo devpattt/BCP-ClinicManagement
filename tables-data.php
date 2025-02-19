@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['accountId'])) {
+if (!isset($_SESSION['username'])) {
   header("Location: index.php");
   exit(); 
 }
@@ -155,16 +155,8 @@ include 'fetchfname.php';
                 </thead>
                 <tbody>
                         <?php
-                        $servername = "localhost"; 
-                        $username = "root"; 
-                        $password = ""; 
-                        $dbname = "bcp_sms3_cms"; 
-
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        if ($conn->connect_error) {
-                            die("Connection failed: " . $conn->connect_error);
-                        }
+                        include 'connection.php';
+                        
                         $stmt = $conn->prepare("SELECT id, fullname, student_number, contact, s_gender, age, year_level, conditions, treatment, DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at FROM bcp_sms3_patients");
                         $stmt->execute();
                         $result = $stmt->get_result();
