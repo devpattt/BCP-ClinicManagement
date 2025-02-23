@@ -1,0 +1,173 @@
+/* style.css */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: #333; /* Dark gray for text */
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #f0f0f0; /* Light gray background for header */
+}
+
+.logo h1 {
+    margin: 0;
+    color: #007bff; /* Blue for the logo */
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav li {
+    margin-left: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #333;
+}
+
+main {
+    display: flex;
+    padding: 20px;
+}
+
+aside {
+    width: 200px;
+    margin-right: 20px;
+}
+
+aside ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+aside li {
+    margin-bottom: 10px;
+}
+
+aside a {
+    text-decoration: none;
+    color: #333;
+}
+
+.content {
+    flex: 1;
+}
+
+.intro-box {
+    border: 1px solid #ddd; /* Light gray border */
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.intro-box h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.intro-box ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.about-tool {
+    margin-top: 20px;
+}
+
+.about-tool ul {
+    list-style: none;
+    padding: 0;
+}
+
+.about-tool li {
+    margin-bottom: 5px;
+}
+
+.image-area {
+    text-align: center; /* Center the image */
+    margin-top: 20px;
+}
+
+.image-area img {
+    max-width: 80%; /* Make image responsive */
+    height: auto;
+}
+
+.certificates {
+    display: flex;
+    justify-content: center; /* Center the certificate icons */
+    margin-top: 10px;
+}
+
+.certificates img {
+    width: 50px; /* Adjust size as needed */
+    height: auto;
+    margin: 0 5px;
+}
+
+.certification-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #777; /* Slightly lighter gray */
+}
+
+.nav-buttons {
+    text-align: right;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #007bff; /* Blue button */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+footer {
+    background-color: #f0f0f0; /* Light gray background for footer */
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 960px; /* Limit width for larger screens */
+    margin: 0 auto; /* Center the footer content */
+}
+
+footer nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+footer nav li {
+    margin-left: 20px;
+}
+
+footer nav a {
+    text-decoration: none;
+    color: #333;
+}
+
+.regulatory-text {
+    font-size: 12px;
+    color: #777; /* Slightly lighter gray */
+}
