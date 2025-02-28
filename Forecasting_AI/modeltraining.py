@@ -1,32 +1,39 @@
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 import joblib
+from sqlalchemy import create_engine
 
-#Sample datasets
-data = {
-    "headache": [1, 0, 1, 1, 0, 0, 1, 1, 0, 1],
-    "dizziness": [1, 0, 1, 0, 1, 0, 1, 1, 1, 0],
-    "fatigue": [0, 1, 1, 0, 1, 1, 0, 1, 0, 1],
-    "fever": [1, 0, 0, 1, 1, 0, 1, 0, 1, 1],
-    "risk": [1, 0, 1, 0, 1, 0, 1, 1, 0, 1]  # 1 = High Risk, 0 = Low Risk
+model = joblib.load("health_risk_model.pkl")
+
+engine = create_engine('mysql+pymysql://root:@localhost:4306/bcp_sms3_cms')
+
+query = "SELECT headache, dizziness, fatigue, fever FROM bcp_sms3_symptoms"
+df = pd.read_sql(query, engine)
+
+predictions = model.predict(df)
+
+df['predicted_risk'] = predictions
+
+risk_to_illness = {
+    0: 'No illness',
+    1: 'Common Cold',
+    2: 'Flu',
+    3: 'Migraine',
 }
 
-df = pd.DataFrame(data)
+df['illness'] = df['predicted_risk'].map(risk_to_illness)
 
-X = df.drop("risk", axis=1) 
-y = df["risk"] 
+print("Predictions from Database:")
+print(df)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+csv_data = pd.read_csv("dands.csv")
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+csv_data = csv_data[["headache", "dizziness", "fatigue", "fever"]]
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+csv_predictions = model.predict(csv_data)
 
-print(f"Model Accuracy: {accuracy:.2f}")
+csv_data['predicted_risk'] = csv_predictions
 
-joblib.dump(model, "health_risk_model.pkl")
+csv_data['illness'] = csv_data['predicted_risk'].map(risk_to_illness)
+
+print("Predictions from CSV:")
+print(csv_data)

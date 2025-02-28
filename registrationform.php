@@ -169,7 +169,7 @@ include ('phpassets/registration.php');
         Your registration was successful!
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="window.location.href='head-register.php';" data-bs-dismiss="modal">OK</button>
+        <button type="button" class="btn btn-primary" onclick="window.location.href='registerform.php';" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
   </div>
