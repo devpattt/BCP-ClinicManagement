@@ -1,5 +1,5 @@
 <?php
-include ('phpassets/registrationforadmin.php');
+include ('phpassets/registerforsadmin.php');
 ?>
 
 <!DOCTYPE html>

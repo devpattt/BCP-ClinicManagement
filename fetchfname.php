@@ -14,7 +14,9 @@ if ($conn->connect_error) {
 
 $user_id = $_SESSION['username'];
 
-$sql = "SELECT fullname FROM bcp_sms3_users WHERE username = ?";
+$sql = "SELECT * FROM (SELECT * FROM bcp_sms3_users UNION ALL SELECT * FROM bcp_sms3_admin 
+    UNION ALL SELECT * FROM bcp_sms3_super_admin) AS all_users WHERE username = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $user_id);
 $stmt->execute();

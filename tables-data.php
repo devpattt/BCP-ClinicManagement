@@ -143,7 +143,7 @@ include 'fetchfname.php';
                   <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Full Name</th>
-                    <th scope="col">Student Number</th>
+                    <th scope="col">Patient</th>
                     <th scope="col">Contact</th>
                     <th scope="col">Gender</th> 
                     <th scope="col">Age</th> 

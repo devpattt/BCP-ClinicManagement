@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['username'])) {
-  header("Location: userside/userside.php");
+  header("Location: superadmin/mainpage.php");
   exit(); 
 }
 
@@ -91,18 +91,18 @@ include '../connection.php';
                   </a>
                   <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
                   <li>
-                      <a href="userside.php" class="active"> 
+                      <a href="mainpage.php" class="active"> 
                         <i class="bi bi-circle" ></i><span>Home</span>
                       </a>
                     </li>
                     <li>
-                      <a href="record-history.php">
-                        <i class="bi bi-circle"></i><span>Appointment</span>
+                      <a href="request.php">
+                        <i class="bi bi-circle"></i><span>Request Supplies</span>
                       </a>
                     </li>
                     <li>
                       <a href="feedback.php" > 
-                        <i class="bi bi-circle" ></i><span>Feedback</span>
+                        <i class="bi bi-circle" ></i><span>View Feedbacks</span>
                       </a>
                     </li>
                   </ul>
@@ -133,7 +133,9 @@ include '../connection.php';
         <div class="card-body">
           <h5 class="card-title">Patient Basic Information</h5>
 
-          <!-- General Form Elements -->
+          <!-- Request Modal -->
+
+          
          
 
 

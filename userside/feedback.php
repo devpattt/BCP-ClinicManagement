@@ -8,7 +8,8 @@ if (!isset($_SESSION['username'])) {
 
 include '../fetchfname.php';
 include '../connection.php';
-
+include 'connectfeed.php';
+    
 ?>
 
 <!DOCTYPE html>
@@ -91,7 +92,7 @@ include '../connection.php';
                   </a>
                   <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
                   <li>
-                      <a href="userside.php" class="active"> 
+                      <a href="userside.php" > 
                         <i class="bi bi-circle" ></i><span>Home</span>
                       </a>
                     </li>
@@ -101,7 +102,7 @@ include '../connection.php';
                       </a>
                     </li>
                     <li>
-                      <a href="feedback.php" > 
+                      <a href="feedback.php"  class="active"> 
                         <i class="bi bi-circle" ></i><span>Feedback</span>
                       </a>
                     </li>
@@ -117,7 +118,7 @@ include '../connection.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Home</h1>
+      <h1>Feedback</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="userside.php">Home</a></li>
@@ -134,7 +135,22 @@ include '../connection.php';
           <h5 class="card-title">Patient Basic Information</h5>
 
           <!-- General Form Elements -->
-         
+        <div class="container mt-5">
+        <h2>Feedback</h2>
+        <form method="POST" action="">
+            <div class="mb-3">
+                <label for="feedback" class="form-label">Please enter here if you have a any concern about in this website.</label>
+                <textarea class="form-control" id="feedback" name="feedback" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        
+        <!-- Success Message -->
+        <div id="successMessage" class="alert alert-success alert-dismissible fade show mt-3" role="alert" style="display: none;">
+            Your feedback has been sent successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
 
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

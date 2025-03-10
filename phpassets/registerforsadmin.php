@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = htmlspecialchars(trim($_POST['username']));
     $password = htmlspecialchars(trim($_POST['password']));
     $cpassword = htmlspecialchars(trim($_POST['cpassword']));
-    $type = "admin";
+    $type = "super";
 
     if ($password !== $cpassword) {
         echo json_encode(['status' => 'error', 'message' => 'Passwords do not match.']);
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Check for duplicate Full Name, Email, or Username
-    $query = "SELECT fullname, email, username FROM bcp_sms3_admin WHERE fullname = ? OR email = ? OR username = ?";
+    $query = "SELECT fullname, email, username FROM bcp_sms3_super_admin WHERE fullname = ? OR email = ? OR username = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("sss", $fullname, $email, $username);
     $stmt->execute();
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // If no errors, insert the user into the database
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO bcp_sms3_admin (user_type, fullname, email, username, password) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO bcp_sms3_super_admin (user_type, fullname, email, username, password) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $type, $fullname, $email, $username, $hashed_password);
 
         

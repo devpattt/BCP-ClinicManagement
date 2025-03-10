@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 if (isset($_SESSION['username'])) {
     header("Location: clinic-dashboard.php");
     exit();
@@ -19,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM bcp_sms3_users WHERE username = ?";
+    $sql = "SELECT * FROM (SELECT * FROM bcp_sms3_users UNION ALL SELECT * FROM bcp_sms3_admin 
+    UNION ALL SELECT * FROM bcp_sms3_super_admin) AS all_users WHERE username = ?";
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
@@ -38,6 +40,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $user['username'];
             $_SESSION['otp'] = $otp;
             $_SESSION['email'] = $user['email'];
+            $_SESSION['user_type'] = $user['user_type']; // Store user type in session
+            //ito bago din to
+            $_SESSION['session_id'] = session_id(); // Store session ID
+
+            echo "<script>
+                  localStorage.setItem('session_active', 'true');
+                  localStorage.setItem('session_id', '" . session_id() . "');
+                  </script>";
+
+                  //hanggang dito sa echo
 
             $mail = new PHPMailer(true);
             try {
@@ -85,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $conn->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -191,7 +204,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     event.preventDefault();
                 }
             }
-        </script>
+        </script> 
+
+        
+<!-- ITO BAGO TO -->
+<script>
+window.addEventListener("storage", function(event) {
+    if (event.key === "forceLogout") {
+        showLogoutModal();
+    }
+});
+
+function showLogoutModal() {
+    let modal = document.createElement("div");
+    modal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;">
+            <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <p style="font-size: 18px;">We've detected that you logged out in another tab.</p>
+                <button onclick="redirectToLogin()" style="background: #007BFF; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px;">OK</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function redirectToLogin() {
+    window.location.href = "index.php"; // Redirect back to login page
+}
+</script>
+
+
 
     </div>
 </body>
