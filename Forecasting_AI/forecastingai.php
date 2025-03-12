@@ -6,12 +6,10 @@ if (!isset($_SESSION['username'])) {
   exit(); 
 }
 
-include 'connection.php';
-include 'fetchfname.php';
+include '../connection.php';
+include '../fetchfname.php';
 
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,19 +19,19 @@ include 'fetchfname.php';
   <title>Clinic Management System</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="../assets/img/favicon.png" rel="icon">
+  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link rel="../preconnect" href="../https://fonts.googleapis.com">
+  <link rel="../preconnect" href="../https://fonts.gstatic.com" crossorigin>
+  <link href="../https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
 </head>
 <body>
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -45,7 +43,7 @@ include 'fetchfname.php';
       <ul class="d-flex align-items-center">
         <li class="nav-item dropdown pe-3">
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
+            <img src="../assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
           </a>
 
@@ -91,27 +89,27 @@ include 'fetchfname.php';
             </a>
             <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
             <li>
-                <a href="clinicdashboard.php">
+                <a href="../clinicdashboard.php">
                   <i class="bi bi-circle" ></i><span>Report and Analytics</span>
                 </a>
               </li>
               <li>
-                <a href="forms-elements.php">
+                <a href="../forms-elements.php">
                   <i class="bi bi-circle"></i><span>Patient Registration</span>
                 </a>
               </li>
               <li>
-                <a href="tables-data.php">
+                <a href="../tables-data.php">
                   <i class="bi bi-circle"></i><span>Patient Medical Records</span>
                 </a>
               </li>
               <li>  
-              <a href="medical-supplies.php">
+              <a href="../medical-supplies.php">
                   <i class="bi bi-circle" ></i><span>Medical Supplies</span>
                 </a>
               </li>
               <li>
-                  <a href="blankanomaly.php" class="active">
+                  <a href="../blankanomaly.php" class="active">
                     <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
                   </a>
                 </li>
@@ -121,6 +119,7 @@ include 'fetchfname.php';
     
       <hr class="sidebar-divider">
     
+
 
 
   </aside><!-- End Sidebar-->
@@ -142,20 +141,20 @@ include 'fetchfname.php';
     </div>
 
     <?php
-    $url = "http://127.0.0.1:5000/predict";
+      $url = "http://127.0.0.1:5000/predict";
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-    curl_setopt($ch, CURLOPT_POST, false); // Use GET request if no payload is required
-    $response = curl_exec($ch);
-
-    if ($response === false) {
-        die("<div class='alert alert-danger'>cURL Error: " . curl_error($ch) . "</div>");
-    }
-
-    curl_close($ch);
-
+      $ch = curl_init($url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+      curl_setopt($ch, CURLOPT_HTTPGET, true); // Explicitly use GET request
+      $response = curl_exec($ch);
+      
+      if ($response === false) {
+          die("<div class='alert alert-danger'>cURL Error: " . curl_error($ch) . "</div>");
+      }
+      
+      curl_close($ch);
+   
 
     // Debugging: Show API response
     echo "<pre style='display: none;'>API Response: " . htmlspecialchars($response) . "</pre>";
@@ -163,7 +162,7 @@ include 'fetchfname.php';
     $data = json_decode($response, true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
-        die("<div class='alert alert-danger'>JSON Decode Error: " . json_last_error_msg() . "</div>");
+        die("<div class='alert alert-danger'>JSON Decode Error: " . json_last_error_msg() . "<br>Response: " . htmlspecialchars($response) . "</div>");
     }
 
     if (!is_array($data)) {
@@ -197,21 +196,21 @@ include 'fetchfname.php';
 
   </main>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="assets/vendor/echarts/echarts.min.js"></script>
-  <script src="assets/vendor/quill/quill.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="../assets/vendor/echarts/echarts.min.js"></script>
+  <script src="../assets/vendor/quill/quill.js"></script>
+  <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="../assets/vendor/php-email-form/validate.js"></script>
+  <script src="../assets/js/main.js"></script>
   <script>
-      function fetchPredictions() {
+    function fetchPredictions() {
         let resultsDiv = document.getElementById("predictionResults");
         resultsDiv.innerHTML = "<p>Loading predictions...</p>"; // Show loading state
 
-        fetch('http://localhost:5000/predict', { method: 'POST' })
+        fetch('http://localhost:5000/predict', { method: 'GET' }) // Change method to GET
         .then(response => response.json())
         .then(data => {
             resultsDiv.innerHTML = ""; // Clear previous results
@@ -238,8 +237,6 @@ include 'fetchfname.php';
 
     setInterval(fetchPredictions, 10000);
     </script>
-
-
 
     <?php
     $conn = new mysqli("localhost", "root", "", "bcp_sms3_cms");

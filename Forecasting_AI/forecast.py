@@ -2,31 +2,66 @@ import mysql.connector
 import pandas as pd
 from flask import Flask, request, jsonify
 from difflib import SequenceMatcher
+from mysql.connector import pooling
+import os
 
 app = Flask(__name__)
 
-# Connect to MySQL database
+# Database configuration
+DB_CONFIG = {
+    "host": "localhost",
+    "port": 4306, 
+    "user": os.getenv("DB_USER", "root"),  
+    "password": os.getenv("DB_PASSWORD", ""),
+    "database": "bcp_sms3_cms"
+}
+
+# Create a connection pool
+db_pool = None
+try:
+    db_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=5, **DB_CONFIG)
+except mysql.connector.Error as err:
+    print(f"Error creating connection pool: {err}")
+
+# Get database connection
+def get_db_connection():
+    if db_pool is None:
+        print("Connection pool is not available")
+        return None
+    try:
+        return db_pool.get_connection()
+    except mysql.connector.Error as err:
+        print(f"Error getting connection from pool: {err}")
+        return None
+
+# Fetch patient data
 def get_patient_data():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="bcp_sms3_cms"
-    )
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT fullname, conditions FROM bcp_sms3_symptoms")
-    patients = cursor.fetchall()
-    conn.close()
-    return patients
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return []  # Return an empty list if no connection
+
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT fullname, conditions FROM bcp_sms3_symptoms")
+        patients = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return patients
+    except Exception as e:
+        print(f"Error fetching patient data: {e}")
+        return []
 
 # Load disease dataset (CIP.csv)
 def load_disease_data():
-    df = pd.read_csv("CIP.csv")
-    return df
+    return pd.read_csv("CIP.csv")
+
+# Normalize symptoms for better matching
+def normalize_text(text):
+    return text.lower().strip()
 
 # Similarity function
 def get_similarity(a, b):
-    return SequenceMatcher(None, a, b).ratio()
+    return SequenceMatcher(None, normalize_text(a), normalize_text(b)).ratio()
 
 # Predict illness
 def predict_disease(patient_symptoms):
@@ -36,7 +71,7 @@ def predict_disease(patient_symptoms):
 
     for _, row in diseases.iterrows():
         disease = row['disease']
-        symptoms_list = row['symptoms'].split(',')
+        symptoms_list = [normalize_text(s) for s in row['symptoms'].split(',')]
 
         # Calculate similarity score
         match_score = sum(get_similarity(patient_symptoms, s) for s in symptoms_list) / len(symptoms_list)
@@ -49,20 +84,24 @@ def predict_disease(patient_symptoms):
 
 # Store predictions in MySQL
 def save_predictions_to_db(fullname, predicted_disease):
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="bcp_sms3_cms"
-    )
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO bcp_sms3_predictions (fullname, predicted_disease) VALUES (%s, %s)",
-                   (fullname, predicted_disease))
-    conn.commit()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO bcp_sms3_predictions (fullname, predicted_disease) VALUES (%s, %s)",
+                       (fullname, predicted_disease))
+        conn.commit()
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # API endpoint to get predictions
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET'])
 def predict():
     patients = get_patient_data()
     results = []

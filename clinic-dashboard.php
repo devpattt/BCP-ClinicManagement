@@ -10,7 +10,6 @@ include 'connection.php';
 include 'fetchfname.php';
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,6 +81,7 @@ include 'fetchfname.php';
             <li class="nav-heading">Clinic Management System</li>
 
             <li class="nav-item">
+            <li class="nav-item">
               <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
               </a>
@@ -122,7 +122,7 @@ include 'fetchfname.php';
         <h1>Dashboard</h1>
         <nav>
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item"><a href="clinic-dashboard.php">Home</a></li>
             <li class="breadcrumb-item active">Dashboard</li>
           </ol>
         </nav>
@@ -225,6 +225,7 @@ include 'fetchfname.php';
         </div>
       </div>
 </section>
+
   <div class="col-12">
     <div class="card">
         <div class="filter">
@@ -294,6 +295,7 @@ include 'fetchfname.php';
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="assets/vendor/chart.js/chart.umd.js"></script>
   <script src="assets/vendor/echarts/echarts.min.js"></script>
   <script src="assets/vendor/quill/quill.js"></script>
