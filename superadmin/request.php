@@ -10,7 +10,7 @@ if (!isset($_SESSION['username'])) {
 include '../connection.php';
 include '../fetchfname.php'; // Ensures $fullname is set
 include 'fetch_medicine.php'; // Fetches medicine names for autocompletes
-include 'fetch_requests.php'; // Fetches requests for the table
+
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -216,7 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           <!-- Request Modal -->
           <div class="container mt-5">
-        <button class="btn btn-primary mb-3" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-toggle="modal" data-bs-target="#addSupplyModal">Request Supply</button>
+        <button class="btn btn-primary mb-3" style="background-color: #1e3a8a; border-color: #1e3a8a;" data-bs-toggle="modal" data-bs-target="#addSupplyModal">Request</button>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -236,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form id="addSupplyForm">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Request Supply</h5>
+                        <h5 class="modal-title">Request</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
@@ -279,90 +279,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="../assets/vendor/php-email-form/validate.js"></script>
   <script src="../assets/js/main.js"></script>
 
-  <script>
-
-$("#addSupplyForm").submit(function (e) {
-    e.preventDefault(); // Prevent default form submission
-    console.log("Form Submitted!"); // Debugging
-    
-    $.ajax({
-        url: "request.php",
-        method: "POST",
-        data: $(this).serialize(),
-        dataType: "json",
-        success: function (response) {
-            console.log("AJAX Success:", response); // Debugging
-            alert(response.message);
-            if (response.status === "success") {
-                $("#addSupplyModal").modal("hide");
-                fetchRequests(); // Refresh table
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("AJAX Error:", error, xhr.responseText);
-        }
-    });
-});
-
-
-    </script>
 
   <script>
-
-$(document).on("click", "#requestSupplyButton", function () {
-    console.log("Request Supply Button Clicked!");
-});
-
-
 $(document).ready(function () {
-    function fetchRequests() {
+    $("#addSupplyForm").submit(function (event) {
+        event.preventDefault(); // Prevent form from submitting normally
+
+        let formData = {
+            item: $("#itemName").val(),
+            category: $("#category").val(),
+            quantity: $("#quantity").val()
+        };
+
         $.ajax({
-            url: "fetch_requests.php",
-            method: "GET",
-            dataType: "json",
-            success: function (data) {
-                let tableBody = $("#supplyTableBody");
-                tableBody.empty();
-
-                data.forEach(function (row) {
-                    tableBody.append(`
-                        <tr>
-                            <td>${row.item}</td>
-                            <td>${row.category}</td>
-                            <td>${row.quantity}</td>
-                            <td>${row.action}</td>
-                        </tr>
-                    `);
-                });
-            }
-        });
-    }
-
-    fetchRequests(); // Load data on page load
-
-    $("#addSupplyForm").submit(function (e) {
-        e.preventDefault();
-        
-        $.ajax({
-            url: "request.php",
+            url: "request.php", // Make sure this points to the correct PHP script handling the request
             method: "POST",
-            data: $(this).serialize(),
+            data: formData,
             dataType: "json",
             success: function (response) {
-                alert(response.message);
                 if (response.status === "success") {
-                    $("#addSupplyModal").modal("hide");
-                    fetchRequests(); // Refresh table after submission
+                    alert("Request submitted successfully!");
+                    $("#addSupplyModal").modal("hide"); // Hide the modal after successful submission
+                    $("#addSupplyForm")[0].reset(); // Clear form fields
+                } else {
+                    alert("Error: " + response.message);
                 }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong. Please try again.");
             }
         });
     });
 });
+</script>
 
-
-
-
-    </script>
   
 
 <!-- RECOMMENDATION FOR MEDICINE NAMES -->
@@ -420,14 +371,7 @@ $(document).ready(function () {
 
 
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-  $(document).ready(function () {
-      $("#requestSupplyButton").click(function () {
-          console.log("Request Supply Button Clicked!");
-      });
-  });
-</script>
+
 </body>
 
 
