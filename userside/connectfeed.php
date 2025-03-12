@@ -2,7 +2,7 @@
 
 
 include '../connection.php';
-session_start();
+
 
 if (!isset($_SESSION['username'])) {
     die("User is not logged in.");

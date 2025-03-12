@@ -72,47 +72,59 @@ include '../connection.php';
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
-    <ul class="sidebar-nav" id="sidebar-nav">
+<ul class="sidebar-nav" id="sidebar-nav">
+<div class="logo-container" style="text-align: center; margin-bottom: 10px;">
+<img src="../assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
+</div>
+    <hr class="sidebar-divider">
 
-     
-    <ul class="sidebar-nav" id="sidebar-nav">
-    <div class="logo-container" style="text-align: center; margin-bottom: 10px;">
-    <img src="../assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
-  </div>
+    <li class="nav-heading">Clinic Management System</li>
 
-
-      <hr class="sidebar-divider">
-
-                <li class="nav-heading">Clinic Management System</li>
-
-                <li class="nav-item">
-                  <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-                  </a>
-                  <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-                  <li>
-                      <a href="mainpage.php" class="active"> 
-                        <i class="bi bi-circle" ></i><span>Home</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="request.php">
-                        <i class="bi bi-circle"></i><span>Request Supplies</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="feedback.php" > 
-                        <i class="bi bi-circle" ></i><span>View Feedbacks</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-
-
-        <hr class="sidebar-divider">
-  
-
-  </aside><!-- End Sidebar-->
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+      <li>
+          <a href="mainpage.php"  class="active">
+            <i class="bi bi-circle" ></i><span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="request.php">
+            <i class="bi bi-circle" ></i><span>Request Supply</span>
+          </a>
+        </li>
+      <li>
+          <a href="clinic-dashboard.php">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+          </a>
+        </li>
+        <li>
+          <a href="forms-elements.php">
+            <i class="bi bi-circle"></i><span>Patient Registration</span>
+          </a>
+        </li>
+        <li>
+          <a href="tables-data.php">
+            <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+          </a>
+        </li>
+        <li>  
+        <a href="medical-supplies.php">
+            <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+          </a>
+        </li>
+          <li>
+            <a href="blankanomaly.php">
+              <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+            </a>
+          </li>
+          <li></li>
+      </ul>
+    </li>
+  <hr class="sidebar-divider">
+</aside><!-- End Sidebar-->
 
   <main id="main" class="main">
 
@@ -120,7 +132,7 @@ include '../connection.php';
       <h1>Home</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="userside.php">Home</a></li>
+        <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -245,7 +257,7 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
         }
     }
 
-    fetch('forms-elements.php', {
+    fetch('../forms-elements.php', {
         method: 'POST',
         body: combinedData
     })

@@ -2,12 +2,12 @@
 session_start();
 
 if (!isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: superadmin/mainpage.php");
   exit(); 
 }
 
-include 'connection.php';
-include 'fetchfname.php';
+include '../connection.php';
+include '../fetchfname.php';
 
 ?>
 
@@ -21,19 +21,19 @@ include 'fetchfname.php';
   <title>Clinic Management System</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="../assets/img/favicon.png" rel="icon">
+  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link rel="../preconnect" href="https://fonts.googleapis.com">
+  <link rel="../preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="../https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
 </head>
 <body>
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -45,7 +45,7 @@ include 'fetchfname.php';
       <ul class="d-flex align-items-center">
         <li class="nav-item dropdown pe-3">
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
+            <img src="../assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
           </a>
 
@@ -76,7 +76,7 @@ include 'fetchfname.php';
       
     <ul class="sidebar-nav" id="sidebar-nav">
     <div class="logo-container" style="text-align: center; margin-bottom: 10px;">
-    <img src="assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
+    <img src="../assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
     </div>
 
 
@@ -90,6 +90,17 @@ include 'fetchfname.php';
               <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+            <li>
+          <a href="mainpage.php">
+            <i class="bi bi-circle" ></i><span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="request.php">
+            <i class="bi bi-circle" ></i><span>Request Supply</span>
+          </a>
+        </li>
+      <li>
             <li>
                 <a href="clinic-dashboard.php">
                   <i class="bi bi-circle" ></i><span>Report and Analytics</span>
@@ -131,7 +142,7 @@ include 'fetchfname.php';
       <h1>Blank Page</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
           <li class="breadcrumb-item">A.I Anomaly</li>
         </ol>
       </nav>
@@ -139,14 +150,14 @@ include 'fetchfname.php';
 
   </main>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="assets/vendor/echarts/echarts.min.js"></script>
-  <script src="assets/vendor/quill/quill.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="../assets/vendor/echarts/echarts.min.js"></script>
+  <script src="../assets/vendor/quill/quill.js"></script>
+  <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="../assets/vendor/php-email-form/validate.js"></script>
+  <script src="../assets/js/main.js"></script>
 </body>
 </html>

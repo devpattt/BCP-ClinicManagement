@@ -3,12 +3,13 @@
 session_start();
 
 if (!isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: superadmin/mainpage.php");
   exit(); 
 }
 
-include 'connection.php';
-include 'fetchfname.php';
+include '../connection.php';
+include '../fetchfname.php';
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = htmlspecialchars(trim($_POST['name']));
@@ -38,19 +39,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <title>Clinic Management System</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-  <link href="assets/img/bcp logo.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-  <link href="assets/css/style.css" rel="stylesheet">
-  <script type="javascript" src="assets/js/darkmode.js" defer></script>
+  <link href="../assets/img/bcp logo.png" rel="icon">
+  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="../https://fonts.gstatic.com" rel="preconnect">
+  <link href="../https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
+  <script type="javascript" src="../assets/js/darkmode.js" defer></script>
 </head>
 <body>
 
@@ -68,11 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <li class="nav-item dropdown pe-3">
 
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-          <img src="assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
+          <img src="../assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
           <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
       </a>
 
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
               <h6>Administrator</h6>
             </li>
@@ -80,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <hr class="dropdown-divider">
             </li>
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="logout.php">
+              <a class="dropdown-item d-flex align-items-center" href="../logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -99,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       
     <ul class="sidebar-nav" id="sidebar-nav">
     <div class="logo-container" style="text-align: center; margin-bottom: 10px;">
-    <img src="assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
+    <img src="../assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
     </div>
 
       <hr class="sidebar-divider">
@@ -112,6 +114,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="mainpage.php">
+            <i class="bi bi-circle" ></i><span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="request.php">
+            <i class="bi bi-circle" ></i><span>Request Supply</span>
+          </a>
+        </li>
+      <li>
           <li>
             <a href="clinic-dashboard.php">
               <i class="bi bi-circle"></i><span>Report and Analytics</span>
@@ -148,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <h1>Medical Supplies Management</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
           <li class="breadcrumb-item active">Medical Supplies Management</li>
         </ol>
       </nav>
@@ -263,7 +276,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="supplyTableBody"></tbody>
+            <tbody id="supplyTableBody">
+              <script>
+            document.addEventListener("DOMContentLoaded", () => {
+    const supplyTableBody = document.getElementById("supplyTableBody");
+
+    const fetchSupplies = () => {
+        fetch("../fetchsupplies.php")
+            .then((response) => response.json())
+            .then((data) => {
+                supplyTableBody.innerHTML = "";
+                data.forEach((supply, index) => {
+                    supplyTableBody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${supply.item_name}</td>
+                            <td>${supply.category || "N/A"}</td>
+                            <td>${supply.quantity}</td>
+                            <td>${supply.minimum_stock}</td>
+                            <td>${supply.date_added}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editSupply(${supply.id}, '${supply.item_name}', '${supply.category}', ${supply.quantity}, ${supply.minimum_stock})">Edit</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+    };
+
+    fetchSupplies();
+
+    const addSupplyForm = document.getElementById("addSupplyForm");
+    addSupplyForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(addSupplyForm);
+        fetch("../addsupplies.php", {
+            method: "POST",
+            body: formData,
+        }).then(() => {
+            fetchSupplies();
+            addSupplyForm.reset();
+            const addSupplyModal = bootstrap.Modal.getInstance(document.getElementById("addSupplyModal"));
+            addSupplyModal.hide();
+        });
+    });
+
+    window.editSupply = (id, itemName, category, quantity, minimumStock) => {
+        document.getElementById("updateId").value = id;
+        document.getElementById("updateItemName").value = itemName;
+        document.getElementById("updateCategory").value = category;
+        document.getElementById("updateQuantity").value = quantity;
+        document.getElementById("updateMinimumStock").value = minimumStock;
+
+        const updateSupplyModal = new bootstrap.Modal(document.getElementById("updateSupplyModal"));
+        updateSupplyModal.show();
+    };
+
+    const updateSupplyForm = document.getElementById("updateSupplyForm");
+    updateSupplyForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const formData = new FormData(updateSupplyForm);
+        fetch("../updatesupplies.php", {
+            method: "POST",
+            body: formData,
+        }).then(() => {
+            fetchSupplies();
+            const updateSupplyModal = bootstrap.Modal.getInstance(document.getElementById("updateSupplyModal"));
+            updateSupplyModal.hide();
+        });
+    });
+});
+
+    </script>
+            </tbody>
         </table>
     </div>
 
@@ -365,22 +450,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/supplies.js"></script>
-  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="assets/vendor/echarts/echarts.min.js"></script>
-  <script src="assets/vendor/quill/quill.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="../https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src=".../assets/js/supplies.js"></script>
+  <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="../assets/vendor/echarts/echarts.min.js"></script>
+  <script src="../assets/vendor/quill/quill.js"></script>
+  <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="../assets/vendor/php-email-form/validate.js"></script>
+  <script src="../assets/js/main.js"></script>
 
   <script> 
 document.addEventListener("DOMContentLoaded", () => {
     const updateLowStockCounts = () => {
-        fetch('fetchlowstocks.php')
+        fetch('../fetchlowstocks.php')
             .then(response => response.json())
             .then(data => {
                 const { lowStockCount } = data;
@@ -402,7 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 document.addEventListener('DOMContentLoaded', function() {
     function updateProfileName() {
-        fetch('fetch_uname.php') 
+        fetch('../fetch_uname.php') 
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -427,6 +512,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   </script>
+
+
 
 </body>
 

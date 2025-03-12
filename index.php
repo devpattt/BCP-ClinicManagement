@@ -20,15 +20,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM (SELECT * FROM bcp_sms3_users UNION ALL SELECT * FROM bcp_sms3_admin 
-    UNION ALL SELECT * FROM bcp_sms3_super_admin) AS all_users WHERE username = ?";
+    $sql = "SELECT username, password, email, 'user' AS user_type FROM bcp_sms3_users WHERE username = ?
+        UNION ALL
+        SELECT username, password, email, 'admin' AS user_type FROM bcp_sms3_admin WHERE username = ?
+        UNION ALL
+        SELECT username, password, email, 'super' AS user_type FROM bcp_sms3_super_admin WHERE username = ?";
+
+
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
         die("SQL Prepare Error: " . $conn->error);
     }
 
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("sss", $username, $username, $username);
+    
     $stmt->execute();
     $result = $stmt->get_result();
 
