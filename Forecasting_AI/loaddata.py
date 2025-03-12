@@ -1,15 +1,14 @@
-import pandas as pd
+import mysql.connector
 
-df = pd.read_csv("C:/xampp/htdocs/BCP-ClinicManagement/Forecasting_AI/dands.csv")
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="bcp_sms3_cms"
+)
+cursor = conn.cursor(dictionary=True)
+cursor.execute("SELECT fullname, conditions FROM bcp_sms3_symptoms")
+patients = cursor.fetchall()
+conn.close()
 
-symptom_columns = df.columns.tolist()
-print("All symptoms and target column:\n", symptom_columns)
-
-symptom_columns_only = [col for col in df.columns if col != 'diseases']
-print("All symptoms:\n", symptom_columns_only)
-
-print("Missing values:\n", df.isnull().sum())
-
-df = pd.get_dummies(df, columns=symptom_columns_only)
-
-print(df.head())
+print(patients)  # Should print patient records

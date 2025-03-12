@@ -6,8 +6,9 @@ if (!isset($_SESSION['username'])) {
   exit(); 
 }
 
-include 'connection.php';
 include 'fetchfname.php';
+include 'connection.php';
+include 'fetch_symptoms.php';
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $fullname = htmlspecialchars(trim($_POST['fullname']));
@@ -142,7 +143,7 @@ include 'fetchfname.php';
                       </a>
                     </li>
                     <li>
-                        <a href="blankanomaly.php">
+                        <a href="forecastingai.php">
                           <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
                         </a>
                       </li>
@@ -159,7 +160,7 @@ include 'fetchfname.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Patient Registration</h1>
+      <h1>Patint Registration</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -185,11 +186,22 @@ include 'fetchfname.php';
               </div>
             </div>
             <div class="row mb-3">
-              <label for="student_number" class="col-sm-2 col-form-label">Student Number</label>
+              <label for="student_number" class="col-sm-2 col-form-label">Patient</label>
               <div class="col-sm-10">
-                <input type="text" id="student_number" name="student_number" class="form-control" placeholder="Enter Student Number" required>
+                <!-- BAGO TO -->
+              <select class="form-control" id="student_number" name="student_number" required>
+                  <option value="">Select</option>
+                  <option value="Student">Student</option>
+                  <option value="Teacher">Teacher</option>
+                  <option value="Janitor">Janitor</option>
+                  <option value="Guard">Guard</option>
+                  <option value="Vendor">Vendor</option>
+                  <option value="Visitor">Visitor</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
             </div>
+            <!-- HANGGANG DITO -->
             <div class="row mb-3">
               <label for="contact" class="col-sm-2 col-form-label">Contact</label>
               <div class="col-sm-10">
@@ -214,19 +226,23 @@ include 'fetchfname.php';
                 <input type="number" class="form-control" id="age" name="age" placeholder="Enter Age" min="1" max="100" required>
               </div>
             </div>
-            <div class="row mb-3">
-              <label for="year_level" class="col-sm-2 col-form-label">Year Level</label>
-              <div class="col-sm-10">
-                <select class="form-control" id="year_level" name="year_level" required>
-                  <option value="">Select Year Level</option>
-                  <option value="shs">Senior High School (SHS)</option>
-                  <option value="1st_year">1st Year</option>
-                  <option value="2nd_year">2nd Year</option>
-                  <option value="3rd_year">3rd Year</option>
-                  <option value="4th_year">4th Year</option>
-                </select>
-              </div>
-            </div>
+
+            <!-- BAGO TO -->
+
+            <div class="row mb-3" id="yearLevelRow" style="display: none;">
+  <label for="year_level" class="col-sm-2 col-form-label">Year Level</label>
+  <div class="col-sm-10">
+    <select class="form-control" id="year_level" name="year_level">
+      <option value="">Select Year Level</option>
+      <option value="shs">Senior High School (SHS)</option>
+      <option value="1st_year">1st Year</option>
+      <option value="2nd_year">2nd Year</option>
+      <option value="3rd_year">3rd Year</option>
+      <option value="4th_year">4th Year</option>
+    </select>
+  </div>
+</div>
+<!-- HANGGANG DITO -->
           </form><!-- End General Form Elements -->
         </div>
       </div>
@@ -240,9 +256,12 @@ include 'fetchfname.php';
           <!-- Advanced Form Elements -->
           <form id="form2" method="post" action="forms-elements.php">
             <div class="row mb-3">
-              <label for="condition" class="col-sm-2 col-form-label">Condition</label>
+              <label for="condition" class="col-sm-2 col-form-label">Symptoms</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="condition" name="condition" placeholder="Enter Symptoms" required>
+      <!-- NEW -->
+              <input type="text" class="form-control" id="condition" name="condition" placeholder="Enter Symptoms" required onkeyup="fetchSuggestions(this.value)">
+                <ul id="suggestions-list" class="list-group" style="position: absolute; z-index: 1000; display: none;"></ul>
+      <!-- NEW -->
               </div>
             </div>
             <div class="row mb-3">
@@ -391,7 +410,50 @@ document.getElementById('submitBtn').addEventListener('click', function(event) {
 
 
 </script>
+<!-- BAGO TO -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var studentNumberDropdown = document.getElementById("student_number");
+    var yearLevelRow = document.getElementById("yearLevelRow");
 
+    studentNumberDropdown.addEventListener("change", function() {
+        if (this.value === "Student") {
+            yearLevelRow.style.display = "flex";  // Show Year Level
+        } else {
+            yearLevelRow.style.display = "none";  // Hide Year Level
+        }
+    });
+});
+</script>
+<!-- RECOMMENDATION GALING SA DATABASE -->
+<script>
+function fetchSuggestions(query) {
+    if (query.length < 2) {
+        document.getElementById("suggestions-list").style.display = "none";
+        return;
+    }
+
+    fetch("fetch_symptoms.php?query=" + query)
+    .then(response => response.json())
+    .then(data => {
+        let suggestionsList = document.getElementById("suggestions-list");
+        suggestionsList.innerHTML = ""; // Clear previous suggestions
+        suggestionsList.style.display = "block";
+
+        data.forEach(symptom => {
+            let item = document.createElement("li");
+            item.classList.add("list-group-item");
+            item.textContent = symptom;
+            item.onclick = function() {
+                document.getElementById("condition").value = symptom;
+                suggestionsList.style.display = "none";
+            };
+            suggestionsList.appendChild(item);
+        });
+    })
+    .catch(error => console.error("Error fetching symptoms:", error));
+}
+</script>
 
 </body>
 

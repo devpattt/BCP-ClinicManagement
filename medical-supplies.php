@@ -134,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </a>
           </li>
           <li>
-            <a href="blankanomaly.php">
+            <a href="forecastingai.php">
               <i class="bi bi-circle"></i><span>A.I Anomaly</span>
             </a>
           </li>

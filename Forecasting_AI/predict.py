@@ -1,13 +1,15 @@
-import joblib
-import numpy as np
+from flask import Flask, jsonify
 
-model = joblib.load("health_risk_model.pkl")
+app = Flask(__name__)
 
-new_patient = np.array([[1, 1, 0, 1]])  
+@app.route('/predict', methods=['POST'])
+def predict():
+    patients = get_patient_data()  # Function to fetch patient data
+    results = []
 
-prediction = model.predict(new_patient)
+    for patient in patients:
+        predicted_disease = predict_disease(patient['conditions'])  # AI prediction function
+        save_predictions_to_db(patient['fullname'], predicted_disease)
+        results.append({"fullname": patient['fullname'], "predicted_disease": predicted_disease})
 
-if prediction[0] == 1:
-    print("⚠️ High risk detected! Advise medical check-up.")
-else:
-    print("✅ Low risk. No immediate concern.")
+    return jsonify(results)
