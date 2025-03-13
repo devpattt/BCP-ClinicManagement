@@ -39,7 +39,7 @@ for ($date = clone $startDate; $date <= $endDate; $date->modify('+1 month')) {
 
     $allMonthsData[] = [
         'month' => $monthNames[$monthNumber] . " $year", 
-        'count' => isset($visitData[$formattedMonth]) ? $visitData[$formattedMonth] : 
+        'count' => isset($visitData[$formattedMonth]) ? $visitData[$formattedMonth] : 0
     ];
 }
 

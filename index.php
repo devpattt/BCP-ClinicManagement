@@ -16,7 +16,7 @@ use PHPMailer\PHPMailer\Exception;
 $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username']; 
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     $sql = "SELECT * FROM bcp_sms3_users WHERE username = ?";
