@@ -1,6 +1,4 @@
-import mysql.connector
-
-def save_predictions_to_db(fullname, predicted_disease):
+def save_predictions_to_db(patient_id, symptoms, predicted_condition, confidence_score, status="New"):
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -8,7 +6,10 @@ def save_predictions_to_db(fullname, predicted_disease):
         database="bcp_sms3_cms"
     )
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO bcp_sms3_predictions (fullname, predicted_disease) VALUES (%s, %s)",
-                   (fullname, predicted_disease))
+    sql = """INSERT INTO bcp_sms3_predictions 
+             (patient_id, symptoms, predicted_condition, confidence_score, status) 
+             VALUES (%s, %s, %s, %s, %s)"""
+    values = (patient_id, symptoms, predicted_condition, confidence_score, status)
+    cursor.execute(sql, values)
     conn.commit()
     conn.close()
