@@ -26,7 +26,6 @@ if ($completed_questionnaire) {
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Sanitize input
     function sanitize_input($data) {
         return htmlspecialchars(trim($data));
     }
@@ -41,7 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $physical_activity = sanitize_input($_POST['physical_activity'] ?? 'Unknown');
     $health_seminars = sanitize_input($_POST['health_seminars'] ?? 'No');
 
-    // Insert responses into database
     $sql = "INSERT INTO bcp_sms3_health_questionnaire 
             (username, allergies, medical_conditions, medication, hospitalization, symptoms, contact_with_sick, sleep_hours, physical_activity, health_seminars) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -53,7 +51,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         );
 
         if ($stmt->execute()) {
-            // Mark questionnaire as completed
             $update_query = "UPDATE bcp_sms3_users SET completed_questionnaire = 1 WHERE username = ?";
             $update_stmt = $conn->prepare($update_query);
             $update_stmt->bind_param("s", $username);
@@ -70,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,9 +87,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             margin-top: 50px;
+            display: none; /* Initially hidden */
         }
         .submit-btn {
-            background-color: #28a745;
+            background-color: rgb(10, 105, 230);
             color: white;
             padding: 10px;
             border: none;
@@ -100,88 +99,180 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
         }
         .submit-btn:hover {
-            background-color: #218838;
+            background-color: rgb(8, 90, 200);
+        }
+
+        /* Agreement Modal */
+        .modal-container {
+            display: flex;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center">Health Questionnaire</h2>
-        <form action="" method="POST">
-            <div class="mb-3">
-                <label class="form-label">Do you have any known allergies?</label>
-                <input type="text" name="allergies" class="form-control" placeholder="Specify or type 'None'" required>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Do you have any existing medical conditions?</label>
-                <input type="text" name="medical_conditions" class="form-control" placeholder="Specify or type 'None'" required>
-            </div>
+<!-- Agreement Modal -->
+<div id="agreementModal" class="modal-container">
+    <div class="modal-content">
+        <h2>Health Questionnaire Agreement</h2>
+        <p>Before proceeding, you must agree to provide accurate health information.</p>
+        <p>Your responses will be used for medical assessment purposes only.</p>
 
-            <div class="mb-3">
-                <label class="form-label">Are you currently taking any medication?</label>
-                <input type="text" name="medication" class="form-control" placeholder="Specify or type 'None'" required>
-            </div>
+        <label class="form-label">Do you accept the agreement?</label><br>
+        <input type="radio" name="agreement" value="yes"> I Agree
+        <input type="radio" name="agreement" value="no"> I Decline
 
-            <div class="mb-3">
-                <label class="form-label">Have you ever been hospitalized?</label>
-                <input type="text" name="hospitalization" class="form-control" placeholder="Specify or type 'None'" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Have you experienced any of these symptoms recently?</label><br>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="symptoms[]" value="Fever"> Fever<br>
-                    <input class="form-check-input" type="checkbox" name="symptoms[]" value="Cough"> Cough<br>
-                    <input class="form-check-input" type="checkbox" name="symptoms[]" value="Shortness of breath"> Shortness of breath<br>
-                    <input class="form-check-input" type="checkbox" name="symptoms[]" value="Sore throat"> Sore throat<br>
-                    <input class="form-check-input" type="checkbox" name="symptoms[]" value="Loss of taste/smell"> Loss of taste/smell<br>
-                    <input class="form-check-input" type="checkbox" name="symptoms[]" value="None"> None<br>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Have you been in contact with someone sick?</label>
-                <select name="contact_with_sick" class="form-select" required>
-                    <option value="">Select</option>
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">How many hours of sleep do you get?</label>
-                <select name="sleep_hours" class="form-select" required>
-                    <option value="">Select</option>
-                    <option value="Less than 4 hours">Less than 4 hours</option>
-                    <option value="4-6 hours">4-6 hours</option>
-                    <option value="7-9 hours">7-9 hours</option>
-                    <option value="More than 9 hours">More than 9 hours</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">How often are you exercise??</label>
-                <select name="physical_activity" class="form-select" required>
-                    <option value="">Select</option>
-                    <option value="Never">Never</option>
-                    <option value="Less than 2 times">Less than 2 times</option>
-                    <option value="2 to 4 times">2 to 4 times</option>
-                    <option value="4 and above">4 and above</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Would you be interested in health seminars?</label>
-                <select name="health_seminars" class="form-select" required>
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-success w-100">Submit</button>
-        </form>
+        <div class="mt-3">
+            <button class="submit-btn" onclick="processAgreement()">Submit</button>
+        </div>
     </div>
+</div>
+
+<!-- Disagreement Confirmation Modal -->
+<div id="disagreeModal" class="modal-container" style="display:none;">
+    <div class="modal-content">
+        <h2>Are you sure?</h2>
+        <p>If you disagree, you will be logged out.</p>
+
+        <label class="form-label">Do you want to proceed?</label><br>
+        <input type="radio" name="disagreeConfirm" value="yes"> Yes, log me out
+        <input type="radio" name="disagreeConfirm" value="no"> No, go back
+
+        <div class="mt-3">
+            <button class="submit-btn" onclick="handleDisagreeChoice()">Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Questionnaire Form -->
+<div id="questionnaire" class="container">
+    <h2 class="text-center">Health Questionnaire</h2>
+    <form action="" method="POST">
+    <div class="mb-3">
+        <label class="form-label">Do you have any known allergies?</label>
+        <input type="text" name="allergies" class="form-control" placeholder="Specify or type 'None'" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Do you have any existing medical conditions?</label>
+        <input type="text" name="medical_conditions" class="form-control" placeholder="Specify or type 'None'" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Are you currently taking any medication?</label>
+        <input type="text" name="medication" class="form-control" placeholder="Specify or type 'None'" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Have you ever been hospitalized?</label>
+        <input type="text" name="hospitalization" class="form-control" placeholder="Specify or type 'None'" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Have you experienced any of these symptoms recently?</label><br>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="symptoms[]" value="Fever"> Fever<br>
+            <input class="form-check-input" type="checkbox" name="symptoms[]" value="Cough"> Cough<br>
+            <input class="form-check-input" type="checkbox" name="symptoms[]" value="Shortness of breath"> Shortness of breath<br>
+            <input class="form-check-input" type="checkbox" name="symptoms[]" value="Sore throat"> Sore throat<br>
+            <input class="form-check-input" type="checkbox" name="symptoms[]" value="Loss of taste/smell"> Loss of taste/smell<br>
+            <input class="form-check-input" type="checkbox" name="symptoms[]" value="None"> None<br>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Have you been in contact with someone sick?</label>
+        <select name="contact_with_sick" class="form-select" required>
+            <option value="">Select</option>
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">How many hours of sleep do you get?</label>
+        <select name="sleep_hours" class="form-select" required>
+            <option value="">Select</option>
+            <option value="Less than 4 hours">Less than 4 hours</option>
+            <option value="4-6 hours">4-6 hours</option>
+            <option value="7-9 hours">7-9 hours</option>
+            <option value="More than 9 hours">More than 9 hours</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">How often do you exercise?</label>
+        <select name="physical_activity" class="form-select" required>
+            <option value="">Select</option>
+            <option value="Never">Never</option>
+            <option value="Once a week">Once a week</option>
+            <option value="2-3 times a week">2-3 times a week</option>
+            <option value="4+ times a week">4+ times a week</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Would you be interested in health seminars?</label>
+        <select name="health_seminars" class="form-select" required>
+            <option value="">Select</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100" style="background-color: #1e3a8a;">Submit</button>
+</form>
+
+</div>
+
+<script>
+function processAgreement() {
+    let agreement = document.querySelector('input[name="agreement"]:checked');
+    if (!agreement) {
+        alert("Please select an option.");
+        return;
+    }
+
+    if (agreement.value === "yes") {
+        document.getElementById("agreementModal").style.display = "none";
+        document.getElementById("questionnaire").style.display = "block";
+    } else {
+        document.getElementById("agreementModal").style.display = "none";
+        document.getElementById("disagreeModal").style.display = "flex";
+    }
+}
+
+function handleDisagreeChoice() {
+    let disagree = document.querySelector('input[name="disagreeConfirm"]:checked');
+    if (!disagree) {
+        alert("Please select an option.");
+        return;
+    }
+
+    if (disagree.value === "yes") {
+        window.location.href = "../index.php";
+    } else {
+        document.getElementById("disagreeModal").style.display = "none";
+        document.getElementById("agreementModal").style.display = "flex";
+    }
+}
+</script>
+
 </body>
 </html>

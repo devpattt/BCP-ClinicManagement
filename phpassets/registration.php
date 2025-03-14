@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // If no errors, insert the user into the database
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO bcp_sms3_admin (user_type, fullname, email, username, password) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO bcp_sms3_users (user_type, fullname, email, username, password) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $type, $fullname, $email, $username, $hashed_password);
 
         
