@@ -11,6 +11,9 @@ include '../fetchfname.php';
 
 $uniqueId = isset($_GET['unique_id']) ? htmlspecialchars($_GET['unique_id']) : "";
 
+// Check if the request is made via AJAX.
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Process the uploaded file.
     if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
@@ -19,20 +22,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         // Only allow TXT files.
         if ($fileExtension !== 'txt') {
-            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file type. Only TXT files are allowed."));
-            exit();
+            if ($isAjax) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid file type. Only TXT files are allowed.']);
+                exit();
+            } else {
+                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file type. Only TXT files are allowed."));
+                exit();
+            }
         }
         $fileContent = file_get_contents($fileTmpPath);
     } else {
-        header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("No file uploaded or an upload error occurred."));
-        exit();
+        if ($isAjax) {
+            echo json_encode(['status' => 'error', 'message' => 'No file uploaded or an upload error occurred.']);
+            exit();
+        } else {
+            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("No file uploaded or an upload error occurred."));
+            exit();
+        }
     }
     
     // Get the Reason input.
     $reason = isset($_POST['reason']) ? trim($_POST['reason']) : "";
     if (empty($reason)) {
-        header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Please enter a reason."));
-        exit();
+        if ($isAjax) {
+            echo json_encode(['status' => 'error', 'message' => 'Please enter a reason.']);
+            exit();
+        } else {
+            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Please enter a reason."));
+            exit();
+        }
     }
     
     // Insert the file content and reason into the database.
@@ -46,20 +64,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           SET process='Done' 
                           WHERE unique_id = '" . $uniqueId . "'";
             if ($conn->query($updateSQL)) {
-                header("Location: integ.php?success=" . urlencode("File and reason stored; process updated to Sent."));
-                exit();
+                if ($isAjax) {
+                    echo json_encode(['status' => 'success', 'message' => 'File Sent Sucessfully!.']);
+                    exit();
+                } else {
+                    header("Location: integ.php?success=" . urlencode("File Failed to Sent!."));
+                    exit();
+                }
             } else {
-                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("File stored but update failed: " . $conn->error));
-                exit();
+                if ($isAjax) {
+                    echo json_encode(['status' => 'error', 'message' => "File stored but update failed: " . $conn->error]);
+                    exit();
+                } else {
+                    header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("File stored but update failed: " . $conn->error));
+                    exit();
+                }
             }
         } else {
-            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Insertion error: " . $stmt->error));
-            exit();
+            if ($isAjax) {
+                echo json_encode(['status' => 'error', 'message' => "Insertion error: " . $stmt->error]);
+                exit();
+            } else {
+                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Insertion error: " . $stmt->error));
+                exit();
+            }
         }
         $stmt->close();
     } else {
-         header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Error preparing statement: " . $conn->error));
-         exit();
+         if ($isAjax) {
+            echo json_encode(['status' => 'error', 'message' => "Error preparing statement: " . $conn->error]);
+            exit();
+         } else {
+            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Error preparing statement: " . $conn->error));
+            exit();
+         }
     }
 }
 ?>
@@ -157,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </ol>
       </nav>
       <p class="text-muted">Reference: <?php echo $uniqueId; ?></p>
-      <!-- Back Button placed immediately below the breadcrumb -->
+      <!-- Back Button -->
       <div class="mb-3">
         <a href="generatePDF.php?unique_id=<?php echo $uniqueId; ?>" class="btn btn-secondary">
           <i class="bi bi-arrow-left"></i> Back
@@ -169,7 +207,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="col-lg-12">
           <div class="card">
             <div class="card-body">
-              <form action="send.php?unique_id=<?php echo $uniqueId; ?>" method="POST" enctype="multipart/form-data">
+              <!-- The form will be submitted via AJAX -->
+              <form id="sendForm" action="send.php?unique_id=<?php echo $uniqueId; ?>" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                   <label for="document" class="form-label">Select TXT File:</label>
                   <input type="file" name="document" id="document" class="form-control" accept=".txt" required>
@@ -178,7 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <label for="reason" class="form-label">Reason:</label>
                   <input type="text" name="reason" id="reason" class="form-control" placeholder="Enter reason here" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Send</button>
+                <!-- Open the confirmation modal instead of submitting directly -->
+                <button type="button" class="btn btn-primary" id="openConfirmModal">Send</button>
               </form>
             </div>
           </div>
@@ -187,17 +227,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </section>
   </main>
 
-  <!-- Modal for displaying messages -->
-  <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmSendModal" tabindex="-1" aria-labelledby="confirmSendModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="messageModalLabel">Message</h5>
+          <h5 class="modal-title" id="confirmSendModalLabel">Confirm Transaction</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="messageModalBody"></div>
+        <div class="modal-body">
+          Are you sure you want to send the TXT file and reason?
+        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <!-- This button will trigger the AJAX submission -->
+          <button type="button" class="btn btn-primary" id="confirmSendButton">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Modal: displays success or error message -->
+  <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resultModalLabel">Result</h5>
+          <!-- The close button here will be handled by our JavaScript to redirect -->
+          <button type="button" class="btn-close" id="resultCloseButton" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="resultModalBody"></div>
+        <div class="modal-footer">
+          <!-- When this button is clicked, the user is redirected to integ.php -->
+          <button type="button" class="btn btn-secondary" id="redirectButton">Close</button>
         </div>
       </div>
     </div>
@@ -211,19 +273,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <script src="../assets/js/main.js"></script>
   
   <script>
-    // When the document loads, check for error or success messages in the URL.
-    document.addEventListener("DOMContentLoaded", function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const error = urlParams.get('error');
-      const success = urlParams.get('success');
-      if (error || success) {
-          const messageModalBody = document.getElementById('messageModalBody');
-          messageModalBody.textContent = error ? error : success;
-          const messageModalLabel = document.getElementById('messageModalLabel');
-          messageModalLabel.textContent = error ? "Error" : "Success";
-          var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
-          messageModal.show();
-      }
+    // Open the confirmation modal when "Send" is clicked.
+    document.getElementById('openConfirmModal').addEventListener('click', function() {
+      var confirmModal = new bootstrap.Modal(document.getElementById('confirmSendModal'));
+      confirmModal.show();
+    });
+
+    // When the user clicks "Confirm" in the confirmation modal, submit the form via AJAX.
+    document.getElementById('confirmSendButton').addEventListener('click', function() {
+      var form = document.getElementById('sendForm');
+      var formData = new FormData(form);
+
+      // Send the form data via fetch with the appropriate header.
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide the confirmation modal.
+        var confirmModalEl = document.getElementById('confirmSendModal');
+        var confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+        confirmModal.hide();
+
+        // Set the result message.
+        document.getElementById('resultModalBody').textContent = data.message;
+        document.getElementById('resultModalLabel').textContent = (data.status === 'success') ? "Success" : "Error";
+
+        // Show the result modal.
+        var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        resultModal.show();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Hide the confirmation modal.
+        var confirmModalEl = document.getElementById('confirmSendModal');
+        var confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+        confirmModal.hide();
+
+        // Display a generic error message.
+        document.getElementById('resultModalBody').textContent = "An unexpected error occurred.";
+        document.getElementById('resultModalLabel').textContent = "Error";
+
+        // Show the result modal.
+        var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        resultModal.show();
+      });
+    });
+
+    // When the user clicks the "Close" button in the result modal, redirect to integ.php.
+    document.getElementById('redirectButton').addEventListener('click', function() {
+      window.location.href = "integ.php";
+    });
+    // Also allow the close icon to trigger the redirect.
+    document.getElementById('resultCloseButton').addEventListener('click', function() {
+      window.location.href = "integ.php";
     });
   </script>
 </body>

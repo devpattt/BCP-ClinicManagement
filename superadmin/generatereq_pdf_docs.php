@@ -38,6 +38,8 @@
   <div class="mt-3">
     <button id="generateDocBtn" class="btn btn-primary">Generate DOC</button>
     <button id="generatePdfBtn" class="btn btn-secondary">Generate PDF</button>
+    <!-- Next button added beside Generate PDF -->
+    <a href="demoreq.php" class="btn btn-info">Next</a>
   </div>
 </div>
 
