@@ -9,14 +9,7 @@ if (!isset($_SESSION['username'])) {
 include '../fetchfname.php';
 include '../connection.php';
 include 'updateAction.php';
-
-
-
-
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,17 +83,15 @@ include 'updateAction.php';
       <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
-      <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-
-
-      <li>
+      <ul id="system-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
           <a href="clinic-dashboard.php">
-            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+            <i class="bi bi-circle"></i><span>Report and Analytics</span>
           </a>
         </li>
         <li>
           <a href="request.php">
-            <i class="bi bi-circle" ></i><span>Request Supply</span>
+            <i class="bi bi-circle"></i><span>Request Supply</span>
           </a>
         </li>
         <li>
@@ -114,25 +105,25 @@ include 'updateAction.php';
           </a>
         </li>
         <li>  
-        <a href="medical-supplies.php">
-            <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+          <a href="medical-supplies.php">
+            <i class="bi bi-circle"></i><span>Medical Supplies</span>
           </a>
         </li>
-          <li>
-            <a href="blankanomaly.php">
-              <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
-            </a>
-          </li>
-          <li>
-          <a href="integ.php"  class="active">
-            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+        <li>
+          <a href="blankanomaly.php">
+            <i class="bi bi-circle"></i><span>A.I Anomaly</span>
           </a>
         </li>
-          <li></li>
-
+        <li>
+          <a href="integ.php" class="active">
+            <i class="bi bi-circle"></i><span>Patient Reports</span>
+          </a>
+        </li>
+        <li></li>
       </ul>
     </li>
   <hr class="sidebar-divider">
+</ul>
 </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
@@ -141,101 +132,89 @@ include 'updateAction.php';
       <h1>Request Reports</h1>
       <nav>
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-        <li class="breadcrumb-item active">Patient Medical Reports</li>
+          <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
+          <li class="breadcrumb-item active">Patient Medical Reports</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
 
-  
     <section class="section">
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Patient Basic Information</h5>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Patient Basic Information</h5>
 
-<!-- Request Table -->
-<div class="container mt-5">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Request</th>
-        <th>Reason</th>
-        <th>Request Date</th>
-        <th>Actions</th>
-        <th>Process</th>
-        <th>Process Buttons</th>
-        <th>Download</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php include 'viewreqforinteg.php'; ?>
-    </tbody>
-  </table>
-</div>
+              <!-- Request Table -->
+              <div class="container mt-5">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Request</th>
+                      <th>Reason</th>
+                      <th>Request Date</th>
+                      <th>Actions</th>
+                      <th>Process</th>
+                      <th>Process Buttons</th>
+                      <th>Download</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php include 'viewreqforinteg.php'; ?>
+                  </tbody>
+                </table>
+              </div>
 
               <!-- JavaScript to handle Process button state transitions -->
               <script>
               function processRow(btn) {
-  // Get the closest row element
-  var row = btn.closest('tr');
-  // Retrieve record id and unique_id from data attributes
-  var recordId = row.getAttribute('data-id');
-  var uniqueId = row.getAttribute('data-uniqueid');
-  
-  // Select the buttons within that row
-  var acceptBtn = row.querySelector('.accept-btn');
-  var sendBtn   = row.querySelector('.send-btn');
-  var doneBtn   = row.querySelector('.done-btn');
-  
-  // Get the Actions cell (assumed to be the 4th column)
-  var actionsCell = row.querySelector('td.actions-cell');
+                  // Get the closest row element
+                  var row = btn.closest('tr');
+                  // Retrieve record id and unique_id from data attributes
+                  var recordId = row.getAttribute('data-id');
+                  var uniqueId = row.getAttribute('data-uniqueid');
 
-  if (btn.classList.contains('accept-btn')) {
-    if (actionsCell.innerText.trim() !== "Accepted") {
-      // Update database via AJAX to set action to "Accepted"
-      fetch('updateAction.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'id=' + encodeURIComponent(recordId) + '&newAction=' + encodeURIComponent('Accepted')
-      })
-      .then(response => response.text())
-      .then(data => {
-        if (data.trim() === "success") {
-          actionsCell.innerText = "Accepted";
-          acceptBtn.disabled = true;
-          sendBtn.disabled = false;
-          doneBtn.disabled = true;
-        } else {
-          alert("Update error: " + data);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert("An error occurred while updating the record.");
-      });
-    } else {
-      // Already accepted
-      acceptBtn.disabled = true;
-      sendBtn.disabled = false;
-      doneBtn.disabled = true;
-    }
-  } else if (btn.classList.contains('send-btn')) {
-    // When Send is clicked, disable Accept and Send; enable Done;
-    acceptBtn.disabled = true;
-    sendBtn.disabled = true;
-    doneBtn.disabled = false;
-    // Navigate to the next page, passing unique_id as a GET parameter
-    window.location.href = 'generatePDF.php?unique_id=' + encodeURIComponent(uniqueId);
-  } else if (btn.classList.contains('done-btn')) {
-    // When Done is clicked, disable all buttons.
-    acceptBtn.disabled = true;
-    sendBtn.disabled = true;
-    doneBtn.disabled = true;
-  }
-}
+                  // Select the buttons within that row
+                  var acceptBtn = row.querySelector('.accept-btn');
+                  var sendBtn   = row.querySelector('.send-btn');
 
+                  // Get the Actions cell (assumed to be the 4th column)
+                  var actionsCell = row.querySelector('td.actions-cell');
+
+                  if (btn.classList.contains('accept-btn')) {
+                      if (actionsCell.innerText.trim() !== "Accepted") {
+                          // Update database via AJAX to set action to "Accepted"
+                          fetch('updateAction.php', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                              body: 'id=' + encodeURIComponent(recordId) + '&newAction=' + encodeURIComponent('Accepted')
+                          })
+                          .then(response => response.text())
+                          .then(data => {
+                              if (data.trim() === "success") {
+                                  actionsCell.innerText = "Accepted";
+                                  acceptBtn.disabled = true;
+                                  sendBtn.disabled = false;
+                              } else {
+                                  alert("Update error: " + data);
+                              }
+                          })
+                          .catch(error => {
+                              console.error('Error:', error);
+                              alert("An error occurred while updating the record.");
+                          });
+                      } else {
+                          acceptBtn.disabled = true;
+                          sendBtn.disabled = false;
+                      }
+                  } else if (btn.classList.contains('send-btn')) {
+                      // When Send is clicked, disable Accept and Send.
+                      acceptBtn.disabled = true;
+                      sendBtn.disabled = true;
+                      // Navigate to the next page, passing unique_id as a GET parameter.
+                      window.location.href = 'generatePDF.php?unique_id=' + encodeURIComponent(uniqueId);
+                  }
+              }
               </script>
             </div>
           </div>

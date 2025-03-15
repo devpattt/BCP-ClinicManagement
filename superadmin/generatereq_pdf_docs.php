@@ -42,11 +42,12 @@
 </div>
 
 <script>
-// This function extracts all valid student numbers (pattern: s followed by 8 digits) from the input.
+// This function extracts all valid student numbers (pattern: s followed by exactly 8 digits)
+// using word boundaries to ensure only exact matches are returned.
 function extractValidStudentNumbers() {
   var content = document.getElementById('studentNumbersInput').value;
-  // Use regex to match valid tokens; it will ignore any extra characters.
-  var matches = content.match(/s\d{8}/gi) || [];
+  // The regex \b ensures the match starts and ends at a word boundary.
+  var matches = content.match(/\bs\d{8}\b/gi) || [];
   // Normalize tokens to lowercase and deduplicate
   var validNumbers = [...new Set(matches.map(s => s.toLowerCase()))];
   return validNumbers;

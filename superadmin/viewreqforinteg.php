@@ -19,15 +19,19 @@ if ($result) {
         // Process Buttons Column:
         echo "<td>";
         if (strtolower(trim($row['action'])) === "accepted") {
-            // If already accepted, disable Accept and Done; enable Send.
-            echo "<button class='btn btn-success btn-sm accept-btn me-1' disabled>Accept</button> ";
-            echo "<button class='btn btn-warning btn-sm send-btn me-1' onclick='processRow(this)'>Send</button> ";
-            echo "<button class='btn btn-info btn-sm done-btn' disabled>Done</button>";
+            if (strtolower(trim($row['process'])) === "done") {
+                // If action is accepted and process is Done: disable Accept and Send.
+                echo "<button class='btn btn-success btn-sm accept-btn me-1' disabled>Accept</button> ";
+                echo "<button class='btn btn-warning btn-sm send-btn me-1' disabled>Send</button> ";
+            } else {
+                // If accepted but process is not Done: disable Accept; enable Send.
+                echo "<button class='btn btn-success btn-sm accept-btn me-1' disabled>Accept</button> ";
+                echo "<button class='btn btn-warning btn-sm send-btn me-1' onclick='processRow(this)'>Send</button> ";
+            }
         } else {
             // Otherwise, only Accept is enabled.
             echo "<button class='btn btn-success btn-sm accept-btn me-1' onclick='processRow(this)'>Accept</button> ";
             echo "<button class='btn btn-warning btn-sm send-btn me-1' onclick='processRow(this)' disabled>Send</button> ";
-            echo "<button class='btn btn-info btn-sm done-btn' onclick='processRow(this)' disabled>Done</button>";
         }
         echo "</td>";
         // Download Column:
@@ -41,3 +45,67 @@ if ($result) {
 }
 $conn->close();
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinic Management System / Patient Reports</title>
+</head>
+<body>
+  <!-- Your page content continues here -->
+  
+  <!-- JavaScript to handle Process button state transitions -->
+  <script>
+    function processRow(btn) {
+      // Get the closest row element
+      var row = btn.closest('tr');
+      // Retrieve record id and unique_id from data attributes
+      var recordId = row.getAttribute('data-id');
+      var uniqueId = row.getAttribute('data-uniqueid');
+      
+      // Select the buttons within that row
+      var acceptBtn = row.querySelector('.accept-btn');
+      var sendBtn   = row.querySelector('.send-btn');
+      
+      // Get the Actions cell (assumed to be the 4th column)
+      var actionsCell = row.querySelector('td.actions-cell');
+
+      if (btn.classList.contains('accept-btn')) {
+          if (actionsCell.innerText.trim() !== "Accepted") {
+              // Update database via AJAX to set action to "Accepted"
+              fetch('updateAction.php', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: 'id=' + encodeURIComponent(recordId) + '&newAction=' + encodeURIComponent('Accepted')
+              })
+              .then(response => response.text())
+              .then(data => {
+                  if (data.trim() === "success") {
+                      actionsCell.innerText = "Accepted";
+                      acceptBtn.disabled = true;
+                      sendBtn.disabled = false;
+                  } else {
+                      alert("Update error: " + data);
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  alert("An error occurred while updating the record.");
+              });
+          } else {
+              // Already accepted
+              acceptBtn.disabled = true;
+              sendBtn.disabled = false;
+          }
+      } else if (btn.classList.contains('send-btn')) {
+          // When Send is clicked, disable Accept and Send.
+          acceptBtn.disabled = true;
+          sendBtn.disabled = true;
+          // Navigate to the next page (e.g., generatePDF.php)
+          window.location.href = 'generatePDF.php?unique_id=' + encodeURIComponent(uniqueId);
+      }
+    }
+  </script>
+</body>
+</html>
