@@ -26,6 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $contact = htmlspecialchars(trim($_POST['contact']));
     $s_gender = htmlspecialchars(trim($_POST['s_gender']));
     $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
+    if ($age === false) {
+        die("Invalid age provided.");
+    }
     $year_level = htmlspecialchars(trim($_POST['year_level']));
     $condition = htmlspecialchars(trim($_POST['condition']));
     $treatment = htmlspecialchars(trim($_POST['treatment']));
@@ -35,8 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Invalid gender selected.");
     }
     
+    // Note: Binding types have been adjusted: "s" for strings, "i" for integer.
     $stmt = $conn->prepare("INSERT INTO bcp_sms3_patients (fullname, student_number, contact, s_gender, age, year_level, conditions, treatment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
+    $stmt->bind_param("ssssisss", $fullname, $student_number, $contact, $s_gender, $age, $year_level, $condition, $treatment);
 
     if ($stmt->execute()) {
         echo "<script>
@@ -179,7 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <h5 class="card-title">Patient Basic Information</h5>
 
               <!-- General Form Elements -->
-              <form id="form1" method="post" action="../forms-elements.php">
+              <form id="form1" method="post" action="forms-elements.php">
                 <div class="row mb-3">
                   <label for="fullname" class="col-sm-2 col-form-label">Fullname</label>
                   <div class="col-sm-10">
@@ -257,7 +261,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="card-body">
               <h5 class="card-title">Additional Diagnostic Informations</h5>
               <!-- Advanced Form Elements -->
-              <form id="form2" method="post" action="../forms-elements.php">
+              <form id="form2" method="post" action="forms-elements.php">
                 <div class="row mb-3">
                   <label for="condition" class="col-sm-2 col-form-label">Symptoms</label>
                   <div class="col-sm-10">
@@ -307,6 +311,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../assets/js/main.js"></script>
 
     <script>
+    // Updated Validation Function: Check only visible fields (input, select, textarea)
+    function areAllInputsFilled(form) {
+      for (var i = 0; i < form.elements.length; i++) {
+        var element = form.elements[i];
+        // Skip if the element is hidden (offsetParent is null for display:none elements)
+        if (element.offsetParent === null) {
+          continue;
+        }
+        // Check for input, select, or textarea fields
+        if ((element.tagName === 'INPUT' ||
+             element.tagName === 'SELECT' ||
+             element.tagName === 'TEXTAREA') &&
+             !element.value) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     // Ensure the additional "Student Number" input shows only when "Student" is selected.
     document.addEventListener("DOMContentLoaded", function() {
       var patientTypeDropdown = document.getElementById("patient_type");
@@ -338,16 +361,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       var form1 = document.getElementById('form1');
       var form2 = document.getElementById('form2');
 
-      function areAllInputsFilled(form) {
-          for (var i = 0; i < form.elements.length; i++) {
-              var element = form.elements[i];
-              if (element.tagName === 'INPUT' && element.type !== 'button' && !element.value) {
-                  return false;
-              }
-          }
-          return true;
-      }
-
       function showValidationAlert(message) {
           const validationAlert = document.getElementById('validationAlert');
           validationAlert.innerText = message;
@@ -362,7 +375,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           successAlert.style.display = 'block'; 
           setTimeout(() => {
               successAlert.style.display = 'none'; 
-              window.location.href = '../forms-elements.php'; 
+              window.location.href = 'forms-elements.php'; 
           }, 3000);
       }
 
@@ -385,7 +398,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
       }
 
-      fetch('../forms-elements.php', {
+      fetch('forms-elements.php', {
           method: 'POST',
           body: combinedData
       })

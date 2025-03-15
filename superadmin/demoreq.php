@@ -91,6 +91,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
   <div class="container mt-5">
+    <!-- Back Button placed at the top -->
+    <a href="generatereq_pdf_docs.php" class="btn btn-secondary mb-3">Back</a>
+    
     <h2 class="mb-4">Add New Request</h2>
     
     <?php if(isset($message)): ?>

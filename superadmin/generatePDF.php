@@ -165,8 +165,10 @@ $result = $conn->query($query);
               <!-- Toolbar Buttons -->
               <div class="d-flex toolbar mb-3">
                 <button onclick="window.location.href='integ.php'" class="btn btn-primary">Back</button>
+                <button id="generateDocsBtn" class="btn btn-success"></button>
+                <button id="generatePdfBtn" class="btn btn-warning"></button>
                 <button id="generateTextBtn" class="btn btn-info">Generate Text</button>
-                <button onclick="window.location.href='send.php?unique_id=<?php echo $uniqueId; ?>'" class="btn btn-info">Next</button>
+                <button onclick="window.location.href='.php?unique_id=<?php echo $uniqueId; ?>'" class="btn btn-info">Next</button>
               </div>
               
               <!-- File Input and Search -->
