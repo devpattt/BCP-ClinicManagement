@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Student Number Input Guideline</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1, h2 { text-align: center; color: #0056b3; }
+    .instructions ol { margin-left: 20px; }
+    .sample { background-color: #f1f1f1; padding: 5px 10px; border: 1px dashed #ccc; display: inline-block; }
+    pre { background: #f9f9f9; border: 1px solid #ddd; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Student Number Input Guideline</h1>
+  <div class="instructions">
+    <p>Please follow the format below when entering student numbers:</p>
+    <ol>
+      <li>Each student number must start with the lowercase letter <strong>s</strong>.</li>
+      <li>Followed by exactly 8 digits (0–9).</li>
+      <li>No spaces, dashes, or extra characters are allowed (the system will extract valid numbers only).</li>
+    </ol>
+    <p>Example: <span class="sample">s21018***</span></p>
+  </div>
+  <h2>Input Student Numbers</h2>
+  <pre>s21018803
+s21015511
+s21022389</pre>
+</body>
+</html>
+  

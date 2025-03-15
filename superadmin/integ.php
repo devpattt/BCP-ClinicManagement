@@ -8,8 +8,14 @@ if (!isset($_SESSION['username'])) {
 
 include '../fetchfname.php';
 include '../connection.php';
+include 'updateAction.php';
+
+
+
 
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -85,19 +91,16 @@ include '../connection.php';
         <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
       </a>
       <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+
+
       <li>
-          <a href="mainpage.php"  class="active">
-            <i class="bi bi-circle" ></i><span>Home</span>
+          <a href="clinic-dashboard.php">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
           </a>
         </li>
         <li>
           <a href="request.php">
             <i class="bi bi-circle" ></i><span>Request Supply</span>
-          </a>
-        </li>
-      <li>
-          <a href="clinic-dashboard.php">
-            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
           </a>
         </li>
         <li>
@@ -120,7 +123,13 @@ include '../connection.php';
               <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
             </a>
           </li>
+          <li>
+          <a href="integ.php"  class="active">
+            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+          </a>
+        </li>
           <li></li>
+
       </ul>
     </li>
   <hr class="sidebar-divider">
@@ -129,10 +138,11 @@ include '../connection.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Home</h1>
+      <h1>Request Reports</h1>
       <nav>
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
+        <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
+        <li class="breadcrumb-item active">Patient Medical Reports</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -140,138 +150,101 @@ include '../connection.php';
   
     <section class="section">
   <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Patient Basic Information</h5>
 
-          <!-- Request Modal -->
+<!-- Request Table -->
+<div class="container mt-5">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Request</th>
+        <th>Reason</th>
+        <th>Request Date</th>
+        <th>Actions</th>
+        <th>Process</th>
+        <th>Process Buttons</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php include 'viewreqforinteg.php'; ?>
+    </tbody>
+  </table>
+</div>
 
-          
-         
+              <!-- JavaScript to handle Process button state transitions -->
+              <script>
+              function processRow(btn) {
+  // Get the closest row element
+  var row = btn.closest('tr');
+  // Retrieve record id and unique_id from data attributes
+  var recordId = row.getAttribute('data-id');
+  var uniqueId = row.getAttribute('data-uniqueid');
+  
+  // Select the buttons within that row
+  var acceptBtn = row.querySelector('.accept-btn');
+  var sendBtn   = row.querySelector('.send-btn');
+  var doneBtn   = row.querySelector('.done-btn');
+  
+  // Get the Actions cell (assumed to be the 4th column)
+  var actionsCell = row.querySelector('td.actions-cell');
 
-
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="../assets/vendor/echarts/echarts.min.js"></script>
-  <script src="../assets/vendor/quill/quill.js"></script>
-  <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="../assets/vendor/php-email-form/validate.js"></script>
-  <script src="../assets/js/main.js"></script>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var dateInput = document.getElementById('date');
-    
-    var today = new Date();
-    var year = today.getFullYear();
-    var month = String(today.getMonth() + 1).padStart(2, '0');  
-    var day = String(today.getDate()).padStart(2, '0');
-
-    var todayDate = year + '-' + month + '-' + day;
-    dateInput.setAttribute('min', todayDate);
-  });
-
-  document.getElementById('age').addEventListener('input', function() {
-    var ageInput = document.getElementById('age');
-    var ageValue = ageInput.value;
-    }
-  );
-
-  document.addEventListener('DOMContentLoaded', function() {
-
-    var dateInput = document.getElementById('date');
-    if (dateInput) {
-        var today = new Date();
-        var year = today.getFullYear();
-        var month = String(today.getMonth() + 1).padStart(2, '0');  
-        var day = String(today.getDate()).padStart(2, '0');
-        var todayDate = year + '-' + month + '-' + day;
-        dateInput.setAttribute('min', todayDate);
-    }
-
-    var ageInput = document.getElementById('age');
-    if (ageInput) {
-        ageInput.addEventListener('input', function() {
-            var ageValue = this.value;
-        });
-    }
-});
-
-document.getElementById('submitBtn').addEventListener('click', function(event) {
-    event.preventDefault(); 
-
-    var form1 = document.getElementById('form1');
-    var form2 = document.getElementById('form2');
-
-    function areAllInputsFilled(form) {
-        for (var i = 0; i < form.elements.length; i++) {
-            var element = form.elements[i];
-            if (element.tagName === 'INPUT' && element.type !== 'button' && !element.value) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function showValidationAlert(message) {
-        const validationAlert = document.getElementById('validationAlert');
-        validationAlert.innerText = message;
-        validationAlert.style.display = 'block'; 
-
-        setTimeout(() => {
-            validationAlert.style.display = 'none'; 
-        }, 3000);
-    }
-
-    function showSuccessAlert() {
-        const successAlert = document.getElementById('successAlert');
-        successAlert.style.display = 'block'; 
-        setTimeout(() => {
-            successAlert.style.display = 'none'; 
-            window.location.href = '../forms-elements.php'; 
-        }, 3000);
-    }
-
-    if (!areAllInputsFilled(form1) || !areAllInputsFilled(form2)) {
-        showValidationAlert('Please fill all the fields in both forms.');
-        return;
-    }
-
-    var combinedData = new FormData();
-
-    for (var i = 0; i < form1.elements.length; i++) {
-        var element = form1.elements[i];
-        if (element.name) {
-            combinedData.append(element.name, element.value);
-        }
-    }
-
-    for (var i = 0; i < form2.elements.length; i++) {
-        var element = form2.elements[i];
-        if (element.name) {
-            combinedData.append(element.name, element.value);
-        }
-    }
-
-    fetch('../forms-elements.php', {
+  if (btn.classList.contains('accept-btn')) {
+    if (actionsCell.innerText.trim() !== "Accepted") {
+      // Update database via AJAX to set action to "Accepted"
+      fetch('updateAction.php', {
         method: 'POST',
-        body: combinedData
-    })
-    .then(response => response.text())
-    .then(result => {
-        showSuccessAlert(); 
-    })
-    .catch(error => showValidationAlert('An error occurred: ' + error)); 
-});
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + encodeURIComponent(recordId) + '&newAction=' + encodeURIComponent('Accepted')
+      })
+      .then(response => response.text())
+      .then(data => {
+        if (data.trim() === "success") {
+          actionsCell.innerText = "Accepted";
+          acceptBtn.disabled = true;
+          sendBtn.disabled = false;
+          doneBtn.disabled = true;
+        } else {
+          alert("Update error: " + data);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert("An error occurred while updating the record.");
+      });
+    } else {
+      // Already accepted
+      acceptBtn.disabled = true;
+      sendBtn.disabled = false;
+      doneBtn.disabled = true;
+    }
+  } else if (btn.classList.contains('send-btn')) {
+    // When Send is clicked, disable Accept and Send; enable Done;
+    acceptBtn.disabled = true;
+    sendBtn.disabled = true;
+    doneBtn.disabled = false;
+    // Navigate to the next page, passing unique_id as a GET parameter
+    window.location.href = 'generatePDF.php?unique_id=' + encodeURIComponent(uniqueId);
+  } else if (btn.classList.contains('done-btn')) {
+    // When Done is clicked, disable all buttons.
+    acceptBtn.disabled = true;
+    sendBtn.disabled = true;
+    doneBtn.disabled = true;
+  }
+}
 
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-</script>
-
-
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
 </body>
-
 </html>

@@ -125,21 +125,16 @@ include '../fetch_symptoms.php';
                   </a>
                   <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
                   <li>
-          <a href="mainpage.php">
-            <i class="bi bi-circle" ></i><span>Home</span>
-          </a>
-        </li>
+                      <a href="clinic-dashboard.php">
+                        <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+                      </a>
+                    </li>
         <li>
           <a href="request.php">
             <i class="bi bi-circle" ></i><span>Request Supply</span>
           </a>
         </li>
       <li>
-                  <li>
-                      <a href="clinic-dashboard.php">
-                        <i class="bi bi-circle" ></i><span>Report and Analytics</span>
-                      </a>
-                    </li>
                     <li>
                       <a href="forms-elements.php" class="active">
                         <i class="bi bi-circle"></i><span>Patient Registration</span>
@@ -160,7 +155,11 @@ include '../fetch_symptoms.php';
                           <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
                         </a>
                       </li>
-                
+                      <li>
+          <a href="integ.php"  >
+            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+          </a>
+        </li>
                   </ul>
                 </li>
 
@@ -176,7 +175,7 @@ include '../fetch_symptoms.php';
       <h1>Form Elements</h1>
       <nav>
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
+        <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
           <li class="breadcrumb-item active">Registration Forms</li>
         </ol>
       </nav>

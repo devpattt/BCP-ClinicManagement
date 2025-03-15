@@ -40,7 +40,7 @@
             exit();
 
         case 'super':
-            header("Location: superadmin/mainpage.php");
+            header("Location: superadmin/clinic-dashboard.php");
             exit();
 
         default:

@@ -115,8 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </a>
         <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
         <li>
-          <a href="mainpage.php">
-            <i class="bi bi-circle" ></i><span>Home</span>
+          <a href="clinic-dashboard.php">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
           </a>
         </li>
         <li>
@@ -125,11 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </a>
         </li>
       <li>
-          <li>
-            <a href="clinic-dashboard.php">
-              <i class="bi bi-circle"></i><span>Report and Analytics</span>
-            </a>
-          </li>
           <li>
             <a href="forms-elements.php">
               <i class="bi bi-circle"></i><span>Patient Registration</span>
@@ -150,6 +145,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <i class="bi bi-circle"></i><span>A.I Anomaly</span>
             </a>
           </li>
+          <li>
+          <a href="integ.php" >
+            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+          </a>
+        </li>
         </ul>
       </li>
 
@@ -161,7 +161,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <h1>Medical Supplies Management</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
+        <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
           <li class="breadcrumb-item active">Medical Supplies Management</li>
         </ol>
       </nav>
