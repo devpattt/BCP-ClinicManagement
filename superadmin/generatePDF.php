@@ -168,7 +168,7 @@ $result = $conn->query($query);
                 <button id="generateDocsBtn" class="btn btn-success"></button>
                 <button id="generatePdfBtn" class="btn btn-warning"></button>
                 <button id="generateTextBtn" class="btn btn-info">Generate Text</button>
-                <button onclick="window.location.href='.php?unique_id=<?php echo $uniqueId; ?>'" class="btn btn-info">Next</button>
+                <button onclick="window.location.href='send.php?unique_id=<?php echo $uniqueId; ?>'" class="btn btn-info">Next</button>
               </div>
               
               <!-- File Input and Search -->
