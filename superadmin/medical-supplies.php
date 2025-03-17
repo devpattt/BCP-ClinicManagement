@@ -107,15 +107,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <hr class="sidebar-divider">
 
 
-      <li class="nav-heading">Clinic Management System</li>
-
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="mainpage.php">
+      <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+      <li>
+          <a href="mainpage.php"  class="active">
             <i class="bi bi-circle" ></i><span>Home</span>
           </a>
         </li>
@@ -125,33 +123,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </a>
         </li>
       <li>
-          <li>
-            <a href="clinic-dashboard.php">
-              <i class="bi bi-circle"></i><span>Report and Analytics</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-elements.php">
-              <i class="bi bi-circle"></i><span>Patient Registration</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.php">
-              <i class="bi bi-circle"></i><span>Patient Medical Records</span>
-            </a>
-          </li>
-          <li>
-            <a href="medical-supplies.php" class="active">
-              <i class="bi bi-circle"></i><span>Medical Supplies</span>
-            </a>
-          </li>
+          <a href="clinic-dashboard.php">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+          </a>
+        </li>
+        <li>
+          <a href="forms-elements.php">
+            <i class="bi bi-circle"></i><span>Patient Registration</span>
+          </a>
+        </li>
+        <li>
+          <a href="tables-data.php">
+            <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+          </a>
+        </li>
+        <li>  
+        <a href="medical-supplies.php">
+            <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+          </a>
+        </li>
           <li>
             <a href="blankanomaly.php">
-              <i class="bi bi-circle"></i><span>A.I Anomaly</span>
+              <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
             </a>
           </li>
-        </ul>
-      </li>
+          <li></li>
+      </ul>
+    </li>
 
   <hr class="sidebar-divider">
   </aside><!-- End Sidebar-->

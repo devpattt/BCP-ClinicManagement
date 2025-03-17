@@ -167,12 +167,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </a>
       <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
       <li>
-          <a href="mainpage.php">
+          <a href="mainpage.php"  class="active">
             <i class="bi bi-circle" ></i><span>Home</span>
           </a>
         </li>
         <li>
-          <a href="request.php" class="active">
+          <a href="request.php">
             <i class="bi bi-circle" ></i><span>Request Supply</span>
           </a>
         </li>
