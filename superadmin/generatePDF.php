@@ -53,6 +53,9 @@ if (isset($_GET['download']) && $_GET['download'] === 'text') {
                    $row['treatment'] . "\t" .
                    $row['formatted_created_at'] . "\n";
     }
+    // Append the unique_id at the bottom in the desired format.
+    $output .= "\nREFERENCE: " . $uniqueId;
+    
     echo $output;
     exit();
 }
@@ -77,10 +80,9 @@ $result = $conn->query($query);
   <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="../assets/css/style.css" rel="stylesheet">
   <!-- Include PDF.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-<!-- Include Mammoth.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <!-- Include Mammoth.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
   <style>
     .responsive-input { width: 100%; }
     .toolbar { flex-wrap: wrap; gap: 0.5rem; }
@@ -165,8 +167,8 @@ $result = $conn->query($query);
               <!-- Toolbar Buttons -->
               <div class="d-flex toolbar mb-3">
                 <button onclick="window.location.href='integ.php'" class="btn btn-primary">Back</button>
-                <button id="generateDocsBtn" class="btn btn-success"></button>
-                <button id="generatePdfBtn" class="btn btn-warning"></button>
+                <button id="generateDocsBtn" class="btn" style="background-color: white; color: black;"></button>
+                <button id="generatePdfBtn" class="btn" style="background-color: white; color: black;"></button>
                 <button id="generateTextBtn" class="btn btn-info">Generate Text</button>
                 <button onclick="window.location.href='send.php?unique_id=<?php echo $uniqueId; ?>'" class="btn btn-info">Next</button>
               </div>
@@ -352,6 +354,7 @@ $result = $conn->query($query);
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     th { background-color: #0056b3; color: white; }
+    .ref { text-align: right; margin-top: 50px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -371,8 +374,7 @@ $result = $conn->query($query);
         <th>Created At</th>
       </tr>
     </thead>
-    <tbody>
-`;
+    <tbody>`;
       selectedData.forEach(function(row) {
         htmlContent += `<tr>
           <td>${row.id}</td>
@@ -391,6 +393,7 @@ $result = $conn->query($query);
       htmlContent += `
     </tbody>
   </table>
+  <p class="ref">REFERENCE: <?php echo $uniqueId; ?></p>
 </body>
 </html>
 `;
@@ -440,6 +443,12 @@ $result = $conn->query($query);
           });
         })
       });
+      
+      // Add the reference text at the bottom right.
+      var pageWidth = doc.internal.pageSize.getWidth();
+      var pageHeight = doc.internal.pageSize.getHeight();
+      doc.setFontSize(10);
+      doc.text("REFERENCE: <?php echo $uniqueId; ?>", pageWidth - 10, pageHeight - 10, { align: "right" });
       
       doc.save("SelectedMedicalRecords.pdf");
     });
@@ -572,8 +581,6 @@ $result = $conn->query($query);
       }
   }
 </script>
-
-
 
 </body>
 </html>

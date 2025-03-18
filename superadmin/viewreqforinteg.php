@@ -2,6 +2,9 @@
 // viewreqforinteg.php
 include '../connection.php';
 
+// Determine the current page based on the script name.
+$current_file = basename($_SERVER['PHP_SELF']);
+
 $query = "SELECT id, unique_id, request, reason, request_at, action, process 
           FROM bcp_sms3_reqmedreqcord 
           ORDER BY request_at DESC";
@@ -9,7 +12,23 @@ $result = $conn->query($query);
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        // Store unique_id as a data attribute in addition to id.
+        // Normalize the values for comparison.
+        $action  = strtolower(trim($row['action']));
+        $process = strtolower(trim($row['process']));
+        
+        // If the current page is viewdone.php, show only rows with Accepted & Done.
+        if ($current_file === 'viewdone.php') {
+            if (!($action === "accepted" && $process === "done")) {
+                continue; // Skip rows not matching criteria.
+            }
+        } else {
+            // For integ.php, skip rows that have been completed (Accepted and Done).
+            if ($action === "accepted" && $process === "done") {
+                continue;
+            }
+        }
+        
+        // Render the row.
         echo "<tr data-id='" . htmlspecialchars($row['id']) . "' data-uniqueid='" . htmlspecialchars($row['unique_id']) . "'>";
         echo "<td>" . htmlspecialchars($row['request']) . "</td>";
         echo "<td>" . htmlspecialchars($row['reason']) . "</td>";
@@ -18,18 +37,18 @@ if ($result) {
         echo "<td>" . htmlspecialchars($row['process']) . "</td>";
         // Process Buttons Column:
         echo "<td>";
-        if (strtolower(trim($row['action'])) === "accepted") {
-            if (strtolower(trim($row['process'])) === "done") {
-                // If action is accepted and process is Done: disable Accept and Send.
+        if ($action === "accepted") {
+            if ($process === "done") {
+                // If action is Accepted and process is Done: disable both buttons.
                 echo "<button class='btn btn-success btn-sm accept-btn me-1' disabled>Accept</button> ";
                 echo "<button class='btn btn-warning btn-sm send-btn me-1' disabled>Send</button> ";
             } else {
-                // If accepted but process is not Done: disable Accept; enable Send.
+                // If Accepted but process is Pending: disable Accept; enable Send.
                 echo "<button class='btn btn-success btn-sm accept-btn me-1' disabled>Accept</button> ";
                 echo "<button class='btn btn-warning btn-sm send-btn me-1' onclick='processRow(this)'>Send</button> ";
             }
         } else {
-            // Otherwise, only Accept is enabled.
+            // For pending actions: only Accept is enabled.
             echo "<button class='btn btn-success btn-sm accept-btn me-1' onclick='processRow(this)'>Accept</button> ";
             echo "<button class='btn btn-warning btn-sm send-btn me-1' onclick='processRow(this)' disabled>Send</button> ";
         }
@@ -58,22 +77,22 @@ $conn->close();
   <!-- JavaScript to handle Process button state transitions -->
   <script>
     function processRow(btn) {
-      // Get the closest row element
+      // Get the closest row element.
       var row = btn.closest('tr');
-      // Retrieve record id and unique_id from data attributes
+      // Retrieve record id and unique_id from data attributes.
       var recordId = row.getAttribute('data-id');
       var uniqueId = row.getAttribute('data-uniqueid');
       
-      // Select the buttons within that row
+      // Select the buttons within that row.
       var acceptBtn = row.querySelector('.accept-btn');
       var sendBtn   = row.querySelector('.send-btn');
       
-      // Get the Actions cell (assumed to be the 4th column)
+      // Get the Actions cell (assumed to be the 4th column).
       var actionsCell = row.querySelector('td.actions-cell');
 
       if (btn.classList.contains('accept-btn')) {
           if (actionsCell.innerText.trim() !== "Accepted") {
-              // Update database via AJAX to set action to "Accepted"
+              // Update database via AJAX to set action to "Accepted".
               fetch('updateAction.php', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -94,15 +113,15 @@ $conn->close();
                   alert("An error occurred while updating the record.");
               });
           } else {
-              // Already accepted
+              // Already accepted.
               acceptBtn.disabled = true;
               sendBtn.disabled = false;
           }
       } else if (btn.classList.contains('send-btn')) {
-          // When Send is clicked, disable Accept and Send.
+          // When Send is clicked, disable both buttons.
           acceptBtn.disabled = true;
           sendBtn.disabled = true;
-          // Navigate to the next page (e.g., generatePDF.php)
+          // Navigate to the next page (e.g., generatePDF.php).
           window.location.href = 'generatePDF.php?unique_id=' + encodeURIComponent(uniqueId);
       }
     }

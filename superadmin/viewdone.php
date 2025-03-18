@@ -15,7 +15,7 @@ include 'updateAction.php';
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Clinic Management System / Patient Reports</title>
+  <title>Clinic Management System / Done Transactions</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
   <link href="../assets/img/bcp logo.png" rel="icon">
@@ -96,7 +96,7 @@ include 'updateAction.php';
               <i class="bi bi-circle"></i><span>Patient Medical Records</span>
             </a>
           </li>
-          <li>  
+          <li>
             <a href="medical-supplies.php">
               <i class="bi bi-circle"></i><span>Medical Supplies</span>
             </a>
@@ -120,11 +120,11 @@ include 'updateAction.php';
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Request Reports</h1>
+      <h1>Done Transactions</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-          <li class="breadcrumb-item active">Patient Medical Reports</li>
+          <li class="breadcrumb-item active">Done Transactions</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -134,12 +134,17 @@ include 'updateAction.php';
         <div class="col-lg-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Patient Basic Information</h5>
-
-              <!-- Request Table with Done Transaction Button -->
-              <div class="container mt-5">
-                <!-- Done Transaction Button -->
-                <a href="viewdone.php" class="btn btn-primary mb-3">Done Transaction</a>
+              <h5 class="card-title">Completed Transaction Details</h5>
+              <!-- Back Button -->
+              <div class="mb-3">
+                <a href="integ.php" class="btn btn-secondary">Back</a>
+              </div>
+              <!-- Search Input -->
+              <div class="mb-3">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by Unique ID or Date...">
+              </div>
+              <!-- Table (the rows are rendered from viewreqforinteg.php) -->
+              <div class="container mt-3">
                 <table class="table table-bordered">
                   <thead>
                     <tr>
@@ -157,48 +162,21 @@ include 'updateAction.php';
                   </tbody>
                 </table>
               </div>
-
-              <!-- JavaScript to handle Process button state transitions -->
+              <!-- JavaScript to filter table rows by unique_id and date -->
               <script>
-              function processRow(btn) {
-                  var row = btn.closest('tr');
-                  var recordId = row.getAttribute('data-id');
-                  var uniqueId = row.getAttribute('data-uniqueid');
-                  var acceptBtn = row.querySelector('.accept-btn');
-                  var sendBtn   = row.querySelector('.send-btn');
-                  var actionsCell = row.querySelector('td.actions-cell');
-
-                  if (btn.classList.contains('accept-btn')) {
-                      if (actionsCell.innerText.trim() !== "Accepted") {
-                          fetch('updateAction.php', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                              body: 'id=' + encodeURIComponent(recordId) + '&newAction=' + encodeURIComponent('Accepted')
-                          })
-                          .then(response => response.text())
-                          .then(data => {
-                              if (data.trim() === "success") {
-                                  actionsCell.innerText = "Accepted";
-                                  acceptBtn.disabled = true;
-                                  sendBtn.disabled = false;
-                              } else {
-                                  alert("Update error: " + data);
-                              }
-                          })
-                          .catch(error => {
-                              console.error('Error:', error);
-                              alert("An error occurred while updating the record.");
-                          });
-                      } else {
-                          acceptBtn.disabled = true;
-                          sendBtn.disabled = false;
-                      }
-                  } else if (btn.classList.contains('send-btn')) {
-                      acceptBtn.disabled = true;
-                      sendBtn.disabled = true;
-                      window.location.href = 'generatePDF.php?unique_id=' + encodeURIComponent(uniqueId);
-                  }
-              }
+                document.getElementById('searchInput').addEventListener('keyup', function() {
+                  var filter = this.value.toUpperCase();
+                  var rows = document.querySelectorAll("table tbody tr");
+                  rows.forEach(function(row) {
+                    // Get unique_id from the data attribute.
+                    var uniqueId = row.getAttribute('data-uniqueid') || "";
+                    // Get the date from the 3rd cell (index 2).
+                    var dateCell = row.cells[2] ? row.cells[2].innerText : "";
+                    // Combine both values.
+                    var combinedText = (uniqueId + " " + dateCell).toUpperCase();
+                    row.style.display = combinedText.indexOf(filter) > -1 ? "" : "none";
+                  });
+                });
               </script>
             </div>
           </div>

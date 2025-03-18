@@ -41,6 +41,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
+    // --- Reference Check --- 
+    // Look for a line like "REFERENCE: <value>" in the file content.
+    if (preg_match('/REFERENCE:\s*(\S+)/i', $fileContent, $matches)) {
+        $fileUniqueId = trim($matches[1]);
+        if ($fileUniqueId !== $uniqueId) {
+            // Reference does not match.
+            if ($isAjax) {
+                echo json_encode(['status' => 'error', 'message' => "Invalid file. Please choose another file to send."]);
+                exit();
+            } else {
+                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file. Please choose another file to send."));
+                exit();
+            }
+        }
+    } else {
+        // No reference found in file.
+        if ($isAjax) {
+            echo json_encode(['status' => 'error', 'message' => "Invalid file. Please choose another file to send."]);
+            exit();
+        } else {
+            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file. Please choose another file to send."));
+            exit();
+        }
+    }
+    
     // Get the Reason input.
     $reason = isset($_POST['reason']) ? trim($_POST['reason']) : "";
     if (empty($reason)) {
@@ -65,10 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           WHERE unique_id = '" . $uniqueId . "'";
             if ($conn->query($updateSQL)) {
                 if ($isAjax) {
-                    echo json_encode(['status' => 'success', 'message' => 'File Sent Sucessfully!.']);
+                    echo json_encode(['status' => 'success', 'message' => 'File Sent Successfully!.']);
                     exit();
                 } else {
-                    header("Location: integ.php?success=" . urlencode("File Failed to Sent!."));
+                    header("Location: integ.php?success=" . urlencode("File Sent Successfully!."));
                     exit();
                 }
             } else {
@@ -253,12 +278,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="resultModalLabel">Result</h5>
-          <!-- The close button here will be handled by our JavaScript to redirect -->
+          <!-- The close button here will be handled by our JavaScript -->
           <button type="button" class="btn-close" id="resultCloseButton" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="resultModalBody"></div>
         <div class="modal-footer">
-          <!-- When this button is clicked, the user is redirected to integ.php -->
+          <!-- When this button is clicked, if the status is Success, the user is redirected; otherwise, the modal is simply hidden. -->
           <button type="button" class="btn btn-secondary" id="redirectButton">Close</button>
         </div>
       </div>
@@ -322,13 +347,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       });
     });
 
-    // When the user clicks the "Close" button in the result modal, redirect to integ.php.
+    // When the user clicks the "Close" button in the result modal or the close icon,
+    // redirect only if the operation was successful. Otherwise, just hide the modal.
     document.getElementById('redirectButton').addEventListener('click', function() {
-      window.location.href = "integ.php";
+      if(document.getElementById('resultModalLabel').textContent.trim() === "Success"){
+        window.location.href = "integ.php";
+      } else {
+        var resultModalEl = document.getElementById('resultModal');
+        var resultModal = bootstrap.Modal.getInstance(resultModalEl);
+        resultModal.hide();
+      }
     });
-    // Also allow the close icon to trigger the redirect.
     document.getElementById('resultCloseButton').addEventListener('click', function() {
-      window.location.href = "integ.php";
+      if(document.getElementById('resultModalLabel').textContent.trim() === "Success"){
+        window.location.href = "integ.php";
+      } else {
+        var resultModalEl = document.getElementById('resultModal');
+        var resultModal = bootstrap.Modal.getInstance(resultModalEl);
+        resultModal.hide();
+      }
     });
   </script>
 </body>
