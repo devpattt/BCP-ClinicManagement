@@ -69,7 +69,7 @@ include '../connection.php';
     </nav>
   </header>
 
-  <!-- ======= Sidebar ======= -->
+  <!-- ======= Sidebarrrr ======= -->
   <aside id="sidebar" class="sidebar">
 
 <ul class="sidebar-nav" id="sidebar-nav">
