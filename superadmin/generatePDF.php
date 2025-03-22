@@ -11,16 +11,15 @@ if (!$conn) {
 }
 $uniqueId = isset($_GET['unique_id']) ? htmlspecialchars($_GET['unique_id']) : "";
 
-// --- Download TXT mode: If "download=text" is set in GET, output only the selected records in a plain text file ---
+// --- Download TXT mode (plain text) ---
+// (This block remains available if triggered externally.)
 if (isset($_GET['download']) && $_GET['download'] === 'text') {
-    // Expect a comma-separated list of record IDs in the GET parameter 'selected'
     if (isset($_GET['selected']) && !empty($_GET['selected'])) {
-        // Explode and sanitize the IDs (allow only numeric values)
         $idsArray = array_filter(explode(",", $_GET['selected']), function($id) {
             return is_numeric($id);
         });
         if (empty($idsArray)) {
-            echo "<script>alert('No valid records selected.');</script>";
+            echo "No valid records selected.";
             exit();
         }
         $idsString = implode(",", $idsArray);
@@ -29,38 +28,37 @@ if (isset($_GET['download']) && $_GET['download'] === 'text') {
                   FROM bcp_sms3_patients
                   WHERE id IN ($idsString)";
     } else {
-        echo "<script>alert('No records selected.');</script>";
+        echo "No records selected.";
         exit();
     }
     
     $result = $conn->query($query);
     
-    header("Content-Type: text/plain; charset=UTF-8");
-    header("Content-Disposition: attachment; filename=SelectedMedicalRecords.txt");
-    
-    // Build output: Title, header, then one row per record.
-    $output  = "Selected Medical Records\n";
-    $output .= "ID\tFull Name\tStudent Number\tContact\tGender\tAge\tYear Level\tConditions\tTreatment\tCreated At\n";
+    $fileContent  = "Selected Medical Records\n";
+    $fileContent .= "ID\tFull Name\tStudent Number\tContact\tGender\tAge\tYear Level\tConditions\tTreatment\tCreated At\n";
     while ($row = $result->fetch_assoc()) {
-        $output .= $row['id'] . "\t" .
-                   $row['fullname'] . "\t" .
-                   $row['student_number'] . "\t" .
-                   $row['contact'] . "\t" .
-                   $row['s_gender'] . "\t" .
-                   $row['age'] . "\t" .
-                   $row['year_level'] . "\t" .
-                   $row['conditions'] . "\t" .
-                   $row['treatment'] . "\t" .
-                   $row['formatted_created_at'] . "\n";
+        $fileContent .= $row['id'] . "\t" .
+                        $row['fullname'] . "\t" .
+                        $row['student_number'] . "\t" .
+                        $row['contact'] . "\t" .
+                        $row['s_gender'] . "\t" .
+                        $row['age'] . "\t" .
+                        $row['year_level'] . "\t" .
+                        $row['conditions'] . "\t" .
+                        $row['treatment'] . "\t" .
+                        $row['formatted_created_at'] . "\n";
     }
-    // Append the unique_id at the bottom in the desired format.
-    $output .= "\nREFERENCE: " . $uniqueId;
-    
-    echo $output;
+    // Append the unique reference
+    $fileContent .= "\nREFERENCE: " . $uniqueId;
+    // Build file name: if the user provided a name, append " ($uniqueId)" before the extension.
+    $baseName = isset($_GET['file_name']) ? preg_replace("/[^A-Za-z0-9\-_]/", "", $_GET['file_name']) : "SelectedMedicalRecords";
+    $desiredName = $baseName . " (" . $uniqueId . ")";
+    header("Content-Type: text/plain; charset=UTF-8");
+    header("Content-Disposition: attachment; filename={$desiredName}.txt");
+    echo $fileContent;
     exit();
 }
 
-// For DOC/PDF generation and table display, run the following query.
 $query = "SELECT id, fullname, student_number, contact, s_gender, age, year_level, conditions, treatment,
          DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at 
          FROM bcp_sms3_patients";
@@ -79,18 +77,16 @@ $result = $conn->query($query);
   <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="../assets/css/style.css" rel="stylesheet">
-  <!-- Include PDF.js -->
+  <!-- Include PDF.js, Mammoth.js, jsPDF, and AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-  <!-- Include Mammoth.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <style>
     .responsive-input { width: 100%; }
     .toolbar { flex-wrap: wrap; gap: 0.5rem; }
     @media (max-width: 768px) { .toolbar button { width: 100%; } }
   </style>
-  <!-- jsPDF and AutoTable -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -120,6 +116,7 @@ $result = $conn->query($query);
     </nav>
   </header>
   
+  <!-- Sidebar -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <div class="logo-container text-center mb-2">
@@ -145,6 +142,7 @@ $result = $conn->query($query);
     </ul>
   </aside>
   
+  <!-- Main Content -->
   <main id="main" class="main">
     <div class="pagetitle">
       <h1>Medical Records</h1>
@@ -167,16 +165,16 @@ $result = $conn->query($query);
               <!-- Toolbar Buttons -->
               <div class="d-flex toolbar mb-3">
                 <button onclick="window.location.href='integ.php'" class="btn btn-primary">Back</button>
-                <button id="generateDocsBtn" class="btn" style="background-color: white; color: black;"></button>
-                <button id="generatePdfBtn" class="btn" style="background-color: white; color: black;"></button>
-                <button id="generateTextBtn" class="btn btn-info">Generate Text</button>
+                <!-- Generate Text button removed -->
+                <button id="generatePdfBtn" class="btn btn-info">Generate PDF</button>
+                <button id="generateDocBtn" class="btn btn-info">Generate DOC</button>
                 <button onclick="window.location.href='send.php?unique_id=<?php echo $uniqueId; ?>'" class="btn btn-info">Next</button>
               </div>
               
               <!-- File Input and Search -->
               <div class="row g-3 mb-3">
                 <div class="col-sm-12 col-md-6">
-                  <label for="uploadFile" class="form-label">Upload PDF, DOCX, DOC, or TXT File:</label>
+                  <label for="uploadFile" class="form-label">Upload PDF, DOC, or TXT File:</label>
                   <input type="file" id="uploadFile" class="form-control responsive-input" accept=".pdf,.doc,.docx,.txt">
                   <button id="readBtn" class="btn btn-secondary mt-2">Read</button>
                 </div>
@@ -209,7 +207,7 @@ $result = $conn->query($query);
                   </thead>
                   <tbody>
                     <?php while($row = $result->fetch_assoc()): ?>
-                    <tr>
+                    <tr data-id="<?php echo htmlspecialchars($row['id']); ?>">
                       <td><?php echo htmlspecialchars($row['id']); ?></td>
                       <td><?php echo htmlspecialchars($row['fullname']); ?></td>
                       <td><?php echo htmlspecialchars($row['student_number']); ?></td>
@@ -254,54 +252,266 @@ $result = $conn->query($query);
     </section>
   </main>
   
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmSendModal" tabindex="-1" aria-labelledby="confirmSendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmSendModalLabel">Confirm Transaction</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to send the document and reason?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmSendButton">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- File Name Modal for Custom File Naming -->
+  <div class="modal fade" id="fileNameModal" tabindex="-1" aria-labelledby="fileNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="fileNameModalLabel">Enter File Name</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="customFileName" class="form-control" placeholder="Enter file name">
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="confirmFileName" class="btn btn-primary">Generate File</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Alert Modal -->
+  <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="alertModalLabel">Notice</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="alertModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Result Modal -->
+  <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resultModalLabel">Result</h5>
+          <button type="button" class="btn-close" id="resultCloseButton" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="resultModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="redirectButton">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+  
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/main.js"></script>
   
   <script>
-    // Search functionality.
-    document.getElementById("searchInput").addEventListener("keyup", function() {
-      var filter = this.value.toUpperCase();
-      var table = document.getElementById("recordsTable");
-      var tr = table.getElementsByTagName("tr");
-      var searchableIndices = [1, 2, 3, 4, 5, 6, 9];
-      for (var i = 1; i < tr.length; i++) {
-        var tds = tr[i].getElementsByTagName("td");
-        var rowContainsFilter = false;
-        for (var j = 0; j < searchableIndices.length; j++) {
-          var index = searchableIndices[j];
-          if (tds[index] && tds[index].textContent.toUpperCase().indexOf(filter) > -1) {
-            rowContainsFilter = true;
-            break;
+    // Function to display modal alerts
+    function showAlert(message) {
+      console.log("Alert:", message);
+      document.getElementById("alertModalBody").textContent = message;
+      let alertModal = new bootstrap.Modal(document.getElementById("alertModal"));
+      alertModal.show();
+    }
+    
+    // Add debugging logs for Generate PDF button
+    document.getElementById('generatePdfBtn').addEventListener('click', function() {
+      console.log("Generate PDF button clicked");
+      let selectedData = getSelectedRowsData();
+      if (selectedData.length === 0) {
+        showAlert("Please select at least one visible row.");
+        return;
+      }
+      currentFileType = 'pdf';
+      currentSelectedData = selectedData;
+      let fileNameModal = new bootstrap.Modal(document.getElementById("fileNameModal"));
+      fileNameModal.show();
+    });
+    
+    // Add debugging logs for Generate DOC button
+    document.getElementById('generateDocBtn').addEventListener('click', function() {
+      console.log("Generate DOC button clicked");
+      let selectedData = getSelectedRowsData();
+      if (selectedData.length === 0) {
+        showAlert("Please select at least one visible row.");
+        return;
+      }
+      currentFileType = 'doc';
+      currentSelectedData = selectedData;
+      let fileNameModal = new bootstrap.Modal(document.getElementById("fileNameModal"));
+      fileNameModal.show();
+    });
+    
+    // Event listener for file name confirmation (if needed for PDF/DOC generation)
+    document.getElementById("confirmFileName").onclick = function() {
+      let fileName = document.getElementById("customFileName").value.trim();
+      if (!fileName) {
+        showAlert("Please enter a valid file name.");
+        return;
+      }
+      // Append unique ID to file name.
+      fileName = fileName + " (<?php echo $uniqueId; ?>)";
+      let modalElem = document.getElementById("fileNameModal");
+      let fileNameModal = bootstrap.Modal.getInstance(modalElem);
+      fileNameModal.hide();
+      
+      if (currentFileType === 'txt') {
+        window.location.href = "generatePDF.php?unique_id=<?php echo $uniqueId; ?>&download=text&selected=" +
+          encodeURIComponent(currentSelectedIds) + "&file_name=" + encodeURIComponent(fileName);
+      } else if (currentFileType === 'pdf') {
+        let { jsPDF } = window.jspdf;
+        let doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text("Selected Medical Records", 105, 20, { align: "center" });
+        let columns = [
+          { header: 'ID', dataKey: 'id' },
+          { header: 'Full Name', dataKey: 'fullname' },
+          { header: 'Student Number', dataKey: 'student_number' },
+          { header: 'Contact', dataKey: 'contact' },
+          { header: 'Gender', dataKey: 's_gender' },
+          { header: 'Age', dataKey: 'age' },
+          { header: 'Year Level', dataKey: 'year_level' },
+          { header: 'Conditions', dataKey: 'conditions' },
+          { header: 'Treatment', dataKey: 'treatment' },
+          { header: 'Created At', dataKey: 'formatted_created_at' }
+        ];
+        doc.autoTable({
+          startY: 30,
+          head: [columns.map(col => col.header)],
+          body: currentSelectedData.map(row => columns.map(col => row[col.dataKey]))
+        });
+        let finalY = doc.lastAutoTable.finalY || 30;
+        doc.setFontSize(12);
+        doc.text("REFERENCE: <?php echo $uniqueId; ?>", 10, finalY + 10);
+        doc.save(fileName + ".pdf");
+      } else if (currentFileType === 'doc') {
+        let htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Selected Medical Records</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #0056b3; color: white; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Selected Medical Records</h1>
+  <table>
+    <thead>
+      <tr>`;
+        for (let key in currentSelectedData[0]) {
+          htmlContent += `<th>${key}</th>`;
+        }
+        htmlContent += `</tr>
+    </thead>
+    <tbody>`;
+        currentSelectedData.forEach(function(row) {
+          htmlContent += `<tr>`;
+          for (let key in row) {
+            htmlContent += `<td>${row[key]}</td>`;
           }
-        }
-        tr[i].style.display = rowContainsFilter ? "" : "none";
+          htmlContent += `</tr>`;
+        });
+        htmlContent += `
+    </tbody>
+  </table>
+  <p>REFERENCE: <?php echo $uniqueId; ?></p>
+</body>
+</html>`;
+        let blob = new Blob([htmlContent], { type: "application/msword" });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = fileName + ".doc";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
+    };
+    
+    // AJAX submission for Send operation.
+    document.getElementById('confirmSendButton').addEventListener('click', function() {
+      console.log("confirmSendButton clicked.");
+      let form = document.getElementById('sendForm');
+      let formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(response => response.text())
+      .then(text => {
+        console.log("Raw response:", text);
+        let data = JSON.parse(text);
+        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSendModal'));
+        confirmModal.hide();
+        document.getElementById('resultModalBody').textContent = data.message;
+        document.getElementById('resultModalLabel').textContent = (data.status === 'success') ? "Success" : "Error";
+        var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        resultModal.show();
+        if (data.status === 'success') {
+          // Delay redirection for 2 seconds to allow the modal to be seen.
+          setTimeout(function(){
+            window.location.href = "integ.php";
+          }, 2000);
+        }
+      })
+      .catch(error => {
+        console.error("AJAX error:", error);
+        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSendModal'));
+        confirmModal.hide();
+        document.getElementById('resultModalBody').textContent = "An unexpected error occurred: " + error.message;
+        document.getElementById('resultModalLabel').textContent = "Error";
+        var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        resultModal.show();
+      });
     });
     
-    // Master "Check All" functionality.
-    document.getElementById("checkAll").addEventListener("change", function() {
-      var isChecked = this.checked;
-      var table = document.getElementById("recordsTable");
-      var tr = table.getElementsByTagName("tr");
-      for (var i = 1; i < tr.length; i++) {
-        if (tr[i].style.display !== "none") {
-          var chk = tr[i].querySelector(".row-check");
-          if (chk) { chk.checked = isChecked; }
-        }
-      }
+    document.getElementById('redirectButton').addEventListener('click', function() {
+      window.location.href = "integ.php";
+    });
+    document.getElementById('resultCloseButton').addEventListener('click', function() {
+      window.location.href = "integ.php";
     });
     
-    // Get selected rows data from visible rows only.
+    // Helper function to retrieve selected rows' data
     function getSelectedRowsData() {
-      var table = document.getElementById("recordsTable");
-      var tbody = table.tBodies[0];
-      var rows = tbody.getElementsByTagName("tr");
-      var data = [];
-      for (var i = 0; i < rows.length; i++) {
+      let table = document.getElementById("recordsTable");
+      let tbody = table.tBodies[0];
+      let rows = tbody.getElementsByTagName("tr");
+      let data = [];
+      for (let i = 0; i < rows.length; i++) {
         if (rows[i].style.display === "none") continue;
-        var checkbox = rows[i].querySelector(".row-check");
+        let checkbox = rows[i].querySelector(".row-check");
         if (checkbox && checkbox.checked) {
-          var cells = rows[i].getElementsByTagName("td");
+          let cells = rows[i].getElementsByTagName("td");
           data.push({
             id: cells[0].textContent.trim(),
             fullname: cells[1].textContent.trim(),
@@ -318,269 +528,7 @@ $result = $conn->query($query);
       }
       return data;
     }
-    
-    // Generate Text file from selected rows.
-    document.getElementById('generateTextBtn').addEventListener('click', function() {
-      var selectedData = getSelectedRowsData();
-      if (selectedData.length === 0) {
-        alert("Please select at least one visible row.");
-        return;
-      }
-      // Build a comma-separated list of record IDs.
-      var selectedIds = selectedData.map(function(row) {
-        return row.id;
-      });
-      var idString = selectedIds.join(',');
-      // Redirect to TXT download mode with the selected record IDs.
-      window.location.href = "generatePDF.php?unique_id=<?php echo $uniqueId; ?>&download=text&selected=" + encodeURIComponent(idString);
-    });
-    
-    // Generate DOC file from selected rows data.
-    document.getElementById('generateDocsBtn').addEventListener('click', function() {
-      var selectedData = getSelectedRowsData();
-      if (selectedData.length === 0) {
-        alert("Please select at least one visible row.");
-        return;
-      }
-      
-      var htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Selected Medical Records</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background-color: #0056b3; color: white; }
-    .ref { text-align: right; margin-top: 50px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h1 style="text-align: center;">Selected Medical Records</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Full Name</th>
-        <th>Student Number</th>
-        <th>Contact</th>
-        <th>Gender</th>
-        <th>Age</th>
-        <th>Year Level</th>
-        <th>Conditions</th>
-        <th>Treatment</th>
-        <th>Created At</th>
-      </tr>
-    </thead>
-    <tbody>`;
-      selectedData.forEach(function(row) {
-        htmlContent += `<tr>
-          <td>${row.id}</td>
-          <td>${row.fullname}</td>
-          <td>${row.student_number}</td>
-          <td>${row.contact}</td>
-          <td>${row.s_gender}</td>
-          <td>${row.age}</td>
-          <td>${row.year_level}</td>
-          <td>${row.conditions}</td>
-          <td>${row.treatment}</td>
-          <td>${row.formatted_created_at}</td>
-        </tr>`;
-      });
-      
-      htmlContent += `
-    </tbody>
-  </table>
-  <p class="ref">REFERENCE: <?php echo $uniqueId; ?></p>
-</body>
-</html>
-`;
-      var blob = new Blob([htmlContent], { type: "application/msword" });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = "SelectedMedicalRecords.doc";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-    
-    // Generate PDF file from selected rows data using jsPDF and AutoTable.
-    document.getElementById('generatePdfBtn').addEventListener('click', function() {
-      var selectedData = getSelectedRowsData();
-      if (selectedData.length === 0) {
-        alert("Please select at least one visible row.");
-        return;
-      }
-      
-      var { jsPDF } = window.jspdf;
-      var doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("Selected Medical Records", 105, 20, { align: "center" });
-      
-      var columns = [
-        { header: 'ID', dataKey: 'id' },
-        { header: 'Full Name', dataKey: 'fullname' },
-        { header: 'Student Number', dataKey: 'student_number' },
-        { header: 'Contact', dataKey: 'contact' },
-        { header: 'Gender', dataKey: 's_gender' },
-        { header: 'Age', dataKey: 'age' },
-        { header: 'Year Level', dataKey: 'year_level' },
-        { header: 'Conditions', dataKey: 'conditions' },
-        { header: 'Treatment', dataKey: 'treatment' },
-        { header: 'Created At', dataKey: 'formatted_created_at' }
-      ];
-      
-      doc.autoTable({
-        startY: 30,
-        head: [columns.map(col => col.header)],
-        body: selectedData.map(function(row) {
-          return columns.map(function(col) {
-            return row[col.dataKey];
-          });
-        })
-      });
-      
-      // Add the reference text at the bottom right.
-      var pageWidth = doc.internal.pageSize.getWidth();
-      var pageHeight = doc.internal.pageSize.getHeight();
-      doc.setFontSize(10);
-      doc.text("REFERENCE: <?php echo $uniqueId; ?>", pageWidth - 10, pageHeight - 10, { align: "right" });
-      
-      doc.save("SelectedMedicalRecords.pdf");
-    });
   </script>
-  <script>
-  document.getElementById('readBtn').addEventListener('click', function() {
-      var fileInput = document.getElementById('uploadFile');
-      if (!fileInput.files.length) {
-          alert("Please upload a file first.");
-          return;
-      }
-      var file = fileInput.files[0];
-      console.log("File selected:", file);
-      var fileExtension = file.name.split('.').pop().toLowerCase();
-      
-      if(fileExtension === 'txt'){
-          var reader = new FileReader();
-          reader.onload = function(e) {
-              var text = e.target.result;
-              processTextContent(text);
-          };
-          reader.onerror = function(e) {
-              console.error("Error reading TXT file", e);
-              alert("Error reading file.");
-          };
-          reader.readAsText(file);
-      }
-      else if(fileExtension === 'pdf'){
-          var fileReader = new FileReader();
-          fileReader.onload = function() {
-              var typedarray = new Uint8Array(this.result);
-              pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-                  var maxPages = pdf.numPages;
-                  var countPromises = [];
-                  for (var j = 1; j <= maxPages; j++) {
-                      countPromises.push(
-                          pdf.getPage(j).then(function(page) {
-                              return page.getTextContent().then(function(textContent) {
-                                  var pageText = textContent.items.map(function(item) {
-                                      return item.str;
-                                  }).join(" ");
-                                  return pageText;
-                              });
-                          })
-                      );
-                  }
-                  Promise.all(countPromises).then(function(pagesText) {
-                      var fullText = pagesText.join("\n");
-                      processTextContent(fullText);
-                  });
-              }).catch(function(error){
-                  console.error("Error processing PDF:", error);
-                  alert("Error processing PDF file.");
-              });
-          };
-          fileReader.onerror = function(e) {
-              console.error("Error reading PDF file", e);
-              alert("Error reading file.");
-          };
-          fileReader.readAsArrayBuffer(file);
-      }
-      else if(fileExtension === 'docx'){
-          var fileReader = new FileReader();
-          fileReader.onload = function(event) {
-              var arrayBuffer = event.target.result;
-              mammoth.extractRawText({arrayBuffer: arrayBuffer})
-                  .then(function(result){
-                      var text = result.value;
-                      processTextContent(text);
-                  })
-                  .catch(function(error){
-                      console.error("Error processing DOCX:", error);
-                      alert("Error processing DOCX file.");
-                  });
-          };
-          fileReader.onerror = function(e) {
-              console.error("Error reading DOCX file", e);
-              alert("Error reading file.");
-          };
-          fileReader.readAsArrayBuffer(file);
-      }
-      else if(fileExtension === 'doc'){
-          // Fallback: attempt to read DOC files as plain text.
-          var reader = new FileReader();
-          reader.onload = function(e) {
-              var text = e.target.result;
-              processTextContent(text);
-          };
-          reader.onerror = function(e) {
-              console.error("Error reading DOC file", e);
-              alert("Error reading file.");
-          };
-          reader.readAsText(file);
-      }
-      else {
-          alert("Unsupported file type for reading.");
-      }
-  });
   
-  // Helper function to process extracted text.
-  function processTextContent(text) {
-      console.log("Extracted text content:", text);
-      var regex = /s\d{8}/gi;
-      var matches = text.match(regex);
-      if (matches) {
-          var extractedNumbers = [...new Set(matches.map(function(s) {
-              return s.toLowerCase();
-          }))];
-          var table = document.getElementById("recordsTable");
-          var tr = table.getElementsByTagName("tr");
-          var tableNumbers = [];
-          for (var i = 1; i < tr.length; i++) {
-              var td = tr[i].getElementsByTagName("td")[2];
-              if (td) {
-                  var num = td.textContent.trim().toLowerCase();
-                  tableNumbers.push(num);
-                  tr[i].style.display = extractedNumbers.indexOf(num) !== -1 ? "" : "none";
-              }
-          }
-          var unmatched = extractedNumbers.filter(function(num) {
-              return tableNumbers.indexOf(num) === -1;
-          });
-          if (unmatched.length > 0) {
-              document.getElementById("unmatchedList").innerText = unmatched.join(", ");
-              var unmatchedModal = new bootstrap.Modal(document.getElementById('unmatchedModal'));
-              unmatchedModal.show();
-          }
-      } else {
-          alert("No student numbers found in the file.");
-      }
-  }
-</script>
-
 </body>
 </html>

@@ -6,8 +6,9 @@ if (!isset($_SESSION['username'])) {
   exit(); 
 }
 
-include '../fetchfname.php';
-include '../connection.php';
+include '../../fetchfname.php';
+include '../../connection.php';
+
 // Note: No updateAction.php needed here.
 ?>
 <!DOCTYPE html>
@@ -18,13 +19,13 @@ include '../connection.php';
   <title>Clinic Management System / Add Records</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
-  <link href="../assets/img/bcp logo.png" rel="icon">
-  <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-  <link href="../https://fonts.gstatic.com" rel="preconnect">
-  <link href="../https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="../assets/css/style.css" rel="stylesheet">
+  <link href="../../assets/img/bcp logo.png" rel="icon">
+  <link href="../../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="../../https://fonts.gstatic.com" rel="preconnect">
+  <link href="../../https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../assets/css/style.css" rel="stylesheet">
   <style>
     .responsive-input { width: 100%; }
   </style>
@@ -61,7 +62,7 @@ include '../connection.php';
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <div class="logo-container" style="text-align: center; margin-bottom: 10px;">
-        <img src="../assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
+        <img src="../../assets/img/bcp logo.png" alt="Logo" style="width: 100px; height: auto;">
       </div>
       <hr class="sidebar-divider">
       <li class="nav-heading">Clinic Management System</li>
@@ -125,7 +126,7 @@ include '../connection.php';
     </section>
   </main>
 
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/main.js"></script>
+  <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../assets/js/main.js"></script>
 </body>
 </html>

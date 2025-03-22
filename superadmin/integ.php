@@ -8,7 +8,8 @@ if (!isset($_SESSION['username'])) {
 
 include '../fetchfname.php';
 include '../connection.php';
-include 'updateAction.php';
+include 'updateAction.php';  // <-- Remove this to avoid confusion
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,11 +47,8 @@ include 'updateAction.php';
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
+            <li class="dropdown-header"></li>
+            <li><hr class="dropdown-divider"></li>
             <li>
               <a class="dropdown-item d-flex align-items-center" href="../logout.php">
                 <i class="bi bi-box-arrow-right"></i>
@@ -144,6 +142,7 @@ include 'updateAction.php';
                   <thead>
                     <tr>
                       <th>Request</th>
+                      <th>Reference</th> <!-- New column -->
                       <th>Reason</th>
                       <th>Request Date</th>
                       <th>Actions</th>
@@ -170,6 +169,7 @@ include 'updateAction.php';
 
                   if (btn.classList.contains('accept-btn')) {
                       if (actionsCell.innerText.trim() !== "Accepted") {
+                          // CHANGE PATH if updateAction.php is not in the same folder
                           fetch('updateAction.php', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

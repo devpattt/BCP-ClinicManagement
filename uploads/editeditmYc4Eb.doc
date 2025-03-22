@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Selected Medical Records</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #0056b3; color: white; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Selected Medical Records</h1>
+  <table>
+    <thead>
+      <tr><th>id</th><th>fullname</th><th>student_number</th><th>contact</th><th>s_gender</th><th>age</th><th>year_level</th><th>conditions</th><th>treatment</th><th>formatted_created_at</th></tr>
+    </thead>
+    <tbody><tr><td>1</td><td>Juan Dela Cruz</td><td>s21015511</td><td>0987654321</td><td>Male</td><td>22</td><td>4th_year</td><td>Frequent headaches</td><td>Frequent headaches</td><td>2024-01-18 05:46 AM</td></tr><tr><td>2</td><td>Maria Santos</td><td>s21022389</td><td>09179876543</td><td>Female</td><td>25</td><td>3rd_year</td><td>Asthma</td><td>Inhaler usage and medication</td><td>2024-09-23 05:46 AM</td></tr>
+    </tbody>
+  </table>
+  <p>REFERENCE: itmYc4Eb</p>
+</body>
+</html>

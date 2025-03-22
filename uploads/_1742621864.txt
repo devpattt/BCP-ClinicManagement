@@ -1,0 +1,6 @@
+Selected Medical Records
+ID	Full Name	Student Number	Contact	Gender	Age	Year Level	Conditions	Treatment	Created At
+1	Juan Dela Cruz	s21015511	0987654321	Male	22	4th_year	Frequent headaches	Frequent headaches	2024-01-18 05:46 AM
+2	Maria Santos	s21022389	09179876543	Female	25	3rd_year	Asthma	Inhaler usage and medication	2024-09-23 05:46 AM
+
+REFERENCE: itmYc4Eb

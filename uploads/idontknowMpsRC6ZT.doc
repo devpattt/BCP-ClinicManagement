@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Selected Medical Records</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #0056b3; color: white; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Selected Medical Records</h1>
+  <table>
+    <thead>
+      <tr><th>id</th><th>fullname</th><th>student_number</th><th>contact</th><th>s_gender</th><th>age</th><th>year_level</th><th>conditions</th><th>treatment</th><th>formatted_created_at</th></tr>
+    </thead>
+    <tbody><tr><td>54</td><td>Patrick Nobleza</td><td>s21015518</td><td>09123478233</td><td>Male</td><td>22</td><td></td><td>dizziness</td><td>sleep.</td><td>2025-03-16 05:42 AM</td></tr><tr><td>55</td><td>Jobert Bordamonte</td><td>Janitor</td><td>09123445346</td><td>Other</td><td>55</td><td></td><td>vomiting</td><td>sleep.</td><td>2025-03-16 05:43 AM</td></tr><tr><td>56</td><td>Aeron Cristobal</td><td></td><td>9083213443</td><td>Prefer_not_to_say</td><td>33</td><td></td><td>fever</td><td>Biogesic</td><td>2025-03-16 06:25 AM</td></tr>
+    </tbody>
+  </table>
+  <p>REFERENCE: MpsRC6ZT</p>
+</body>
+</html>

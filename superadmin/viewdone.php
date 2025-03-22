@@ -149,6 +149,7 @@ include 'updateAction.php';
                   <thead>
                     <tr>
                       <th>Request</th>
+                      <th>Reference</th>
                       <th>Reason</th>
                       <th>Request Date</th>
                       <th>Actions</th>
@@ -158,7 +159,7 @@ include 'updateAction.php';
                     </tr>
                   </thead>
                   <tbody>
-                    <?php include 'viewreqforinteg.php'; ?>
+                    <?php include 'viewdontable.php'; ?>
                   </tbody>
                 </table>
               </div>

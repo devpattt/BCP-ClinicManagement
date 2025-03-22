@@ -1,5 +1,9 @@
 <?php
-session_start();
+// Only start the session if it's not already started.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once "../connection.php";
 
 // (Optional) Check if the user is logged in.
@@ -11,21 +15,38 @@ if (!isset($_SESSION['username'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'] ?? '';
     $newAction = $_POST['newAction'] ?? '';
+    // newProcess is optional.
+    $newProcess = $_POST['newProcess'] ?? null;
 
     if ($id && $newAction) {
-        // Use backticks around the column name 'action'
-        $query = "UPDATE bcp_sms3_reqmedreqcord SET `action` = ? WHERE id = ?";
-        if ($stmt = $conn->prepare($query)) {
-            $stmt->bind_param("si", $newAction, $id);
-            if ($stmt->execute()){
-                echo "success";
+        if ($newProcess !== null) {
+            // Update both the action and process columns.
+            $query = "UPDATE bcp_sms3_reqmedreqcord SET action = ?, process = ? WHERE id = ?";
+            if ($stmt = $conn->prepare($query)) {
+                $stmt->bind_param("ssi", $newAction, $newProcess, $id);
+                if ($stmt->execute()){
+                    echo "success";
+                } else {
+                    echo "error: " . $stmt->error;
+                }
+                $stmt->close();
             } else {
-                // Print statement error for debugging
-                echo "error: " . $stmt->error;
+                echo "error: " . $conn->error;
             }
-            $stmt->close();
         } else {
-            echo "error: " . $conn->error;
+            // Update only the action column.
+            $query = "UPDATE bcp_sms3_reqmedreqcord SET action = ? WHERE id = ?";
+            if ($stmt = $conn->prepare($query)) {
+                $stmt->bind_param("si", $newAction, $id);
+                if ($stmt->execute()){
+                    echo "success";
+                } else {
+                    echo "error: " . $stmt->error;
+                }
+                $stmt->close();
+            } else {
+                echo "error: " . $conn->error;
+            }
         }
     } else {
         echo "Missing parameters";

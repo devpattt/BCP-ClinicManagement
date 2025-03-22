@@ -1,6 +1,10 @@
 <?php
-session_start();
+ob_start(); // Start output buffering
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
 
+session_start();
 if (!isset($_SESSION['username'])) {
     header("Location: ../superadmin/mainpage.php");
     exit();
@@ -9,121 +13,105 @@ if (!isset($_SESSION['username'])) {
 include '../connection.php';
 include '../fetchfname.php';
 
+// Get the unique_id from the URL
 $uniqueId = isset($_GET['unique_id']) ? htmlspecialchars($_GET['unique_id']) : "";
 
 // Check if the request is made via AJAX.
-$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+$isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+          strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Process the uploaded file.
-    if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
+    try {
+        if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+            throw new Exception("No file uploaded or an upload error occurred.");
+        }
+        
         $fileName    = trim($_FILES['document']['name']);
         $fileTmpPath = $_FILES['document']['tmp_name'];
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        // Only allow TXT files.
-        if ($fileExtension !== 'txt') {
-            if ($isAjax) {
-                echo json_encode(['status' => 'error', 'message' => 'Invalid file type. Only TXT files are allowed.']);
-                exit();
-            } else {
-                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file type. Only TXT files are allowed."));
-                exit();
-            }
+        
+        // Allowed file extensions.
+        $allowedExtensions = ['pdf', 'doc', 'docx'];
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            throw new Exception("Invalid file type. Only PDF, DOC, and DOCX files are allowed.");
         }
+        
+        // Read file content (for the sake of reference check only; we won't store it in the DB)
+        // (You could remove this if you don't need to validate file content.)
         $fileContent = file_get_contents($fileTmpPath);
-    } else {
-        if ($isAjax) {
-            echo json_encode(['status' => 'error', 'message' => 'No file uploaded or an upload error occurred.']);
-            exit();
-        } else {
-            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("No file uploaded or an upload error occurred."));
-            exit();
+        if ($fileContent === false) {
+            throw new Exception("Failed to read file content.");
         }
-    }
-    
-    // --- Reference Check --- 
-    // Look for a line like "REFERENCE: <value>" in the file content.
-    if (preg_match('/REFERENCE:\s*(\S+)/i', $fileContent, $matches)) {
-        $fileUniqueId = trim($matches[1]);
-        if ($fileUniqueId !== $uniqueId) {
-            // Reference does not match.
-            if ($isAjax) {
-                echo json_encode(['status' => 'error', 'message' => "Invalid file. Please choose another file to send."]);
-                exit();
-            } else {
-                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file. Please choose another file to send."));
-                exit();
-            }
+        
+        // --- Reference Check ---
+        // Extract the reference from the file name.
+        // Example: "MyDocument (ABC123).pdf" yields reference "ABC123"
+        if (strpos($fileName, '(') === false || strpos($fileName, ')') === false) {
+            throw new Exception("No reference found in the file name. Please include the reference in parentheses.");
         }
-    } else {
-        // No reference found in file.
-        if ($isAjax) {
-            echo json_encode(['status' => 'error', 'message' => "Invalid file. Please choose another file to send."]);
-            exit();
-        } else {
-            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Invalid file. Please choose another file to send."));
-            exit();
+        $startPos = strpos($fileName, '(');
+        $endPos   = strpos($fileName, ')', $startPos);
+        $fileReference = trim(substr($fileName, $startPos + 1, $endPos - $startPos - 1));
+        if ($fileReference !== $uniqueId) {
+            throw new Exception("Invalid file. The reference in the file name does not match.");
         }
-    }
-    
-    // Get the Reason input.
-    $reason = isset($_POST['reason']) ? trim($_POST['reason']) : "";
-    if (empty($reason)) {
-        if ($isAjax) {
-            echo json_encode(['status' => 'error', 'message' => 'Please enter a reason.']);
-            exit();
-        } else {
-            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Please enter a reason."));
-            exit();
+        
+        // Get the Reason input.
+        $reason = isset($_POST['reason']) ? trim($_POST['reason']) : "";
+        if (empty($reason)) {
+            throw new Exception("Please enter a reason.");
         }
-    }
-    
-    // Insert the file content and reason into the database.
-    $sql = "INSERT INTO bcp_sms3_send_integ (unique_id, request, reason, sent_date)
-            VALUES (?, ?, ?, NOW())";
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("sss", $uniqueId, $fileContent, $reason);
-        if ($stmt->execute()) {
-            // After successful insertion, update process status to 'Done' in the bcp_sms3_reqmedreqcord table.
-            $updateSQL = "UPDATE bcp_sms3_reqmedreqcord 
-                          SET process='Done' 
-                          WHERE unique_id = '" . $uniqueId . "'";
-            if ($conn->query($updateSQL)) {
-                if ($isAjax) {
-                    echo json_encode(['status' => 'success', 'message' => 'File Sent Successfully!.']);
-                    exit();
-                } else {
-                    header("Location: integ.php?success=" . urlencode("File Sent Successfully!."));
-                    exit();
-                }
-            } else {
-                if ($isAjax) {
-                    echo json_encode(['status' => 'error', 'message' => "File stored but update failed: " . $conn->error]);
-                    exit();
-                } else {
-                    header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("File stored but update failed: " . $conn->error));
-                    exit();
-                }
-            }
-        } else {
-            if ($isAjax) {
-                echo json_encode(['status' => 'error', 'message' => "Insertion error: " . $stmt->error]);
-                exit();
-            } else {
-                header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Insertion error: " . $stmt->error));
-                exit();
-            }
+        
+        // Optional: Sanitize file name for disk storage.
+        $fileNameCmps = pathinfo($fileName);
+        $newFileName = preg_replace('/[^a-zA-Z0-9_-]/', '', $fileNameCmps['filename']) . '.' . $fileNameCmps['extension'];
+        
+        // Set the upload folder.
+        $uploadFileDir = '../uploads/';
+        if (!is_dir($uploadFileDir)) {
+            mkdir($uploadFileDir, 0777, true);
+        }
+        $dest_path = $uploadFileDir . $newFileName;
+        if (!move_uploaded_file($fileTmpPath, $dest_path)) {
+            throw new Exception("There was an error moving the uploaded file.");
+        }
+        
+        // Insert only the unique_id, file name, and reason into the database.
+        $sql = "INSERT INTO bcp_sms3_send_integ (unique_id, request, reason, sent_date)
+                VALUES (?, ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE 
+                    request = VALUES(request), 
+                    reason = VALUES(reason), 
+                    sent_date = NOW()";
+                    
+        if (!($stmt = $conn->prepare($sql))) {
+            throw new Exception("Error preparing statement: " . $conn->error);
+        }
+        
+        // Bind parameters: unique_id (s), request (s), reason (s)
+        $stmt->bind_param("sss", $uniqueId, $newFileName, $reason);
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Insertion error: " . $stmt->error);
         }
         $stmt->close();
-    } else {
-         if ($isAjax) {
-            echo json_encode(['status' => 'error', 'message' => "Error preparing statement: " . $conn->error]);
-            exit();
-         } else {
-            header("Location: send.php?unique_id=" . urlencode($uniqueId) . "&error=" . urlencode("Error preparing statement: " . $conn->error));
-            exit();
-         }
+        
+        // Update process status in the related table.
+        $updateSQL = "UPDATE bcp_sms3_reqmedreqcord SET process='Done' WHERE unique_id = '" . $uniqueId . "'";
+        if (!$conn->query($updateSQL)) {
+            throw new Exception("File stored but update failed: " . $conn->error);
+        }
+        
+        ob_clean();
+        $response = ['status' => 'success', 'message' => 'File Sent Successfully!.'];
+    } catch (Exception $e) {
+        ob_clean();
+        $response = ['status' => 'error', 'message' => $e->getMessage()];
     }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -131,13 +119,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Clinic Management System / Send TXT with Reason</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>Clinic Management System / Send Document with Reason</title>
   <link href="../assets/img/bcp logo.png" rel="icon">
   <link href="../assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-  <link href="../https://fonts.gstatic.com" rel="preconnect">
-  <link href="../https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="../assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
@@ -146,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <link href="../assets/css/style.css" rel="stylesheet">
-  <script type="javascript" src="../assets/js/darkmode.js" defer></script>
+  <script type="text/javascript" src="../assets/js/darkmode.js" defer></script>
   <style>
     .pagetitle { margin: 80px 0 20px; }
   </style>
@@ -212,11 +198,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <!-- ======= Main Content ======= -->
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Send TXT File with Reason</h1>
+      <h1>Send Document with Reason</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-          <li class="breadcrumb-item active">Send TXT</li>
+          <li class="breadcrumb-item active">Send Document</li>
         </ol>
       </nav>
       <p class="text-muted">Reference: <?php echo $uniqueId; ?></p>
@@ -235,11 +221,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <!-- The form will be submitted via AJAX -->
               <form id="sendForm" action="send.php?unique_id=<?php echo $uniqueId; ?>" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
-                  <label for="document" class="form-label">Select TXT File:</label>
-                  <input type="file" name="document" id="document" class="form-control" accept=".txt" required>
+                  <label for="document" class="form-label">Select Document (PDF, DOC, or DOCX):</label>
+                  <input type="file" name="document" id="document" class="form-control" accept=".pdf,.doc,.docx" required>
                 </div>
                 <div class="mb-3">
-                  <label for="reason" class="form-label">Reason:</label>
+                  <label for="reason" class="form-label">Remarks:</label>
                   <input type="text" name="reason" id="reason" class="form-control" placeholder="Enter reason here" required>
                 </div>
                 <!-- Open the confirmation modal instead of submitting directly -->
@@ -261,11 +247,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Are you sure you want to send the TXT file and reason?
+          Are you sure you want to send the document and reason?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <!-- This button will trigger the AJAX submission -->
+          <!-- This button triggers the AJAX submission -->
           <button type="button" class="btn btn-primary" id="confirmSendButton">Confirm</button>
         </div>
       </div>
@@ -278,12 +264,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="resultModalLabel">Result</h5>
-          <!-- The close button here will be handled by our JavaScript -->
           <button type="button" class="btn-close" id="resultCloseButton" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="resultModalBody"></div>
         <div class="modal-footer">
-          <!-- When this button is clicked, if the status is Success, the user is redirected; otherwise, the modal is simply hidden. -->
           <button type="button" class="btn btn-secondary" id="redirectButton">Close</button>
         </div>
       </div>
@@ -304,68 +288,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       confirmModal.show();
     });
 
-    // When the user clicks "Confirm" in the confirmation modal, submit the form via AJAX.
+    // When the user clicks "Confirm", submit the form via AJAX.
     document.getElementById('confirmSendButton').addEventListener('click', function() {
       var form = document.getElementById('sendForm');
       var formData = new FormData(form);
 
-      // Send the form data via fetch with the appropriate header.
       fetch(form.action, {
         method: 'POST',
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
-      .then(response => response.json())
-      .then(data => {
-        // Hide the confirmation modal.
-        var confirmModalEl = document.getElementById('confirmSendModal');
-        var confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+      .then(response => response.text())
+      .then(text => {
+        console.log("Raw response:", text);
+        let data = JSON.parse(text);
+        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSendModal'));
         confirmModal.hide();
-
-        // Set the result message.
         document.getElementById('resultModalBody').textContent = data.message;
         document.getElementById('resultModalLabel').textContent = (data.status === 'success') ? "Success" : "Error";
-
-        // Show the result modal.
         var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
         resultModal.show();
+        if (data.status === 'success') {
+          // Delay redirection for 2 seconds to allow the modal to be seen.
+          setTimeout(function(){
+            window.location.href = "integ.php";
+          }, 2000);
+        }
       })
       .catch(error => {
-        console.error('Error:', error);
-        // Hide the confirmation modal.
-        var confirmModalEl = document.getElementById('confirmSendModal');
-        var confirmModal = bootstrap.Modal.getInstance(confirmModalEl);
+        console.error("AJAX error:", error);
+        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmSendModal'));
         confirmModal.hide();
-
-        // Display a generic error message.
-        document.getElementById('resultModalBody').textContent = "An unexpected error occurred.";
+        document.getElementById('resultModalBody').textContent = "An unexpected error occurred: " + error.message;
         document.getElementById('resultModalLabel').textContent = "Error";
-
-        // Show the result modal.
         var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
         resultModal.show();
       });
     });
 
-    // When the user clicks the "Close" button in the result modal or the close icon,
-    // redirect only if the operation was successful. Otherwise, just hide the modal.
     document.getElementById('redirectButton').addEventListener('click', function() {
-      if(document.getElementById('resultModalLabel').textContent.trim() === "Success"){
-        window.location.href = "integ.php";
-      } else {
-        var resultModalEl = document.getElementById('resultModal');
-        var resultModal = bootstrap.Modal.getInstance(resultModalEl);
-        resultModal.hide();
-      }
+      window.location.href = "integ.php";
     });
     document.getElementById('resultCloseButton').addEventListener('click', function() {
-      if(document.getElementById('resultModalLabel').textContent.trim() === "Success"){
-        window.location.href = "integ.php";
-      } else {
-        var resultModalEl = document.getElementById('resultModal');
-        var resultModal = bootstrap.Modal.getInstance(resultModalEl);
-        resultModal.hide();
-      }
+      window.location.href = "integ.php";
     });
   </script>
 </body>
