@@ -45,7 +45,7 @@ include '../fetchfname.php';
     <li class="nav-item dropdown pe-3">
 
       <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-        <img src="../assets/imG/default profile.jpg" alt="Profile" class="rounded-circle">
+        <img src="../assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
         <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
       </a>
 
@@ -84,49 +84,54 @@ include '../fetchfname.php';
 
   <li class="nav-heading">Clinic Management System</li>
 
-  <li class="nav-item">
-    <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-      <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-    </a>
-    <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-    <li>
-        <a href="clinic-dashboard.php">
-          <i class="bi bi-circle" ></i><span>Report and Analytics</span>
-        </a>
-      </li>
+   <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+      <li>
+          <a href="clinic-dashboard.php">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+          </a>
+        </li>
         <li>
+          <a href="forms-elements.php">
+            <i class="bi bi-circle"></i><span>Patient Registration</span>
+          </a>
+        </li>
+        <li>
+          <a href="tables-data.php" class="active">
+            <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+          </a>
+        </li>
+        <li>  
+        <a href="medical-supplies.php">
+            <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+          </a>
+        </li>
+         <li>
           <a href="request.php">
             <i class="bi bi-circle" ></i><span>Request Supply</span>
           </a>
         </li>
-      <li>
-      <li>
-        <a href="forms-elements.php">
-          <i class="bi bi-circle"></i><span>Patient Registration</span>
-        </a>
-      </li>
-      <li>
-        <a href="tables-data.php" class="active">
-          <i class="bi bi-circle"></i><span>Patient Medical Records</span>
-        </a>
-      </li>
-      <li>  
-      <a href="medical-supplies.php">
-          <i class="bi bi-circle" ></i><span>Medical Supplies</span>
-        </a>
-      </li>
-      <li>
-          <a href="blankanomaly.php">
-            <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+          <li>
+            <a href="SDforecastingai.php">
+              <i class="bi bi-circle" ></i><span>ForecastingAI</span>
+            </a>
+          </li>
+          <li>
+          <a href="admission.php">
+            <i class="bi bi-circle"></i><span>Student Data</span>
           </a>
         </li>
         <li>
-          <a href="integ.php" >
-            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+          <a href="integ.php">
+            <i class="bi bi-circle"></i><span>Medical Requests</span>
           </a>
         </li>
-    </ul>
-  </li>
+          <li></li>
+      </ul>
+    </li>
 
       <hr class="sidebar-divider">
     
@@ -136,10 +141,10 @@ include '../fetchfname.php';
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Data Tables</h1>
+      <h1>Patient Medical Records</h1>
       <nav>
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
           <li class="breadcrumb-item active">Patient Medical Records</li>
         </ol>
       </nav>

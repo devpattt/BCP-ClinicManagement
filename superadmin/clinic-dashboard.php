@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['username'])) {
-    header("Location: superadmin/mainpage.php");
+    header("Location: index.php");
     exit(); 
 }
 
@@ -82,47 +82,53 @@ include '../fetchfname.php';
             <li class="nav-heading">Clinic Management System</li>
 
             <li class="nav-item">
-              <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
-              </a>
-              <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-              <li>
-                  <a href="clinic-dashboard.php"  class="active">
-                    <i class="bi bi-circle" ></i><span>Report and Analytics</span>
-                  </a>
-                </li>
+      <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+      <li>
+          <a href="clinic-dashboard.php" class="active">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+          </a>
+        </li>
         <li>
+          <a href="forms-elements.php">
+            <i class="bi bi-circle"></i><span>Patient Registration</span>
+          </a>
+        </li>
+        <li>
+          <a href="tables-data.php">
+            <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+          </a>
+        </li>
+        <li>  
+        <a href="medical-supplies.php">
+            <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+          </a>
+        </li>
+         <li>
           <a href="request.php">
             <i class="bi bi-circle" ></i><span>Request Supply</span>
           </a>
         </li>
-      <li>
-                <li>
-                  <a href="forms-elements.php">
-                    <i class="bi bi-circle"></i><span>Patient Registration</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="tables-data.php">
-                    <i class="bi bi-circle"></i><span>Patient Medical Records</span>
-                  </a>
-                </li>
-                <li>  
-                <a href="medical-supplies.php">
-                    <i class="bi bi-circle" ></i><span>Medical Supplies</span>
-                  </a>
-                </li>
-                  <li>
-                    <a href="blankanomaly.php">
-                      <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
-                    </a>
-                  </li>
-                  <a href="integ.php"  >
-            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+          <li>
+            <a href="SDforecastingai.php">
+              <i class="bi bi-circle" ></i><span>ForecastingAI</span>
+            </a>
+          </li>
+          <li>
+          <a href="admission.php">
+            <i class="bi bi-circle"></i><span>Student Data</span>
           </a>
         </li>
-              </ul>
-            </li>
+        <li>
+          <a href="integ.php">
+            <i class="bi bi-circle"></i><span>Medical Requests</span>
+          </a>
+        </li>
+          <li></li>
+      </ul>
+    </li>
           <hr class="sidebar-divider">
       </aside><!-- End Sidebar-->
 

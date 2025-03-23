@@ -172,11 +172,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </a>
         </li>
         <li>
-          <a href="request.php" class="active">
-            <i class="bi bi-circle" ></i><span>Request Supply</span>
-          </a>
-        </li>
-        <li>
           <a href="forms-elements.php">
             <i class="bi bi-circle"></i><span>Patient Registration</span>
           </a>
@@ -191,14 +186,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <i class="bi bi-circle" ></i><span>Medical Supplies</span>
           </a>
         </li>
+         <li>
+          <a href="request.php" class="active">
+            <i class="bi bi-circle" ></i><span>Request Supply</span>
+          </a>
+        </li>
           <li>
-            <a href="blankanomaly.php">
-              <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
+            <a href="SDforecastingai.php">
+              <i class="bi bi-circle" ></i><span>ForecastingAI</span>
             </a>
           </li>
           <li>
-          <a href="integ.php" >
-            <i class="bi bi-circle" ></i><span>Patient Reports</span>
+          <a href="admission.php">
+            <i class="bi bi-circle"></i><span>Student Data</span>
+          </a>
+        </li>
+        <li>
+          <a href="integ.php">
+            <i class="bi bi-circle"></i><span>Medical Requests</span>
           </a>
         </li>
           <li></li>
@@ -213,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <h1>Request Page</h1>
       <nav>
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="mainpage.php">Home</a></li>
         <li class="breadcrumb-item active">Request Supplies</li>
         </ol>
       </nav>
