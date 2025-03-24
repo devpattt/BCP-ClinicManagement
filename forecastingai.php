@@ -9,6 +9,18 @@ if (!isset($_SESSION['username'])) {
 include 'connection.php';
 include 'fetchfname.php';
 
+$command = "python forecasting_AI/forecast.py 2>&1";
+$output = shell_exec($command);
+
+
+echo "<pre>Raw Output: " . htmlspecialchars($output) . "</pre>"; // Debugging
+$predictions = json_decode($output, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo "<div class='alert alert-danger'>JSON Error: " . json_last_error_msg() . "</div>";
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +45,22 @@ include 'fetchfname.php';
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <link href="assets/css/style.css" rel="stylesheet">
 </head>
+<style> 
+h2 {
+    margin-top: 20px !important; /* Adjust as needed */
+}
+.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+#ai-predictions {
+    position: relative;
+    z-index: 1;
+}
+
+
+</style>
 <body>
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
@@ -125,9 +153,8 @@ include 'fetchfname.php';
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
-
     <div class="pagetitle">
-      <h1>Forecasting Artificial Intellegence</h1>
+      <h1>Forecasting Artificial Intelligence</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -135,66 +162,46 @@ include 'fetchfname.php';
         </ol>
       </nav>
     </div>
-    <div class="container">
+
+    <div class="container mt-5">
       <h2>AI Health Predictions</h2>
-      <div id="predictionResults" class="alert alert-info">Fetching predictions...</div>
-    </div>
 
-    <?php
-      $url = "http://127.0.0.1:5000/predict";
-
-      $ch = curl_init($url);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-      curl_setopt($ch, CURLOPT_HTTPGET, true); // Explicitly use GET request
-      $response = curl_exec($ch);
-      
-      if ($response === false) {
-          die("<div class='alert alert-danger'>cURL Error: " . curl_error($ch) . "</div>");
+      <?php
+      // Show error if script output is empty
+      if (!$output) {
+        echo "<div class='alert alert-danger'>Error: No output from AI script.</div>";
+        exit();
       }
-      
-      curl_close($ch);
-   
 
-    // Debugging: Show API response
-    echo "<pre style='display: none;'>API Response: " . htmlspecialchars($response) . "</pre>";
+      // Check if JSON is valid
+      if (json_last_error() !== JSON_ERROR_NONE) {
+        echo "<div class='alert alert-danger'>JSON Error: " . json_last_error_msg() . "</div>";
+        echo "<pre>Raw Output: " . htmlspecialchars($output) . "</pre>"; // Debugging
+        exit();
+      }
 
-    $data = json_decode($response, true);
+      // If you want to debug raw JSON, uncomment:
+      // echo "<pre>Raw Output: " . htmlspecialchars($output) . "</pre>";
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        die("<div class='alert alert-danger'>JSON Decode Error: " . json_last_error_msg() . "<br>Response: " . htmlspecialchars($response) . "</div>");
-    }
-
-    if (!is_array($data)) {
-        die("<div class='alert alert-warning'>Invalid API response format.</div>");
-    }
-
-    echo "<ul class='list-group'>";
-    foreach ($data as $result) {
-        echo "<li class='list-group-item'><strong>" . htmlspecialchars($result['fullname']) . "</strong> might have: <span class='text-danger'>" . htmlspecialchars($result['predicted_disease']) . "</span></li>";
-    }
-    echo "</ul>";
-    ?>
-
-    <?php
-    $conn = new mysqli("localhost", "root", "", "bcp_sms3_cms");
-    if ($conn->connect_error) {
-        die("<div class='alert alert-danger'>Database Connection Failed: " . $conn->connect_error . "</div>");
-    }
-
-    $result = $conn->query("SELECT * FROM bcp_sms3_predictions ORDER BY id DESC LIMIT 5");
-
-    echo "<h3>Recent Predictions</h3>";
-    while ($row = $result->fetch_assoc()) {
-        echo "<p><b>{$row['fullname']}</b> might have: <span style='color:red;'>{$row['predicted_disease']}</span></p>";
-    }
-
-    $conn->close();
-
-    ?>
-
-
+      // Print predictions if available
+      if (!empty($predictions)) {
+        echo "<table class='table'>";
+        echo "<tr><th>Patient ID</th><th>Name</th><th>Prediction</th></tr>";
+        foreach ($predictions as $row) {
+            echo "<tr>
+                    <td>{$row['patient_id']}</td>
+                    <td>{$row['name']}</td>
+                    <td>{$row['predicted_illness']}</td>
+                  </tr>";
+        }
+        echo "</table>";
+      } else {
+        echo "<p>No data found.</p>";
+      }
+      ?>
+    </div>
   </main>
+
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -205,64 +212,5 @@ include 'fetchfname.php';
   <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="../assets/vendor/php-email-form/validate.js"></script>
   <script src="../assets/js/main.js"></script>
-  <script>
-    function fetchPredictions() {
-        let resultsDiv = document.getElementById("predictionResults");
-        resultsDiv.innerHTML = "<p>Loading predictions...</p>"; // Show loading state
-
-        fetch('http://localhost:5000/predict', { method: 'GET' }) // Change method to GET
-        .then(response => response.json())
-        .then(data => {
-            resultsDiv.innerHTML = ""; // Clear previous results
-
-            if (!Array.isArray(data) || data.length === 0) {
-                resultsDiv.innerHTML = "<p>No new predictions available.</p>";
-                return;
-            }
-
-            let output = "<ul class='list-group'>";
-            data.forEach(patient => {
-                output += `<li class='list-group-item'><strong>${patient.fullname}</strong> might have: <span style="color:red;">${patient.predicted_disease}</span></li>`;
-                showNotification(patient.fullname, patient.predicted_disease);
-            });
-            output += "</ul>";
-
-            resultsDiv.innerHTML = output;
-        })
-        .catch(error => {
-            console.error("Error fetching predictions:", error);
-            resultsDiv.innerHTML = "<p class='text-danger'>Error fetching data.</p>";
-        });
-    }
-
-    setInterval(fetchPredictions, 10000);
-    </script>
-
-    <?php
-    $conn = new mysqli("localhost", "root", "", "bcp_sms3_cms");
-    $result = $conn->query("SELECT * FROM bcp_sms3_predictions ORDER BY id DESC LIMIT 1"); 
-    $row = $result->fetch_assoc();
-    ?>
-
-    <script>
-    function showNotification(name, disease) {
-        if (Notification.permission === "granted") {
-            new Notification("Health Alert", {
-                body: name + " might have: " + disease,
-                icon: "alert_icon.png"
-            });
-        } else {
-            Notification.requestPermission();
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        let latestName = "<?php echo $row['fullname']; ?>";
-        let latestDisease = "<?php echo $row['predicted_disease']; ?>";
-        showNotification(latestName, latestDisease);
-    });
-    </script>
-
-
 </body>
 </html>

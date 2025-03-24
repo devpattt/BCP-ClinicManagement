@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])) {
 
 include 'connection.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
