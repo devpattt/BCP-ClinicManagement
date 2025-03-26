@@ -1,14 +1,15 @@
 <?php
 session_start();
+
 if (isset($_SESSION['username'])) {
     header("Location: clinic-dashboard.php");
     exit();
 }
 
 include 'connection.php';
-require 'phpmailer/src/PHPMailer.php';
-require 'phpmailer/src/Exception.php';
-require 'phpmailer/src/SMTP.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -19,14 +20,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM bcp_sms3_users WHERE username = ?";
+    $sql = "SELECT username, password, email, 'user' AS user_type FROM bcp_sms3_users WHERE username = ?
+        UNION ALL
+        SELECT username, password, email, 'admin' AS user_type FROM bcp_sms3_admin WHERE username = ?
+        UNION ALL
+        SELECT username, password, email, 'super' AS user_type FROM bcp_sms3_super_admin WHERE username = ?";
+
+
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
         die("SQL Prepare Error: " . $conn->error);
     }
 
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("sss", $username, $username, $username);
+    
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -38,6 +46,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $user['username'];
             $_SESSION['otp'] = $otp;
             $_SESSION['email'] = $user['email'];
+            $_SESSION['user_type'] = $user['user_type']; // Store user type in session
+            //ito bago din to
+            $_SESSION['session_id'] = session_id(); // Store session ID
+
+            echo "<script>
+                  localStorage.setItem('session_active', 'true');
+                  localStorage.setItem('session_id', '" . session_id() . "');
+                  </script>";
+
+                  //hanggang dito sa echo
 
             $mail = new PHPMailer(true);
             try {
@@ -85,6 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     $conn->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -96,6 +115,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="description" content="Clinic Management System.">
     <link rel="stylesheet" href="assets/css/index.css">
     <title>Login - CMS</title>
+    <style>
+        .login-container {  
+        background-color: white;
+        padding: 20px;
+        border-radius: 25px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+        border: 1px solid #000000;
+        margin: 0 auto;
+    }
+    
+    h2 {
+        color: #000000;
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        text-align: left;
+        color: #000000;
+        margin: 10px 0 5px;
+    }
+    
+    .text {
+        color: #000000;
+    }
+    
+    #username, #password {
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 2px;
+        border: 1px solid black;
+    }
+    
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    
+    .forgot-password {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+    
+    .forgot-password a {
+        color: #000000;
+        text-decoration: none;
+        font-size: 15px;
+    }
+    
+    .forgot-password a:hover {
+        text-decoration: none;
+    }
+
+    </style>
 </head>
 <body>
     <div class="logo">
@@ -191,7 +271,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     event.preventDefault();
                 }
             }
-        </script>
+        </script> 
+
+        
+<!-- ITO BAGO TO -->
+<script>
+window.addEventListener("storage", function(event) {
+    if (event.key === "forceLogout") {
+        showLogoutModal();
+    }
+});
+
+function showLogoutModal() {
+    let modal = document.createElement("div");
+    modal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center;">
+            <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <p style="font-size: 18px;">We've detected that you logged out in another tab.</p>
+                <button onclick="redirectToLogin()" style="background: #007BFF; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px;">OK</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function redirectToLogin() {
+    window.location.href = "index.php"; // Redirect back to login page
+}
+</script>
+
+
 
     </div>
 </body>

@@ -9,18 +9,28 @@ if (!isset($_SESSION['username'])) {
 include 'connection.php';
 include 'fetchfname.php';
 
-$command = "python forecasting_AI/forecast.py 2>&1";
-$output = shell_exec($command);
+// Fetch patient symptoms
+$sql_patients = "SELECT id, fullname, symptoms FROM bcp_sms3_patients";
+$result_patients = $conn->query($sql_patients);
 
-
-echo "<pre>Raw Output: " . htmlspecialchars($output) . "</pre>"; // Debugging
-$predictions = json_decode($output, true);
-
-if (json_last_error() !== JSON_ERROR_NONE) {
-    echo "<div class='alert alert-danger'>JSON Error: " . json_last_error_msg() . "</div>";
-    exit();
+$patientData = [];
+while ($row = $result_patients->fetch_assoc()) {
+    $patientData[] = $row;
 }
 
+// Fetch illness database (illness name & associated symptoms)
+$sql_illness = "SELECT illness_name, symptoms FROM bcp_sms3_illness";
+$result_illness = $conn->query($sql_illness);
+
+$illnessData = [];
+while ($row = $result_illness->fetch_assoc()) {
+    $illnessData[] = $row;
+}
+
+$conn->close();
+
+// Return both datasets for AI training
+echo json_encode(["patients" => $patientData, "illnesses" => $illnessData]);
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +57,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 </head>
 <style> 
 h2 {
-    margin-top: 20px !important; /* Adjust as needed */
+    margin-top: 20px !important;
 }
 .clearfix::after {
     content: "";
@@ -83,7 +93,7 @@ h2 {
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li>
+            <li>lo
               <a class="dropdown-item d-flex align-items-center" href="logout.php">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
@@ -111,38 +121,53 @@ h2 {
 
           <li class="nav-heading">Clinic Management System</li>
 
-          <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
-              <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+           <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#system-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-hospital"></i><span>Clinic Management</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
+      <li>
+          <a href="clinic-dashboard.php">
+            <i class="bi bi-circle" ></i><span>Report and Analytics</span>
+          </a>
+        </li>
+        <li>
+          <a href="forms-elements.php">
+            <i class="bi bi-circle"></i><span>Patient Registration</span>
+          </a>
+        </li>
+        <li>
+          <a href="tables-data.php">
+            <i class="bi bi-circle"></i><span>Patient Medical Records</span>
+          </a>
+        </li>
+        <li>  
+        <a href="medical-supplies.php">
+            <i class="bi bi-circle" ></i><span>Medical Supplies</span>
+          </a>
+        </li>
+         <li>
+          <a href="request.php">
+            <i class="bi bi-circle" ></i><span>Request Supply</span>
+          </a>
+        </li>
+          <li>
+            <a href="SDforecastingai.php" class="active">
+              <i class="bi bi-circle" ></i><span>ForecastingAI</span>
             </a>
-            <ul id="system-nav" class="nav-content collapse show " data-bs-parent="#sidebar-nav">
-            <li>
-                <a href="clinic-dashboard.php">
-                  <i class="bi bi-circle" ></i><span>Report and Analytics</span>
-                </a>
-              </li>
-              <li>
-                <a href="forms-elements.php">
-                  <i class="bi bi-circle"></i><span>Patient Registration</span>
-                </a>
-              </li>
-              <li>
-                <a href="tables-data.php">
-                  <i class="bi bi-circle"></i><span>Patient Medical Records</span>
-                </a>
-              </li>
-              <li>  
-              <a href="medical-supplies.php">
-                  <i class="bi bi-circle" ></i><span>Medical Supplies</span>
-                </a>
-              </li>
-              <li>
-                  <a href="blankanomaly.php" class="active">
-                    <i class="bi bi-circle" ></i><span>A.I Anomaly</span>
-                  </a>
-                </li>
-            </ul>
           </li>
+          <li>
+          <a href="admission.php">
+            <i class="bi bi-circle"></i><span>Student Data</span>
+          </a>
+        </li>
+        <li>
+          <a href="integ.php">
+            <i class="bi bi-circle"></i><span>Medical Requests</span>
+          </a>
+        </li>
+      </ul>
+    </li>
 
     
       <hr class="sidebar-divider">
@@ -161,56 +186,21 @@ h2 {
           <li class="breadcrumb-item">Forecasting AI</li>
         </ol>
       </nav>
-    </div>
-
-    <div class="container mt-5">
-      <h2>AI Health Predictions</h2>
-
-      <?php
-      // Show error if script output is empty
-      if (!$output) {
-        echo "<div class='alert alert-danger'>Error: No output from AI script.</div>";
-        exit();
-      }
-
-      // Check if JSON is valid
-      if (json_last_error() !== JSON_ERROR_NONE) {
-        echo "<div class='alert alert-danger'>JSON Error: " . json_last_error_msg() . "</div>";
-        echo "<pre>Raw Output: " . htmlspecialchars($output) . "</pre>"; // Debugging
-        exit();
-      }
-
-      // If you want to debug raw JSON, uncomment:
-      // echo "<pre>Raw Output: " . htmlspecialchars($output) . "</pre>";
-
-      // Print predictions if available
-      if (!empty($predictions)) {
-        echo "<table class='table'>";
-        echo "<tr><th>Patient ID</th><th>Name</th><th>Prediction</th></tr>";
-        foreach ($predictions as $row) {
-            echo "<tr>
-                    <td>{$row['patient_id']}</td>
-                    <td>{$row['name']}</td>
-                    <td>{$row['predicted_illness']}</td>
-                  </tr>";
-        }
-        echo "</table>";
-      } else {
-        echo "<p>No data found.</p>";
-      }
-      ?>
-    </div>
+      <h1>AI-Based Illness Prediction</h1>
+      <div id="predictionResult">Loading predictions...</div>
   </main>
 
+ 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="../assets/vendor/echarts/echarts.min.js"></script>
-  <script src="../assets/vendor/quill/quill.js"></script>
-  <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="../assets/vendor/php-email-form/validate.js"></script>
-  <script src="../assets/js/main.js"></script>
+  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="assets/vendor/echarts/echarts.min.js"></script>
+  <script src="assets/vendor/quill/quill.js"></script>
+  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/js/main.js"></script>
+
 </body>
 </html>
