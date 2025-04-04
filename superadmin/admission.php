@@ -216,6 +216,7 @@ include '../fetchfname.php';
                     <th>First Name</th>
                     <th>Middle Name</th>
                     <th>Last Name</th>
+                    <th>Birth Date</th>
                     <th>Contact Number</th>
                     <th>Year Level</th>
                     <th>Sex</th>
@@ -232,6 +233,7 @@ include '../fetchfname.php';
                     <td>${student.first_name}</td>
                     <td>${student.middle_name || 'N/A'}</td>
                     <td>${student.last_name}</td>
+                    <td>${student.birthday}</td>
                     <td>${student.contact_number}</td>
                     <td>${student.year_level}</td>
                     <td>${student.sex}</td>

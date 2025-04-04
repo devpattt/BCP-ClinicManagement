@@ -76,11 +76,9 @@ include '../fetchfname.php';
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="header-left d-flex align-items-center">
       <i class="bi bi-list toggle-sidebar-btn"></i>
-      <!-- Link to records page -->
-      <a href="rec_diag.php" class="diagnosis-link">
-        Student Records With Diagnosis
-      </a>
-      <a href="other_patient.php" class="diagnosis-link">Other Patients</a>
+      <!-- Navigation links -->
+      <a href="tables-data.php" class="diagnosis-link">Back</a>
+      <a href="rec_diag.php" class="diagnosis-link">Medical Records With Diagnosis</a>
     </div>
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -172,11 +170,11 @@ include '../fetchfname.php';
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Student Patient Medical Records</h1>
+      <h1>Patient Medical Records</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-          <li class="breadcrumb-item active">Student Patient Medical Records</li>
+          <li class="breadcrumb-item active">Patient Medical Records</li>
         </ol>
       </nav>
     </div>
@@ -192,13 +190,12 @@ include '../fetchfname.php';
                   <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Patient</th>
+                    <th scope="col">Unique ID</th>
                     <th scope="col">Full Name</th>
-                    <th scope="col">Student Number</th>
-                    <th scope="col">Contact Number</th>
+                    <th scope="col">Contact</th>
                     <th scope="col">Gender</th>
                     <th scope="col">Birth Date</th>
-                    <th scope="col">Year Level</th>
-                    <th scope="col">Department Code</th>
+                    <th scope="col">Department</th>
                     <th scope="col">Diagnostic</th>
                     <th scope="col">Recommendation</th>
                     <th scope="col">Recorded At</th>
@@ -206,51 +203,49 @@ include '../fetchfname.php';
                 </thead>
                 <tbody>
                   <?php
-                  // Retrieve all records including diagnostic and recommendation columns and the patient column
+                  // Retrieve all records from the bcp_sms3_other_patients table including the patient column
                   $stmt = $conn->prepare("
-                    SELECT id, patient, fullname, student_number, contact_number, sex, birthday,
-                           year_level, department_code, diagnostic, recommendation,
-                           DATE_FORMAT(created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at
-                    FROM bcp_sms3_patients
+                    SELECT id, unique_id, patient, fullname, contact, birthdate, sex, department, diagnostic, recommendation,
+                           DATE_FORMAT(create_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at
+                    FROM bcp_sms3_other_patients
                   ");
                   $stmt->execute();
                   $result = $stmt->get_result();
 
                   if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                      // Hide row if both diagnostic and recommendation have values
-                      if (!empty($row["diagnostic"]) && !empty($row["recommendation"])) {
+                      // Skip row if both diagnostic and recommendation have values
+                      if (!empty($row['diagnostic']) && !empty($row['recommendation'])) {
                         continue;
                       }
                       
-                      // Check if diagnostic has been entered
-                      if (empty($row["diagnostic"])) {
-                        // Diagnostic not yet entered: clickable Diagnose button and disabled Recommendation button
-                        $diagnoseBtn = "<a href='diag.php?id=" . urlencode($row["id"]) . "' class='btn btn-primary w-100'>Diagnose</a>";
+                      // Determine the buttons based on the diagnostic field
+                      if (empty($row['diagnostic'])) {
+                        // Diagnostic not entered: clickable Diagnose button directing to diag_other.php and disabled Recommendation button
+                        $diagnoseBtn = "<a href='diag_other.php?id=" . urlencode($row['id']) . "' class='btn btn-primary w-100'>Diagnose</a>";
                         $recommendationBtn = "<button class='btn btn-primary w-100' disabled>Recommendation</button>";
                       } else {
-                        // Diagnostic entered: disabled Diagnose button and clickable Recommendation button
+                        // Diagnostic entered: disabled Diagnose button and clickable Recommendation button directing to recom_other.php
                         $diagnoseBtn = "<button class='btn btn-primary w-100' disabled>Diagnose</button>";
-                        $recommendationBtn = "<a href='recom.php?id=" . urlencode($row["id"]) . "' class='btn btn-primary w-100'>Recommendation</a>";
+                        $recommendationBtn = "<a href='recom_other.php?id=" . urlencode($row['id']) . "' class='btn btn-primary w-100'>Recommendation</a>";
                       }
                       
                       echo "<tr>";
-                      echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["patient"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["fullname"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["student_number"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["contact_number"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["sex"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["birthday"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["year_level"]) . "</td>";
-                      echo "<td>" . htmlspecialchars($row["department_code"]) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['id']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['patient']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['unique_id']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['fullname']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['contact']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['sex']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['birthdate']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['department']) . "</td>";
                       echo "<td>" . $diagnoseBtn . "</td>";
                       echo "<td>" . $recommendationBtn . "</td>";
-                      echo "<td>" . htmlspecialchars($row["formatted_created_at"]) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['formatted_created_at']) . "</td>";
                       echo "</tr>";
                     }
                   } else {
-                    echo "<tr><td colspan='12'>No records found</td></tr>";
+                    echo "<tr><td colspan='11'>No records found</td></tr>";
                   }
                   $stmt->close();
                   ?>

@@ -1,19 +1,19 @@
 <?php
 include 'connection.php';
 
-$id = $_POST['id'];
+$id = $_POST['code'];
 $item_name = $_POST['item_name'];
 $category = $_POST['category'];
 $quantity = $_POST['quantity'];
-$minimum_stock = $_POST['minimum_stock'];
+$unit = $_POST['unit'];
 
 $sql = "UPDATE bcp_sms3_medicalsupplies
-        SET item_name='$item_name', category='$category', quantity=$quantity, minimum_stock=$minimum_stock 
-        WHERE id=$id";
+        SET item_name='$item_name', category='$category', quantity=$quantity, unit=$unit
+        WHERE code='$id'";
 
 if ($conn->query($sql) === TRUE) {
-    echo "Supply updated successfully.";
+    echo json_encode(["status" => "success"]);
 } else {
-    echo "Error: " . $conn->error;
+    echo json_encode(["status" => "error", "message" => $conn->error]);
 }
 ?>
