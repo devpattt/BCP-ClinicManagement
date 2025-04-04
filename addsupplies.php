@@ -60,6 +60,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Check if item already exists
+    $checkStmt = $conn->prepare("SELECT id FROM bcp_sms3_medicalsupplies WHERE item_name = ?");
+    $checkStmt->bind_param("s", $itemName);
+    $checkStmt->execute();
+    $checkStmt->store_result();
+    
+    if ($checkStmt->num_rows > 0) {
+        echo json_encode(['status' => 'error', 'message' => 'This brand name already exists.']);
+        $checkStmt->close();
+        exit();
+    }
+    
+    $checkStmt->close();
+
     $code = generateUniqueCode($conn);
 
     $stmt = $conn->prepare("INSERT INTO bcp_sms3_medicalsupplies (code, item_name, category, quantity, unit) VALUES (?, ?, ?, ?, ?)");

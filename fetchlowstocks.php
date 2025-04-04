@@ -87,7 +87,12 @@ $result = $conn->query($query);
 $data = [];
 
 while ($row = $result->fetch_assoc()) {
-    $data[] = $row['code'] . " - " . $row['item_name'] . " = " . $row['unit'] . ", " . $row['quantity'];
+    $data[] = [
+        'code'      => $row['code'], 
+        'item_name' => $row['item_name'],
+        'unit'      => $row['unit'],
+        'quantity'  => $row['quantity']
+    ];
 }
 
 echo json_encode($data);
