@@ -146,73 +146,57 @@ include '../fetchfname.php';
     </div>
 
     <section class="section dashboard">
-      <div class="row">
-        <div class="col-lg-24">
-          <div class="row d-flex justify-content-between">
-            <!-- Card 1: Out of Stocks Products -->
-            <div class="col-lg-4 col-md-6 mb-4">
-              <div class="card info-card sales-card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i></i></a>
+  <div class="row">
+    <!-- Instead of col-lg-24, use col-lg-12 or remove entirely -->
+    <div class="col-lg-12">
+      <div class="row d-flex justify-content-between">
+        
+        <!-- Card 1: Out of Stocks Products -->
+        <div class="col-lg-6 col-md-6 mb-4">
+          <div class="card info-card sales-card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i></i></a>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Out of stocks products</h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i id="outOfStockIcon" class="bi bi-exclamation-triangle text-danger" style="cursor: pointer;"></i>
                 </div>
-                <div class="card-body">
-                  <h5 class="card-title">Out of stocks products</h5>
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i id="outOfStockIcon" class="bi bi-exclamation-triangle text-danger" style="cursor: pointer;"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6 id="today-count"></h6>
-                    </div>
-                  </div>
+                <div class="ps-3">
+                  <h6 id="today-count"></h6>
                 </div>
               </div>
             </div>
-
-            <!-- Card 2: Supplies on Low Stocks -->
-            <div class="col-lg-4 col-md-6 mb-4">
-              <div class="card info-card revenue-card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i></i></a>
-                </div>
-                <div class="card-body">
-                  <h5 class="card-title">Supplies on low stocks</h5>
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i id="lowStockIcon" class="bi bi-exclamation-triangle text-primary" style="cursor: pointer;"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6 id="month-count"></h6>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 3: Numbers of Products to be Arrived -->
-            <div class="col-lg-4 col-md-6 mb-4">
-              <div class="card info-card customers-card">
-                <div class="filter">
-                  <a class="icon" href="logic.php" data-bs-toggle="dropdown"><i></i></a>
-                </div>
-                <div class="card-body">
-                  <h5 class="card-title">Numbers of Products to be arrived</h5>
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-truck text-success"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6 id="year-count"></h6>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
+
+        <!-- Card 2: Supplies on Low Stocks -->
+        <div class="col-lg-6 col-md-6 mb-4">
+          <div class="card info-card revenue-card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i></i></a>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Supplies on low stocks</h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i id="lowStockIcon" class="bi bi-exclamation-triangle text-primary" style="cursor: pointer;"></i>
+                </div>
+                <div class="ps-3">
+                  <h6 id="month-count"></h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- If you need a third card, you can add another col-lg-6 col-md-6 here -->
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+
 
     <!-- Modal for Notifications -->
     <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
