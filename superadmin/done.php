@@ -14,7 +14,7 @@ include '../connection.php';
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Clinic Management System / Patient Reports</title>
+  <title>Clinic Management System / Processed Files</title>
 
   <!-- Favicon and Apple Touch Icon -->
   <link href="../assets/img/bcp logo.png" rel="icon">
@@ -58,7 +58,6 @@ include '../connection.php';
   </style>
 </head>
 <body>
-
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="d-flex align-items-center justify-content-between">
@@ -70,9 +69,7 @@ include '../connection.php';
         <li class="nav-item dropdown pe-3">
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="../assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">
-              <?php echo htmlspecialchars($fullname); ?>
-            </span>
+            <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header"></li>
@@ -126,7 +123,7 @@ include '../connection.php';
             </a>
           </li>
           <li>
-            <a href="request.php" class="active">
+            <a href="request.php">
               <i class="bi bi-circle"></i><span>Request Supply</span>
             </a>
           </li>
@@ -141,7 +138,7 @@ include '../connection.php';
             </a>
           </li>
           <li>
-            <a href="integ.php">
+            <a href="integ.php" class="active">
               <i class="bi bi-circle"></i><span>Medical Requests</span>
             </a>
           </li>
@@ -155,11 +152,10 @@ include '../connection.php';
   <main id="main" class="main mt-5 pt-5">
     <div class="container">
       <div class="pagetitle">
-        <h1>Request Report</h1>
+        <h1>Processed Files</h1>
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-            <li class="breadcrumb-item active">Request Data</li>
           </ol>
         </nav>
       </div><!-- End Page Title -->
@@ -169,47 +165,54 @@ include '../connection.php';
           <div class="col-lg-12">
             <div class="card">
               <div class="card-body">
-                <!-- Table header with a title and the Accepted Request Button -->
+                <!-- Table header with a title and a Back button -->
                 <div class="table-header mb-3">
-                  <h4 class="card-title fw-bold" style="color: #012970;">Request Reports from Student Affair</h4>
-                  <button type="button" onclick="window.location.href='acc.php'" class="btn btn-primary">Accepted Request</button>
+                  <h4 class="card-title fw-bold" style="color:rgb(255, 255, 255);">..</h4>
+                  <button type="button" onclick="window.location.href='integ.php'" class="btn btn-primary">Back</button>
                 </div>
-                <!-- Updated table for showing pending requests from bcp_sms3_req -->
+                <!-- Table: show all columns except id, and only rows with a value in status -->
                 <table class="table table-sm table-hover table-striped table-bordered align-middle text-center">
                   <thead class="table-primary">
                     <tr>
-                      <th>Student</th>
-                      <th>Remarks</th>
-                      <th>Request Date</th>
+                      <th>Reference #</th>
+                      <th>PDF File</th>
+                      <th>Status</th>
+                      <th>Date</th>
                       <th>Actions</th>
+                      <th>Download</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                      // Retrieve records that have not been processed (both action and rem2 are empty)
-                      $stmt = $conn->prepare("SELECT id, students, remarks, request_at FROM bcp_sms3_req WHERE (action IS NULL OR action = '') AND (rem2 IS NULL OR rem2 = '') ORDER BY request_at DESC");
+                      // Retrieve records from bcp_sms3_send_integ table where status is not empty
+                      $stmt = $conn->prepare("SELECT unique_id, request, status, date FROM bcp_sms3_send_integ WHERE status <> ''");
                       $stmt->execute();
                       $result = $stmt->get_result();
 
                       if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                          $id = $row["id"];
-                          $student = htmlspecialchars($row["students"]);
-                          $remarks = htmlspecialchars($row["remarks"]);
-                          $requestDate = htmlspecialchars($row["request_at"]);
+                          $uniqueId = htmlspecialchars($row["unique_id"]);
+                          $pdfFile  = htmlspecialchars($row["request"]);
+                          $status   = htmlspecialchars($row["status"]);
+                          $date     = htmlspecialchars($row["date"]);
 
-                          echo "<tr id='row_$id'>";
-                          echo "<td>" . $student . "</td>";
-                          echo "<td>" . $remarks . "</td>";
-                          echo "<td>" . $requestDate . "</td>";
-                          echo "<td>
-                                  <button class='btn btn-primary btn-sm' onclick='acceptRequest($id)'>Accept</button>
-                                  <button class='btn btn-primary btn-sm' onclick='openDenyModal($id)'>Deny</button>
-                                </td>";
+                          echo "<tr>";
+                          echo "<td>" . $uniqueId . "</td>";
+                          echo "<td>" . $pdfFile . "</td>";
+                          echo "<td>" . $status . "</td>";
+                          echo "<td>" . $date . "</td>";
+                          // Actions column for Edit button only
+                          echo "<td>";
+                          echo "<button type='button' class='btn btn-primary btn-sm btn-responsive' onclick='openEditModal(\"$uniqueId\")'>Edit</button>";
+                          echo "</td>";
+                          // New column for Download icon
+                          echo "<td>";
+                          echo "<a href='../" . $pdfFile . "' download title='Download PDF'><i class='bi bi-download' style='font-size: 1.5rem; color: #012970;'></i></a>";
+                          echo "</td>";
                           echo "</tr>";
                         }
                       } else {
-                        echo "<tr><td colspan='4' class='text-center'>No records found</td></tr>";
+                        echo "<tr><td colspan='6' class='text-center'>No records found</td></tr>";
                       }
                       $stmt->close();
                     ?>
@@ -223,26 +226,23 @@ include '../connection.php';
     </div><!-- End container -->
   </main>
 
-  <!-- Deny Modal -->
-  <div class="modal fade" id="denyModal" tabindex="-1" aria-labelledby="denyModalLabel" aria-hidden="true">
+  <!-- Modal for confirming edit (which will delete the row) -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <!-- Modal header with blue background -->
+        <!-- Modal header -->
         <div class="modal-header" style="background-color: blue; color: white;">
-          <h5 class="modal-title" id="denyModalLabel">Deny Request</h5>
+          <h5 class="modal-title" id="editModalLabel">Confirm Edit</h5>
           <button type="button" class="btn btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <!-- Modal body with larger, required remarks input -->
+        <!-- Modal body -->
         <div class="modal-body">
-          <div class="mb-3">
-            <label for="denyRemarks" class="form-label">Remarks</label>
-            <textarea id="denyRemarks" class="form-control" style="height: 200px;" placeholder="Enter your denial remarks here..." required></textarea>
-          </div>
+          Are you sure you want to edit this file?
         </div>
-        <!-- Modal footer with Close and Submit buttons -->
+        <!-- Modal footer with Close and Confirm buttons -->
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="submitDeny()">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="confirmEdit()">Confirm</button>
         </div>
       </div>
     </div>
@@ -252,7 +252,7 @@ include '../connection.php';
   <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header" style="background-color: blue; color: white;">
+        <div class="modal-header">
           <h5 class="modal-title" id="messageModalLabel">Notification</h5>
           <button type="button" class="btn btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -277,63 +277,45 @@ include '../connection.php';
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script>
-    // Global variable to hold the current request ID for Deny action
-    var currentDenyId = null;
+    // Global variable to hold the current row's unique_id for editing
+    var currentUniqueId = "";
 
-    // Function to display messages in the message modal
+    // Function to display messages in a modal
     function showMessageModal(message) {
       $('#messageModalBody').text(message);
       var modal = new bootstrap.Modal(document.getElementById('messageModal'));
       modal.show();
     }
 
-    // Function to accept a request
-    function acceptRequest(id) {
-      $.ajax({
-        url: 'update_request.php',
-        type: 'POST',
-        data: { id: id, type: 'accept' },
-        success: function(response) {
-          // On success, remove the corresponding table row
-          $("#row_" + id).remove();
-          showMessageModal('Request accepted successfully!');
-        },
-        error: function(xhr, status, error) {
-          showMessageModal('An error occurred while accepting the request: ' + error);
-        }
-      });
+    // Placeholder function for viewing the PDF (if needed)
+    function viewPdf(fileUrl) {
+      window.open('../' + fileUrl, '_blank');
     }
 
-    // Function to open the Deny modal
-    function openDenyModal(id) {
-      currentDenyId = id;
-      $("#denyRemarks").val(""); // Clear previous remarks
-      var modal = new bootstrap.Modal(document.getElementById('denyModal'));
+    // Open the edit modal and store the unique_id
+    function openEditModal(uniqueId) {
+      currentUniqueId = uniqueId;
+      var modal = new bootstrap.Modal(document.getElementById('editModal'));
       modal.show();
     }
 
-    // Function to submit Deny action via AJAX
-    function submitDeny() {
-      var remarks = $("#denyRemarks").val().trim();
-      if (remarks === "") {
-        alert("Please fill up the remarks.");
-        return;
-      }
+    // Function to call when "Confirm" is clicked in the edit modal
+    function confirmEdit() {
       $.ajax({
-        url: 'update_request.php',
+        url: 'delete_file.php',
         type: 'POST',
-        data: { id: currentDenyId, type: 'deny', rem2: remarks },
+        data: { unique_id: currentUniqueId },
         success: function(response) {
-          // On success, remove the corresponding table row
-          $("#row_" + currentDenyId).remove();
-          showMessageModal('Request denied successfully!');
-          // Hide the Deny modal
-          var modalEl = document.getElementById('denyModal');
+          showMessageModal('File deleted successfully!');
+          // Hide the edit modal
+          var modalEl = document.getElementById('editModal');
           var modal = bootstrap.Modal.getInstance(modalEl);
           modal.hide();
+          // Reload the page to update the table
+          location.reload();
         },
         error: function(xhr, status, error) {
-          showMessageModal('An error occurred while denying the request: ' + error);
+          showMessageModal('An error occurred: ' + error);
         }
       });
     }

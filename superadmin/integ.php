@@ -50,6 +50,11 @@ include '../connection.php';
         margin-bottom: 0.5rem;
       }
     }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -154,7 +159,7 @@ include '../connection.php';
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-            <li class="breadcrumb-item active">Sent Reports</li>
+            <li class="breadcrumb-item active">Sent File</li>
           </ol>
         </nav>
       </div><!-- End Page Title -->
@@ -164,10 +169,12 @@ include '../connection.php';
           <div class="col-lg-12">
             <div class="card">
               <div class="card-body">
-                <!-- Table heading with matching color -->
-                <h4 class="card-title fw-bold mb-3" style="color: #012970;">
-                  Sent Reports from Integration
-                </h4>
+                <!-- Table header with a title and the Processed File button -->
+                <div class="table-header mb-3">
+                  <h4 class="card-title fw-bold" style="color: #012970;">Sent Reports to Student Affair</h4>
+                  <button type="button" onclick="window.location.href='done.php'" class="btn btn-primary">Processed Files</button>
+
+                </div>
                 <!-- Compact table for sent reports -->
                 <table class="table table-sm table-hover table-striped table-bordered align-middle text-center">
                   <thead class="table-primary">
@@ -175,15 +182,14 @@ include '../connection.php';
                       <th>Reference #</th>
                       <th>PDF File</th>
                       <th>Date</th>
-                      <!-- New columns for actions and download -->
                       <th>Actions</th>
                       <th>Download</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                      // Retrieve records from bcp_sms3_send_integ table
-                      $stmt = $conn->prepare("SELECT unique_id, request, date FROM bcp_sms3_send_integ");
+                      // Retrieve records from bcp_sms3_send_integ table excluding those with status 'Done'
+                      $stmt = $conn->prepare("SELECT unique_id, request, date FROM bcp_sms3_send_integ WHERE status <> 'Done'");
                       $stmt->execute();
                       $result = $stmt->get_result();
 
@@ -191,7 +197,7 @@ include '../connection.php';
                         while ($row = $result->fetch_assoc()) {
                           // Escape values for safety
                           $uniqueId = htmlspecialchars($row["unique_id"]);
-                          // $pdfFile contains a relative URL stored in the database, for example "uploads/Patient_Report_XXX.pdf"
+                          // $pdfFile contains a relative URL stored in the database, e.g. "uploads/Patient_Report_XXX.pdf"
                           $pdfFile = htmlspecialchars($row["request"]);
                           $date = htmlspecialchars($row["date"]);
 
@@ -200,14 +206,14 @@ include '../connection.php';
                           echo "<td>" . $pdfFile . "</td>";
                           echo "<td>" . $date . "</td>";
 
-                          // Actions column with View and Send buttons
+                          // Actions column with View and Send buttons.
+                          // Passing both uniqueId and pdfFile to the sendPdf function.
                           echo "<td>";
                           echo "<button type='button' class='btn btn-primary btn-sm btn-responsive' onclick='viewPdf(\"$pdfFile\")'>View</button> ";
-                          echo "<button type='button' class='btn btn-secondary btn-sm btn-responsive' onclick='sendPdf(\"$uniqueId\")'>Send</button>";
+                          echo "<button type='button' class='btn btn-primary btn-sm btn-responsive' onclick='sendPdf(\"$uniqueId\", \"$pdfFile\")'>Send</button>";
                           echo "</td>";
 
                           // Download column with download icon.
-                          // Prepend "../" to the relative URL if the file is located in the uploads folder one level up.
                           echo "<td>";
                           echo "<a href='../" . $pdfFile . "' download title='Download PDF'><i class='bi bi-download' style='font-size: 1.5rem; color: #012970;'></i></a>";
                           echo "</td>";
@@ -229,6 +235,49 @@ include '../connection.php';
     </div><!-- End container -->
   </main>
 
+  <!-- Modal for sending PDF -->
+  <div class="modal fade" id="sendModal" tabindex="-1" aria-labelledby="sendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal header with blue background -->
+        <div class="modal-header" style="background-color: blue; color: white;">
+          <h5 class="modal-title" id="sendModalLabel">Send Report</h5>
+          <button type="button" class="btn btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- Modal body with larger remarks input -->
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="remarks" class="form-label">Remarks</label>
+            <textarea id="remarks" class="form-control" style="height: 150px;" placeholder="Enter your remarks here..."></textarea>
+          </div>
+        </div>
+        <!-- Modal footer with Close and Send buttons -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="submitSend()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Modal for notifications -->
+  <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="messageModalLabel">Notification</h5>
+          <button type="button" class="btn btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="messageModalBody">
+          <!-- Message content will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
     <i class="bi bi-arrow-up-short"></i>
   </a>
@@ -237,16 +286,61 @@ include '../connection.php';
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/main.js"></script>
 
+  <!-- jQuery (for AJAX) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <script>
-    // Placeholder functions for the View and Send buttons
+    // Global variables to hold the current reference and pdf file values
+    var currentReference = "";
+    var currentPdfFile = "";
+
+    // Function to display messages in a modal instead of alerts
+    function showMessageModal(message) {
+      $('#messageModalBody').text(message);
+      var modal = new bootstrap.Modal(document.getElementById('messageModal'));
+      modal.show();
+    }
+
+    // Placeholder function for viewing the PDF
     function viewPdf(fileUrl) {
-      // Open the PDF in a new window/tab
       window.open('../' + fileUrl, '_blank');
     }
 
-    function sendPdf(uniqueId) {
-      // Implement send functionality here (e.g., via AJAX or redirection)
-      alert("Send action triggered for Reference #: " + uniqueId);
+    // Open the send modal with the provided uniqueId and pdfFile
+    function sendPdf(uniqueId, pdfFile) {
+      currentReference = uniqueId;
+      currentPdfFile = pdfFile;
+      // Clear any previous remarks
+      $('#remarks').val('');
+      // Show the modal using Bootstrap's modal method
+      var modal = new bootstrap.Modal(document.getElementById('sendModal'));
+      modal.show();
+    }
+
+    // Function to submit the send action via AJAX
+    function submitSend() {
+      var remarks = $('#remarks').val();
+      $.ajax({
+        url: 'update_send.php',
+        type: 'POST',
+        data: {
+          reference: currentReference,
+          pdfFile: currentPdfFile,
+          remarks: remarks
+        },
+        success: function(response) {
+          showMessageModal('Send completed successfully!');
+          // Hide the send modal after sending
+          var modalEl = document.getElementById('sendModal');
+          var modal = bootstrap.Modal.getInstance(modalEl);
+          modal.hide();
+          // Optionally, refresh or update the table data here. For example, reload the page:
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          showMessageModal('An error occurred: ' + error);
+        }
+      });
     }
   </script>
 </body>

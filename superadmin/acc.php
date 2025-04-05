@@ -38,22 +38,25 @@ include '../connection.php';
   <link href="../assets/css/forms.css" rel="stylesheet">
 
   <style>
+    /* Add some margin to push the content down */
+    main.main {
+      margin-top: 70px; /* Adjust as needed to move content further down from the header */
+    }
     /* Slightly reduce table font size on smaller screens */
     @media (max-width: 768px) {
       table.table {
         font-size: 0.9rem;
       }
     }
-    /* Responsive flex for action buttons on small screens */
-    @media (max-width: 576px) {
-      .btn-responsive {
-        margin-bottom: 0.5rem;
-      }
-    }
     .table-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 1rem;
+    }
+    /* Simple styling for the search input */
+    #tableSearch {
+      width: 300px;
     }
   </style>
 </head>
@@ -152,14 +155,13 @@ include '../connection.php';
   </aside>
   <!-- ======= End Sidebar ======= -->
 
-  <main id="main" class="main mt-5 pt-5">
+  <main id="main" class="main">
     <div class="container">
       <div class="pagetitle">
-        <h1>Request Report</h1>
+        <h1>Accepted Request</h1>
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-            <li class="breadcrumb-item active">Request Data</li>
           </ol>
         </nav>
       </div><!-- End Page Title -->
@@ -167,27 +169,28 @@ include '../connection.php';
       <section class="section">
         <div class="row">
           <div class="col-lg-12">
-            <div class="card">
+            <!-- Add margin-top to push the card further down -->
+            <div class="card mt-4">
               <div class="card-body">
-                <!-- Table header with a title and the Accepted Request Button -->
-                <div class="table-header mb-3">
-                  <h4 class="card-title fw-bold" style="color: #012970;">Request Reports from Student Affair</h4>
-                  <button type="button" onclick="window.location.href='acc.php'" class="btn btn-primary">Accepted Request</button>
+                <!-- Table header: search bar on left, Back button on right -->
+                <div class="table-header mt-3 mb-3">
+                  <input type="text" id="tableSearch" placeholder="Search..." class="form-control me-2">
+                  <button type="button" onclick="window.location.href='request.php'" class="btn btn-primary">Back</button>
                 </div>
-                <!-- Updated table for showing pending requests from bcp_sms3_req -->
-                <table class="table table-sm table-hover table-striped table-bordered align-middle text-center">
+                <table class="table table-sm table-hover table-striped table-bordered align-middle text-center" id="dataTable">
                   <thead class="table-primary">
                     <tr>
                       <th>Student</th>
                       <th>Remarks</th>
                       <th>Request Date</th>
+                      <th>Process</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                      // Retrieve records that have not been processed (both action and rem2 are empty)
-                      $stmt = $conn->prepare("SELECT id, students, remarks, request_at FROM bcp_sms3_req WHERE (action IS NULL OR action = '') AND (rem2 IS NULL OR rem2 = '') ORDER BY request_at DESC");
+                      // Retrieve only records that have a non-empty "action" value
+                      $stmt = $conn->prepare("SELECT id, students, remarks, request_at, action FROM bcp_sms3_req WHERE action IS NOT NULL AND action <> '' ORDER BY request_at DESC");
                       $stmt->execute();
                       $result = $stmt->get_result();
 
@@ -197,19 +200,20 @@ include '../connection.php';
                           $student = htmlspecialchars($row["students"]);
                           $remarks = htmlspecialchars($row["remarks"]);
                           $requestDate = htmlspecialchars($row["request_at"]);
+                          $process = htmlspecialchars($row["action"]);
 
                           echo "<tr id='row_$id'>";
                           echo "<td>" . $student . "</td>";
                           echo "<td>" . $remarks . "</td>";
                           echo "<td>" . $requestDate . "</td>";
+                          echo "<td>" . $process . "</td>";
                           echo "<td>
-                                  <button class='btn btn-primary btn-sm' onclick='acceptRequest($id)'>Accept</button>
-                                  <button class='btn btn-primary btn-sm' onclick='openDenyModal($id)'>Deny</button>
+                                  <button class='btn btn-primary btn-sm' onclick='openEditModal($id)'>Edit</button>
                                 </td>";
                           echo "</tr>";
                         }
                       } else {
-                        echo "<tr><td colspan='4' class='text-center'>No records found</td></tr>";
+                        echo "<tr><td colspan='5' class='text-center'>No records found</td></tr>";
                       }
                       $stmt->close();
                     ?>
@@ -223,26 +227,23 @@ include '../connection.php';
     </div><!-- End container -->
   </main>
 
-  <!-- Deny Modal -->
-  <div class="modal fade" id="denyModal" tabindex="-1" aria-labelledby="denyModalLabel" aria-hidden="true">
+  <!-- Edit Confirmation Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <!-- Modal header with blue background -->
+        <!-- Modal header -->
         <div class="modal-header" style="background-color: blue; color: white;">
-          <h5 class="modal-title" id="denyModalLabel">Deny Request</h5>
+          <h5 class="modal-title" id="editModalLabel">Edit Row</h5>
           <button type="button" class="btn btn-primary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <!-- Modal body with larger, required remarks input -->
+        <!-- Modal body with confirmation message -->
         <div class="modal-body">
-          <div class="mb-3">
-            <label for="denyRemarks" class="form-label">Remarks</label>
-            <textarea id="denyRemarks" class="form-control" style="height: 200px;" placeholder="Enter your denial remarks here..." required></textarea>
-          </div>
+          <p>Are you sure you want to edit this row?</p>
         </div>
-        <!-- Modal footer with Close and Submit buttons -->
+        <!-- Modal footer with Close and Confirm buttons -->
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="submitDeny()">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="confirmEdit()">Confirm</button>
         </div>
       </div>
     </div>
@@ -273,70 +274,56 @@ include '../connection.php';
   <!-- Vendor JS Files -->
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/main.js"></script>
-  <!-- jQuery (for AJAX) -->
+  <!-- jQuery (for AJAX and search filtering) -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script>
-    // Global variable to hold the current request ID for Deny action
-    var currentDenyId = null;
+    var currentEditId = null;
 
-    // Function to display messages in the message modal
+    // Show message in the modal
     function showMessageModal(message) {
       $('#messageModalBody').text(message);
       var modal = new bootstrap.Modal(document.getElementById('messageModal'));
       modal.show();
     }
 
-    // Function to accept a request
-    function acceptRequest(id) {
-      $.ajax({
-        url: 'update_request.php',
-        type: 'POST',
-        data: { id: id, type: 'accept' },
-        success: function(response) {
-          // On success, remove the corresponding table row
-          $("#row_" + id).remove();
-          showMessageModal('Request accepted successfully!');
-        },
-        error: function(xhr, status, error) {
-          showMessageModal('An error occurred while accepting the request: ' + error);
-        }
-      });
-    }
-
-    // Function to open the Deny modal
-    function openDenyModal(id) {
-      currentDenyId = id;
-      $("#denyRemarks").val(""); // Clear previous remarks
-      var modal = new bootstrap.Modal(document.getElementById('denyModal'));
+    // Open the Edit modal
+    function openEditModal(id) {
+      currentEditId = id;
+      var modal = new bootstrap.Modal(document.getElementById('editModal'));
       modal.show();
     }
 
-    // Function to submit Deny action via AJAX
-    function submitDeny() {
-      var remarks = $("#denyRemarks").val().trim();
-      if (remarks === "") {
-        alert("Please fill up the remarks.");
-        return;
-      }
+    // Confirm edit (clear 'action' in DB, remove row)
+    function confirmEdit() {
       $.ajax({
-        url: 'update_request.php',
+        url: 'up.php',
         type: 'POST',
-        data: { id: currentDenyId, type: 'deny', rem2: remarks },
+        data: { id: currentEditId, type: 'edit' },
         success: function(response) {
           // On success, remove the corresponding table row
-          $("#row_" + currentDenyId).remove();
-          showMessageModal('Request denied successfully!');
-          // Hide the Deny modal
-          var modalEl = document.getElementById('denyModal');
+          $("#row_" + currentEditId).remove();
+          showMessageModal('Row updated successfully!');
+          // Hide the Edit modal
+          var modalEl = document.getElementById('editModal');
           var modal = bootstrap.Modal.getInstance(modalEl);
           modal.hide();
         },
         error: function(xhr, status, error) {
-          showMessageModal('An error occurred while denying the request: ' + error);
+          showMessageModal('An error occurred while editing the row: ' + error);
         }
       });
     }
+
+    // Search filter
+    $(document).ready(function(){
+      $("#tableSearch").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#dataTable tbody tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+      });
+    });
   </script>
 </body>
 </html>

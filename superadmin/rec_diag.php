@@ -484,353 +484,219 @@ if ($result) {
 
 
   <!-- Vendor JS Files -->
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/main.js"></script>
-  <script>
-  // Function to show a notification message (if needed)
-  function showNotification(message, title = "Notification") {
-    document.getElementById("notificationModalLabel").textContent = title;
-    document.getElementById("notificationMessage").textContent = message;
-    new bootstrap.Modal(document.getElementById("notificationModal")).show();
-  }
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/main.js"></script>
+<script>
+// Function to show a notification message (if needed)
+function showNotification(message, title = "Notification") {
+  document.getElementById("notificationModalLabel").textContent = title;
+  document.getElementById("notificationMessage").textContent = message;
+  new bootstrap.Modal(document.getElementById("notificationModal")).show();
+}
 
-  // Helper function to get meds updates from the current meds text with zero diff.
-  function getMedsUpdates() {
-    const medsText = document.getElementById("currentMeds").textContent.trim();
-    let updates = [];
-    if (medsText !== "" && medsText !== "N/A") {
-      medsText.split(",").forEach(pair => {
-        let parts = pair.split("=");
-        if (parts.length === 2) {
-          let med = parts[0].trim();
-          let qty = parseInt(parts[1].trim(), 10);
-          updates.push({ med: med, oldQty: qty, newQty: qty, diff: 0 });
-        }
-      });
-    }
-    return updates;
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const customNameModal   = new bootstrap.Modal(document.getElementById("customNameModal"));
-    const sendModal         = new bootstrap.Modal(document.getElementById("sendModal")); // for PDF sending
-    const editDetailsModal  = new bootstrap.Modal(document.getElementById("editDetailsModal"));
-    const updateFieldModal  = new bootstrap.Modal(document.getElementById("updateFieldModal"));
-    const clearConfirmModal = new bootstrap.Modal(document.getElementById("clearConfirmModal"));
-    const successModal      = new bootstrap.Modal(document.getElementById("successModal"));
-    const editDetailsDialog = document.getElementById("editDetailsDialog");
-    const updateFieldsContainer = document.getElementById("updateFieldsContainer");
-
-    let currentSendUrl = '';
-    let customFileName = '';
-    let currentUID = ''; // Store the current patient's unique ID
-    let fieldToClear = null; // Will store the field name to clear
-
-    // JS variable for meds options (populated by PHP)
-    const medsOptions = `<?php echo $itemsOptions; ?>`;
-
-    // --- Bind Send button click (for PDF) ---
-    document.querySelectorAll(".send-btn").forEach(btn => {
-      btn.addEventListener("click", function(e) {
-        e.preventDefault();
-        currentSendUrl = this.getAttribute("data-href");
-        document.getElementById("customFileName").value = "report.pdf";
-        customNameModal.show();
-      });
+// Helper function to get meds updates from the current meds text with zero diff.
+function getMedsUpdates() {
+  const medsText = document.getElementById("currentMeds").textContent.trim();
+  let updates = [];
+  if (medsText !== "" && medsText !== "N/A") {
+    medsText.split(",").forEach(pair => {
+      let parts = pair.split("=");
+      if (parts.length === 2) {
+        let med = parts[0].trim();
+        let qty = parseInt(parts[1].trim(), 10);
+        updates.push({ med: med, oldQty: qty, newQty: qty, diff: 0 });
+      }
     });
+  }
+  return updates;
+}
 
-    // --- When a table Edit button is clicked, show Modal 1 and store uid ---
-    document.querySelectorAll(".btn-edit").forEach(btn => {
-      btn.addEventListener("click", function() {
-        currentUID = this.getAttribute("data-uid");
-        editDetailsDialog.classList.remove("modal-left1");
-        editDetailsDialog.classList.add("modal-centered-dialog");
-        // Set fields to "N/A" if empty
-        const diagVal = this.getAttribute("data-diagnostic").trim() || "N/A";
-        const recVal  = this.getAttribute("data-recommendation").trim() || "N/A";
-        const medsVal = this.getAttribute("data-meds").trim() || "N/A";
-        document.getElementById("currentDiagnostic").textContent = diagVal;
-        document.getElementById("currentRecommendation").textContent = recVal;
-        document.getElementById("currentMeds").textContent = medsVal;
-        editDetailsModal.show();
-      });
+document.addEventListener("DOMContentLoaded", function () {
+  const customNameModal   = new bootstrap.Modal(document.getElementById("customNameModal"));
+  const sendModal         = new bootstrap.Modal(document.getElementById("sendModal")); // for PDF sending
+  const editDetailsModal  = new bootstrap.Modal(document.getElementById("editDetailsModal"));
+  const updateFieldModal  = new bootstrap.Modal(document.getElementById("updateFieldModal"));
+  const clearConfirmModal = new bootstrap.Modal(document.getElementById("clearConfirmModal"));
+  const successModal      = new bootstrap.Modal(document.getElementById("successModal"));
+  const editDetailsDialog = document.getElementById("editDetailsDialog");
+  const updateFieldsContainer = document.getElementById("updateFieldsContainer");
+
+  let currentSendUrl = '';
+  let customFileName = '';
+  let currentUID = ''; // Store the current patient's unique ID
+  let fieldToClear = null; // Will store the field name to clear
+
+  // JS variable for meds options (populated by PHP)
+  const medsOptions = `<?php echo $itemsOptions; ?>`;
+
+  // --- Bind Send button click (for PDF) ---
+  document.querySelectorAll(".send-btn").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      currentSendUrl = this.getAttribute("data-href");
+      document.getElementById("customFileName").value = "report.pdf";
+      customNameModal.show();
     });
+  });
 
-    // --- When Edit button in Modal 1 is clicked, add dynamic input in Modal 2 ---
-    document.querySelectorAll(".edit-field-btn").forEach(btn => {
-      btn.addEventListener("click", function() {
-        const field = this.getAttribute("data-field");
-        editDetailsDialog.classList.remove("modal-centered-dialog");
-        editDetailsDialog.classList.add("modal-left1");
+  // --- When a table Edit button is clicked, show Modal 1 and store uid ---
+  document.querySelectorAll(".btn-edit").forEach(btn => {
+    btn.addEventListener("click", function() {
+      currentUID = this.getAttribute("data-uid");
+      editDetailsDialog.classList.remove("modal-left1");
+      editDetailsDialog.classList.add("modal-centered-dialog");
+      // Set fields to "N/A" if empty
+      const diagVal = this.getAttribute("data-diagnostic").trim() || "N/A";
+      const recVal  = this.getAttribute("data-recommendation").trim() || "N/A";
+      const medsVal = this.getAttribute("data-meds").trim() || "N/A";
+      document.getElementById("currentDiagnostic").textContent = diagVal;
+      document.getElementById("currentRecommendation").textContent = recVal;
+      document.getElementById("currentMeds").textContent = medsVal;
+      editDetailsModal.show();
+    });
+  });
 
-        if (!document.getElementById("field-" + field)) {
-          const fieldDiv = document.createElement("div");
-          fieldDiv.classList.add("mb-3");
-          fieldDiv.id = "field-" + field;
+  // --- When Edit button in Modal 1 is clicked, add dynamic input in Modal 2 ---
+  document.querySelectorAll(".edit-field-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+      const field = this.getAttribute("data-field");
+      editDetailsDialog.classList.remove("modal-centered-dialog");
+      editDetailsDialog.classList.add("modal-left1");
 
-          const headerDiv = document.createElement("div");
-          headerDiv.classList.add("input-header");
+      if (!document.getElementById("field-" + field)) {
+        const fieldDiv = document.createElement("div");
+        fieldDiv.classList.add("mb-3");
+        fieldDiv.id = "field-" + field;
 
-          const label = document.createElement("label");
-          label.classList.add("form-label");
-          label.textContent = field.charAt(0).toUpperCase() + field.slice(1) + ":";
+        const headerDiv = document.createElement("div");
+        headerDiv.classList.add("input-header");
 
-          const closeBtn = document.createElement("span");
-          closeBtn.classList.add("input-close-btn");
-          closeBtn.innerHTML = "&times;";
-          closeBtn.addEventListener("click", function() {
-            fieldDiv.remove();
+        const label = document.createElement("label");
+        label.classList.add("form-label");
+        label.textContent = field.charAt(0).toUpperCase() + field.slice(1) + ":";
+
+        const closeBtn = document.createElement("span");
+        closeBtn.classList.add("input-close-btn");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.addEventListener("click", function() {
+          fieldDiv.remove();
+        });
+
+        headerDiv.appendChild(label);
+        headerDiv.appendChild(closeBtn);
+        fieldDiv.appendChild(headerDiv);
+
+        if (field === 'meds') {
+          const medsRowsContainer = document.createElement("div");
+          medsRowsContainer.id = "medsRowsContainer";
+          
+          const addMedBtn = document.createElement("button");
+          addMedBtn.type = "button";
+          addMedBtn.classList.add("btn", "btn-secondary", "meds-add-btn");
+          addMedBtn.textContent = "Add Medicine";
+          
+          function updateAddMedBtnVisibility() {
+            const currentRows = medsRowsContainer.querySelectorAll(".meds-row").length;
+            addMedBtn.style.display = (currentRows >= 3) ? 'none' : 'block';
+          }
+          
+          function createMedsRow() {
+            const row = document.createElement("div");
+            row.classList.add("row", "mb-3", "meds-row");
+            row.innerHTML = `
+              <div class="col-6">
+                <select name="meds[]" class="form-select" required>
+                  ${medsOptions}
+                </select>
+              </div>
+              <div class="col-4">
+                <input type="number" name="quantity[]" class="form-control" placeholder="Qty" required>
+              </div>
+              <div class="col-2 d-flex align-items-center justify-content-center">
+                <button type="button" class="btn btn-link text-danger removeMedRowBtn" title="Remove">&times;</button>
+              </div>
+            `;
+            row.querySelector(".removeMedRowBtn").addEventListener("click", function() {
+              medsRowsContainer.removeChild(row);
+              updateAddMedBtnVisibility();
+            });
+            return row;
+          }
+          
+          medsRowsContainer.appendChild(createMedsRow());
+          updateAddMedBtnVisibility();
+          fieldDiv.appendChild(medsRowsContainer);
+          
+          addMedBtn.addEventListener("click", function() {
+            const currentRows = medsRowsContainer.querySelectorAll(".meds-row").length;
+            if (currentRows < 3) {
+              medsRowsContainer.appendChild(createMedsRow());
+              updateAddMedBtnVisibility();
+            }
           });
-
-          headerDiv.appendChild(label);
-          headerDiv.appendChild(closeBtn);
-          fieldDiv.appendChild(headerDiv);
-
-          if (field === 'meds') {
-            const medsRowsContainer = document.createElement("div");
-            medsRowsContainer.id = "medsRowsContainer";
-            
-            const addMedBtn = document.createElement("button");
-            addMedBtn.type = "button";
-            addMedBtn.classList.add("btn", "btn-secondary", "meds-add-btn");
-            addMedBtn.textContent = "Add Medicine";
-            
-            function updateAddMedBtnVisibility() {
-              const currentRows = medsRowsContainer.querySelectorAll(".meds-row").length;
-              addMedBtn.style.display = (currentRows >= 3) ? 'none' : 'block';
-            }
-            
-            function createMedsRow() {
-              const row = document.createElement("div");
-              row.classList.add("row", "mb-3", "meds-row");
-              row.innerHTML = `
-                <div class="col-6">
-                  <select name="meds[]" class="form-select" required>
-                    ${medsOptions}
-                  </select>
-                </div>
-                <div class="col-4">
-                  <input type="number" name="quantity[]" class="form-control" placeholder="Qty" required>
-                </div>
-                <div class="col-2 d-flex align-items-center justify-content-center">
-                  <button type="button" class="btn btn-link text-danger removeMedRowBtn" title="Remove">&times;</button>
-                </div>
-              `;
-              row.querySelector(".removeMedRowBtn").addEventListener("click", function() {
-                medsRowsContainer.removeChild(row);
-                updateAddMedBtnVisibility();
-              });
-              return row;
-            }
-            
-            medsRowsContainer.appendChild(createMedsRow());
-            updateAddMedBtnVisibility();
-            fieldDiv.appendChild(medsRowsContainer);
-            
-            addMedBtn.addEventListener("click", function() {
-              const currentRows = medsRowsContainer.querySelectorAll(".meds-row").length;
-              if (currentRows < 3) {
-                medsRowsContainer.appendChild(createMedsRow());
-                updateAddMedBtnVisibility();
-              }
-            });
-            fieldDiv.appendChild(addMedBtn);
-          } else {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.classList.add("form-control");
-            input.placeholder = "Enter new " + field;
-            input.name = field;
-            fieldDiv.appendChild(input);
-          }
-          updateFieldsContainer.appendChild(fieldDiv);
-        }
-        updateFieldModal.show();
-      });
-    });
-
-    // --- Clear Button in Modal 1: open confirmation modal ---
-    document.querySelectorAll(".clear-field-btn").forEach(btn => {
-      btn.addEventListener("click", function() {
-        fieldToClear = this.getAttribute("data-field");
-        clearConfirmModal.show();
-      });
-    });
-
-    // --- Clear Confirmation Modal: No button ---
-    document.getElementById("clearNoBtn").addEventListener("click", function() {
-      fieldToClear = null;
-      clearConfirmModal.hide();
-    });
-
-    // --- Clear Confirmation Modal: Yes button ---
-    document.getElementById("clearYesBtn").addEventListener("click", function() {
-      if (fieldToClear && currentUID) {
-        // For diagnostic and recommendation, simply set to "N/A"
-        const currentDiag = document.getElementById("currentDiagnostic").textContent.trim() || "N/A";
-        const currentRec  = document.getElementById("currentRecommendation").textContent.trim() || "N/A";
-        let medsUpdates = [];
-        if (fieldToClear === "meds") {
-          // Parse current meds string and build updates with newQty = 0
-          const medsText = document.getElementById("currentMeds").textContent.trim();
-          if(medsText !== "" && medsText !== "N/A") {
-            medsText.split(",").forEach(pair => {
-              let parts = pair.split("=");
-              if(parts.length === 2) {
-                let med = parts[0].trim();
-                let qty = parseInt(parts[1].trim(),10);
-                // When clearing, newQty becomes 0 so diff = 0 - oldQty.
-                medsUpdates.push({ med: med, oldQty: qty, newQty: 0, diff: (0 - qty) });
-              }
-            });
-          }
+          fieldDiv.appendChild(addMedBtn);
         } else {
-          medsUpdates = getMedsUpdates();
+          const input = document.createElement("input");
+          input.type = "text";
+          input.classList.add("form-control");
+          input.placeholder = "Enter new " + field;
+          input.name = field;
+          fieldDiv.appendChild(input);
         }
-        const newDiag = (fieldToClear === "diagnostic") ? "N/A" : currentDiag;
-        const newRec  = (fieldToClear === "recommendation") ? "N/A" : currentRec;
-        fetch("update_meds.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uid: currentUID,
-            updates: medsUpdates,
-            diagnostic: newDiag,
-            recommendation: newRec
-          })
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.success) {
-            // Upon success, close modals and refresh the page.
-            hideBothModals();
-            window.location.reload();
-          } else {
-            showNotification("Error clearing field: " + data.error, "Error");
-          }
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          showNotification("An error occurred: " + error.message, "Error");
-        });
+        updateFieldsContainer.appendChild(fieldDiv);
       }
-      fieldToClear = null;
-      clearConfirmModal.hide();
+      updateFieldModal.show();
     });
+  });
 
-    // --- Submit button for Modal 2: update diagnostic, recommendation, and meds ---
-    document.getElementById("submitUpdateFieldsBtn").addEventListener("click", function() {
-      // Validate that all visible inputs are not blank
+  // --- Clear Button in Modal 1: open confirmation modal ---
+  document.querySelectorAll(".clear-field-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+      fieldToClear = this.getAttribute("data-field");
+      clearConfirmModal.show();
+    });
+  });
 
-      // For text inputs (diagnostic and recommendation)
-      const textInputs = updateFieldsContainer.querySelectorAll("input[type='text']");
-      for (let input of textInputs) {
-        if (input.value.trim() === "") {
-          showNotification("Please fill all input fields before submitting.", "Warning");
-          return;
-        }
-      }
+  // --- Clear Confirmation Modal: No button ---
+  document.getElementById("clearNoBtn").addEventListener("click", function() {
+    fieldToClear = null;
+    clearConfirmModal.hide();
+  });
 
-      // For meds rows, if any exist
-      const medsFieldDiv = document.getElementById("field-meds");
-      if (medsFieldDiv) {
-        const medsRows = medsFieldDiv.querySelectorAll(".meds-row");
-        for (let row of medsRows) {
-          const selectEl = row.querySelector("select[name='meds[]']");
-          const qtyInput = row.querySelector("input[name='quantity[]']");
-          if (selectEl.value.trim() === "" || qtyInput.value.trim() === "") {
-            showNotification("Please fill all medicine selections and quantities.", "Warning");
-            return;
-          }
-        }
-      }
-
-      // Only update the fields that are showing in Modal 2.
-      // For diagnostic:
-      let newDiagnostic;
-      const diagInput = updateFieldsContainer.querySelector("input[name='diagnostic']");
-      if (diagInput) {
-        newDiagnostic = diagInput.value.trim();
-      } else {
-        newDiagnostic = document.getElementById("currentDiagnostic").textContent;
-      }
-
-      // For recommendation:
-      let newRecommendation;
-      const recInput = updateFieldsContainer.querySelector("input[name='recommendation']");
-      if (recInput) {
-        newRecommendation = recInput.value.trim();
-      } else {
-        newRecommendation = document.getElementById("currentRecommendation").textContent;
-      }
-
-      // 1. Parse existing meds from the "currentMeds" span
-      const currentMedsText = document.getElementById("currentMeds").textContent;
-      let oldMeds = {};
-      if (currentMedsText.trim() !== "" && currentMedsText.trim() !== "N/A") {
-        currentMedsText.split(",").forEach(pair => {
-          let parts = pair.split("=");
-          if (parts.length === 2) {
-            let med = parts[0].trim();
-            let qty = parseInt(parts[1].trim(), 10);
-            oldMeds[med] = qty;
-          }
-        });
-      }
-
-      // 2. Collect new meds input from Modal 2 if available
-      let newMeds = {};
-      const medsFieldDivUpdate = document.getElementById("field-meds");
-      if (medsFieldDivUpdate) {
-        const medsRowsContainer = medsFieldDivUpdate.querySelector("#medsRowsContainer");
-        if (medsRowsContainer) {
-          const rows = medsRowsContainer.querySelectorAll(".meds-row");
-          rows.forEach(row => {
-            const selectEl = row.querySelector("select[name='meds[]']");
-            const qtyInput = row.querySelector("input[name='quantity[]']");
-            if (selectEl && qtyInput && selectEl.value.trim() !== "" && qtyInput.value.trim() !== "") {
-              let med = selectEl.value.trim();
-              let qty = parseInt(qtyInput.value.trim(), 10);
-              newMeds[med] = qty;
+  // --- Clear Confirmation Modal: Yes button ---
+  document.getElementById("clearYesBtn").addEventListener("click", function() {
+    if (fieldToClear && currentUID) {
+      // For diagnostic and recommendation, simply set to "N/A"
+      const currentDiag = document.getElementById("currentDiagnostic").textContent.trim() || "N/A";
+      const currentRec  = document.getElementById("currentRecommendation").textContent.trim() || "N/A";
+      let medsUpdates = [];
+      if (fieldToClear === "meds") {
+        // Parse current meds string and build updates with newQty = 0
+        const medsText = document.getElementById("currentMeds").textContent.trim();
+        if(medsText !== "" && medsText !== "N/A") {
+          medsText.split(",").forEach(pair => {
+            let parts = pair.split("=");
+            if(parts.length === 2) {
+              let med = parts[0].trim();
+              let qty = parseInt(parts[1].trim(),10);
+              // When clearing, newQty becomes 0 so diff = 0 - oldQty.
+              medsUpdates.push({ med: med, oldQty: qty, newQty: 0, diff: (0 - qty) });
             }
           });
         }
+      } else {
+        medsUpdates = getMedsUpdates();
       }
-
-      // Combine with old meds for any that might not have been updated
-      for (let med in oldMeds) {
-        if (!newMeds.hasOwnProperty(med)) {
-          newMeds[med] = oldMeds[med];
-        }
-      }
-
-      let combinedMedSet = new Set([...Object.keys(oldMeds), ...Object.keys(newMeds)]);
-      let updates = [];
-      combinedMedSet.forEach(med => {
-        let oldQtyVal = oldMeds[med] || 0;
-        let newQtyVal = newMeds[med] || 0;
-        let diffVal = oldQtyVal - newQtyVal;
-        updates.push({
-          med: med,
-          oldQty: oldQtyVal,
-          newQty: newQtyVal,
-          diff: diffVal
-        });
-      });
-
+      const newDiag = (fieldToClear === "diagnostic") ? "N/A" : currentDiag;
+      const newRec  = (fieldToClear === "recommendation") ? "N/A" : currentRec;
       fetch("update_meds.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uid: currentUID,
-          updates: updates,
-          diagnostic: newDiagnostic,
-          recommendation: newRecommendation
+          updates: medsUpdates,
+          diagnostic: newDiag,
+          recommendation: newRec
         })
       })
       .then(response => {
@@ -841,27 +707,246 @@ if ($result) {
       })
       .then(data => {
         if (data.success) {
-          // Update current display and table cells
-          document.getElementById("currentDiagnostic").textContent = newDiagnostic;
-          document.getElementById("currentRecommendation").textContent = newRecommendation;
-          let medsDisplay = Object.keys(newMeds)
-            .filter(med => newMeds[med] > 0)
-            .map(med => med + " = " + newMeds[med])
-            .join(", ");
-          if (!medsDisplay) medsDisplay = "N/A";
-          document.getElementById("currentMeds").textContent = medsDisplay;
-
-          if (currentUID) {
-            document.getElementById("diagnostic-" + currentUID).textContent = newDiagnostic;
-            document.getElementById("recommendation-" + currentUID).textContent = newRecommendation;
-            document.getElementById("meds-" + currentUID).textContent = medsDisplay;
-          }
-
-          // Instead of showing the PDF send modal, we hide the Edit and Update modals and show the Success Modal.
+          // Upon success, close modals and refresh the page.
           hideBothModals();
+          window.location.reload();
+        } else {
+          showNotification("Error clearing field: " + data.error, "Error");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        showNotification("An error occurred: " + error.message, "Error");
+      });
+    }
+    fieldToClear = null;
+    clearConfirmModal.hide();
+  });
+
+  // --- Submit button for Modal 2: update diagnostic, recommendation, and meds ---
+  document.getElementById("submitUpdateFieldsBtn").addEventListener("click", function() {
+    // Validate that all visible inputs are not blank
+
+    // For text inputs (diagnostic and recommendation)
+    const textInputs = updateFieldsContainer.querySelectorAll("input[type='text']");
+    for (let input of textInputs) {
+      if (input.value.trim() === "") {
+        showNotification("Please fill all input fields before submitting.", "Warning");
+        return;
+      }
+    }
+
+    // For meds rows, if any exist
+    const medsFieldDiv = document.getElementById("field-meds");
+    if (medsFieldDiv) {
+      const medsRows = medsFieldDiv.querySelectorAll(".meds-row");
+      for (let row of medsRows) {
+        const selectEl = row.querySelector("select[name='meds[]']");
+        const qtyInput = row.querySelector("input[name='quantity[]']");
+        if (selectEl.value.trim() === "" || qtyInput.value.trim() === "") {
+          showNotification("Please fill all medicine selections and quantities.", "Warning");
+          return;
+        }
+      }
+    }
+
+    // Only update the fields that are showing in Modal 2.
+    // For diagnostic:
+    let newDiagnostic;
+    const diagInput = updateFieldsContainer.querySelector("input[name='diagnostic']");
+    if (diagInput) {
+      newDiagnostic = diagInput.value.trim();
+    } else {
+      newDiagnostic = document.getElementById("currentDiagnostic").textContent;
+    }
+
+    // For recommendation:
+    let newRecommendation;
+    const recInput = updateFieldsContainer.querySelector("input[name='recommendation']");
+    if (recInput) {
+      newRecommendation = recInput.value.trim();
+    } else {
+      newRecommendation = document.getElementById("currentRecommendation").textContent;
+    }
+
+    // 1. Parse existing meds from the "currentMeds" span
+    const currentMedsText = document.getElementById("currentMeds").textContent;
+    let oldMeds = {};
+    if (currentMedsText.trim() !== "" && currentMedsText.trim() !== "N/A") {
+      currentMedsText.split(",").forEach(pair => {
+        let parts = pair.split("=");
+        if (parts.length === 2) {
+          let med = parts[0].trim();
+          let qty = parseInt(parts[1].trim(), 10);
+          oldMeds[med] = qty;
+        }
+      });
+    }
+
+    // 2. Collect new meds input from Modal 2 if available
+    let newMeds = {};
+    const medsFieldDivUpdate = document.getElementById("field-meds");
+    if (medsFieldDivUpdate) {
+      const medsRowsContainer = medsFieldDivUpdate.querySelector("#medsRowsContainer");
+      if (medsRowsContainer) {
+        const rows = medsRowsContainer.querySelectorAll(".meds-row");
+        rows.forEach(row => {
+          const selectEl = row.querySelector("select[name='meds[]']");
+          const qtyInput = row.querySelector("input[name='quantity[]']");
+          if (selectEl && qtyInput && selectEl.value.trim() !== "" && qtyInput.value.trim() !== "") {
+            let med = selectEl.value.trim();
+            let qty = parseInt(qtyInput.value.trim(), 10);
+            newMeds[med] = qty;
+          }
+        });
+      }
+    }
+
+    // Combine with old meds for any that might not have been updated
+    for (let med in oldMeds) {
+      if (!newMeds.hasOwnProperty(med)) {
+        newMeds[med] = oldMeds[med];
+      }
+    }
+
+    let combinedMedSet = new Set([...Object.keys(oldMeds), ...Object.keys(newMeds)]);
+    let updates = [];
+    combinedMedSet.forEach(med => {
+      let oldQtyVal = oldMeds[med] || 0;
+      let newQtyVal = newMeds[med] || 0;
+      let diffVal = oldQtyVal - newQtyVal;
+      updates.push({
+        med: med,
+        oldQty: oldQtyVal,
+        newQty: newQtyVal,
+        diff: diffVal
+      });
+    });
+
+    fetch("update_meds.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uid: currentUID,
+        updates: updates,
+        diagnostic: newDiagnostic,
+        recommendation: newRecommendation
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        // Update current display and table cells
+        document.getElementById("currentDiagnostic").textContent = newDiagnostic;
+        document.getElementById("currentRecommendation").textContent = newRecommendation;
+        let medsDisplay = Object.keys(newMeds)
+          .filter(med => newMeds[med] > 0)
+          .map(med => med + " = " + newMeds[med])
+          .join(", ");
+        if (!medsDisplay) medsDisplay = "N/A";
+        document.getElementById("currentMeds").textContent = medsDisplay;
+
+        if (currentUID) {
+          document.getElementById("diagnostic-" + currentUID).textContent = newDiagnostic;
+          document.getElementById("recommendation-" + currentUID).textContent = newRecommendation;
+          document.getElementById("meds-" + currentUID).textContent = medsDisplay;
+        }
+
+        // Instead of showing the PDF send modal, we hide the Edit and Update modals and show the Success Modal.
+        hideBothModals();
+        successModal.show();
+      } else {
+        showNotification("Error updating record: " + data.error, "Error");
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      showNotification("An error occurred: " + error.message, "Error");
+    });
+  });
+
+  // --- Customize PDF Name Modal: Set button ---
+  document.getElementById("customSaveBtn").addEventListener("click", function() {
+    let inputName = document.getElementById("customFileName").value.trim();
+    if (inputName === "") {
+      showNotification("Please enter a file name.", "Warning");
+      return;
+    }
+    // Append .pdf if it doesn't already end with it.
+    if (!inputName.toLowerCase().endsWith(".pdf")) {
+      inputName += ".pdf";
+    }
+    customFileName = encodeURIComponent(inputName);
+    customNameModal.hide();
+    // Use the appropriate separator depending on whether the URL already has a query string.
+    let separator = currentSendUrl.indexOf('?') !== -1 ? '&' : '?';
+    window.location.href = currentSendUrl + separator + "filename=" + customFileName;
+    // Refresh the page after 3 seconds once the process is done
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+  });
+
+  // --- Success Modal OK: close Success Modal and refresh the page ---
+  document.getElementById("successModalOkBtn").addEventListener("click", function() {
+    successModal.hide();
+    window.location.reload();
+  });
+
+  // --- Bind "Done" Button Clicks ---
+  document.querySelectorAll(".done-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+      let uid = this.getAttribute("data-uid");
+      // Store the uid globally so it can be used after modal OK is clicked.
+      window.currentDoneUID = uid;
+
+      // Get current values from the table cells; default to "N/A" if missing.
+      const diagEl = document.getElementById("diagnostic-" + uid);
+      const recEl = document.getElementById("recommendation-" + uid);
+      const medsEl = document.getElementById("meds-" + uid);
+      const diagnostic = diagEl ? diagEl.textContent.trim() : "N/A";
+      const recommendation = recEl ? recEl.textContent.trim() : "N/A";
+      const medsText = medsEl ? medsEl.textContent.trim() : "N/A";
+
+      let updates = [];
+      if (medsText !== "" && medsText !== "N/A") {
+        medsText.split(",").forEach(pair => {
+          let parts = pair.split("=");
+          if (parts.length === 2) {
+            let med = parts[0].trim();
+            let qty = parseInt(parts[1].trim(), 10);
+            updates.push({ med: med, oldQty: qty, newQty: qty, diff: 0 });
+          }
+        });
+      }
+
+      fetch("update_meds.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: uid,
+          updates: updates,
+          diagnostic: diagnostic,
+          recommendation: recommendation,
+          action: "Done"
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
           successModal.show();
         } else {
-          showNotification("Error updating record: " + data.error, "Error");
+          showNotification("Error updating action: " + data.error, "Error");
         }
       })
       .catch(error => {
@@ -869,92 +954,17 @@ if ($result) {
         showNotification("An error occurred: " + error.message, "Error");
       });
     });
-
-    // --- Customize PDF Name Modal: Set button ---
-    document.getElementById("customSaveBtn").addEventListener("click", function() {
-      customFileName = encodeURIComponent(document.getElementById("customFileName").value.trim());
-      if (customFileName === "") {
-        showNotification("Please enter a file name.", "Warning");
-        return;
-      }
-      customNameModal.hide();
-      // Use the appropriate separator depending on whether the URL already has a query string.
-      let separator = currentSendUrl.indexOf('?') !== -1 ? '&' : '?';
-      window.location.href = currentSendUrl + separator + "filename=" + customFileName;
-    });
-
-    // --- Success Modal OK: close Success Modal and refresh the page ---
-    document.getElementById("successModalOkBtn").addEventListener("click", function() {
-      successModal.hide();
-      window.location.reload();
-    });
-
-    // --- Bind "Done" Button Clicks ---
-    document.querySelectorAll(".done-btn").forEach(btn => {
-      btn.addEventListener("click", function() {
-        let uid = this.getAttribute("data-uid");
-        // Store the uid globally so it can be used after modal OK is clicked.
-        window.currentDoneUID = uid;
-
-        // Get current values from the table cells; default to "N/A" if missing.
-        const diagEl = document.getElementById("diagnostic-" + uid);
-        const recEl = document.getElementById("recommendation-" + uid);
-        const medsEl = document.getElementById("meds-" + uid);
-        const diagnostic = diagEl ? diagEl.textContent.trim() : "N/A";
-        const recommendation = recEl ? recEl.textContent.trim() : "N/A";
-        const medsText = medsEl ? medsEl.textContent.trim() : "N/A";
-
-        let updates = [];
-        if (medsText !== "" && medsText !== "N/A") {
-          medsText.split(",").forEach(pair => {
-            let parts = pair.split("=");
-            if (parts.length === 2) {
-              let med = parts[0].trim();
-              let qty = parseInt(parts[1].trim(), 10);
-              updates.push({ med: med, oldQty: qty, newQty: qty, diff: 0 });
-            }
-          });
-        }
-
-        fetch("update_meds.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uid: uid,
-            updates: updates,
-            diagnostic: diagnostic,
-            recommendation: recommendation,
-            action: "Done"
-          })
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.success) {
-            successModal.show();
-          } else {
-            showNotification("Error updating action: " + data.error, "Error");
-          }
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          showNotification("An error occurred: " + error.message, "Error");
-        });
-      });
-    });
   });
+});
 
-  function hideBothModals() {
-    const editDetails = bootstrap.Modal.getInstance(document.getElementById("editDetailsModal"));
-    const updateField = bootstrap.Modal.getInstance(document.getElementById("updateFieldModal"));
-    if (editDetails) editDetails.hide();
-    if (updateField) updateField.hide();
-  }
+function hideBothModals() {
+  const editDetails = bootstrap.Modal.getInstance(document.getElementById("editDetailsModal"));
+  const updateField = bootstrap.Modal.getInstance(document.getElementById("updateFieldModal"));
+  if (editDetails) editDetails.hide();
+  if (updateField) updateField.hide();
+}
 </script>
+
 
 
 

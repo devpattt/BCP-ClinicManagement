@@ -19,47 +19,68 @@ if ($result) {
     }
 }
 
-// Get record ID from URL
+// Instead of dying when no ID is provided, we set an error message.
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-  die("No record ID provided.");
+  $error = "No record ID provided.";
+} else {
+  $id = intval($_GET['id']);
 }
-$id = intval($_GET['id']);
 
-$error = "";
+$error = isset($error) ? $error : "";
 $recommendation = "";
 $success = "";
+// Array to hold the new computed stock values for each medicine pair
+$newValues = [];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $recommendation = trim($_POST['recommendation']);
-    $meds_given_arr = $_POST['meds'];
-    $quantity_arr = $_POST['quantity'];
+    // Arrays for medicines and quantities; they may be empty strings
+    $meds_given_arr = isset($_POST['meds']) ? $_POST['meds'] : [];
+    $quantity_arr = isset($_POST['quantity']) ? $_POST['quantity'] : [];
     
-    // Validate recommendation exists
+    // Validate that recommendation is filled
     if (empty($recommendation)) {
         $error = "Please fill out the recommendation.";
     } else {
         $meds_combined = [];
-        $valid = true; // Flag to check if all inputs are valid
+        $valid = true; // Flag to check if inputs are valid
         
-        // Loop through each medicine pair and validate against inventory
+        // Loop through each medicine pair
         foreach ($meds_given_arr as $index => $med_val) {
             $med_val = trim($med_val);
             $quantity_val = trim($quantity_arr[$index]);
-            // Only process if both values are provided
+            // Only process if both fields are provided (non-empty)
             if (!empty($med_val) && !empty($quantity_val)) {
-                // Query the available quantity for the given medicine
-                $stmt = $conn->prepare("SELECT quantity FROM bcp_sms3_medicalsupplies WHERE item_name = ?");
+                // Query the available quantity and unit for the given medicine
+                $stmt = $conn->prepare("SELECT quantity, unit FROM bcp_sms3_medicalsupplies WHERE item_name = ?");
                 $stmt->bind_param("s", $med_val);
                 $stmt->execute();
                 $resultMed = $stmt->get_result();
                 if ($row = $resultMed->fetch_assoc()) {
-                    $available_quantity = $row['quantity'];
-                    // Check if the input quantity exceeds the available quantity
-                    if ($quantity_val > $available_quantity) {
-                        $error = "Quantity is invalid the remaining of the {$med_val} is {$available_quantity}.";
+                    $current_quantity = $row['quantity'];
+                    $current_unit = $row['unit'];
+                    // Calculate total available stock: quantity + (unit * 10)
+                    $total_available = $current_quantity + ($current_unit * 10);
+                    
+                    if ($quantity_val > $total_available) {
+                        $error = "Quantity is invalid. The total available of {$med_val} is {$total_available}.";
                         $valid = false;
                         $stmt->close();
                         break;
                     } else {
+                        // Compute the new total after subtraction
+                        $new_total = $total_available - $quantity_val;
+                        // New quantity is the remainder when divided by 10
+                        $new_quantity = $new_total % 10;
+                        // New unit is the integer division of new_total by 10
+                        $new_unit = floor($new_total / 10);
+                        
+                        // Save these new values for updating later
+                        $newValues[$index] = [
+                            'medicine' => $med_val,
+                            'new_quantity' => $new_quantity,
+                            'new_unit' => $new_unit
+                        ];
                         $meds_combined[] = "$med_val = $quantity_val";
                     }
                 } else {
@@ -70,33 +91,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
                 $stmt->close();
             }
+            // If one field is filled without the other, simply ignore that pair.
         }
         
-        // Ensure at least one valid pair exists
-        if (empty($meds_combined)) {
-            $error = "Please provide at least one valid Meds Given and Quantity pair.";
-            $valid = false;
-        }
+        // Combine the medicine pairs into a string (or empty if none)
+        $meds_given = !empty($meds_combined) ? implode(", ", $meds_combined) : "";
         
-        // If everything is valid, update the patient's record and the supplies quantities
+        // If everything is valid, update the patient's record and, if applicable, update the supplies quantities
         if ($valid) {
-            // Combine pairs with commas
-            $meds_given = implode(", ", $meds_combined);
-    
             // Update recommendation and meds in the patients table
             $stmt = $conn->prepare("UPDATE bcp_sms3_patients SET recommendation = ?, meds = ? WHERE id = ?");
             $stmt->bind_param("ssi", $recommendation, $meds_given, $id);
             if ($stmt->execute()) {
-                // Update each medicine's available quantity
-                foreach ($meds_given_arr as $index => $med_val) {
-                    $med_val = trim($med_val);
-                    $quantity_val = trim($quantity_arr[$index]);
-                    if (!empty($med_val) && !empty($quantity_val)) {
-                        $stmt2 = $conn->prepare("UPDATE bcp_sms3_medicalsupplies SET quantity = quantity - ? WHERE item_name = ?");
-                        $stmt2->bind_param("is", $quantity_val, $med_val);
-                        $stmt2->execute();
-                        $stmt2->close();
-                    }
+                // Update each medicine's available quantity and unit only for valid pairs
+                foreach ($newValues as $index => $data) {
+                    $med = $data['medicine'];
+                    $new_quantity = $data['new_quantity'];
+                    $new_unit = $data['new_unit'];
+                    
+                    $stmt2 = $conn->prepare("UPDATE bcp_sms3_medicalsupplies SET quantity = ?, unit = ? WHERE item_name = ?");
+                    $stmt2->bind_param("iis", $new_quantity, $new_unit, $med);
+                    $stmt2->execute();
+                    $stmt2->close();
                 }
                 $success = "Recommendation updated successfully!";
             } else {
@@ -249,11 +265,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Enter Recommendation Message</h5>
-              <?php
-              if (!empty($error)) {
-                  echo "<div class='alert alert-danger'>" . htmlspecialchars($error) . "</div>";
-              }
-              ?>
+              <!-- Form without inline alerts -->
               <form method="POST" action="">
                 <div class="form-group mb-3">
                   <label for="recommendation">Recommendation Message</label>
@@ -264,13 +276,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   <div class="row mb-3 meds-row">
                     <div class="col-md-5">
                       <label for="meds_0">Meds Given</label>
-                      <select name="meds[]" id="meds_0" class="form-select" required>
+                      <select name="meds[]" id="meds_0" class="form-select">
                         <?php echo $itemsOptions; ?>
                       </select>
                     </div>
                     <div class="col-md-5">
                       <label for="quantity_0">Quantity</label>
-                      <input type="number" name="quantity[]" id="quantity_0" class="form-control" required>
+                      <input type="number" name="quantity[]" id="quantity_0" class="form-control">
                     </div>
                     <!-- No remove button for the initial row -->
                   </div>
@@ -346,13 +358,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         newRow.innerHTML = `
           <div class="col-md-5">
             <label for="meds_${newIndex}">Meds Given</label>
-            <select name="meds[]" id="meds_${newIndex}" class="form-select" required>
+            <select name="meds[]" id="meds_${newIndex}" class="form-select">
               <?php echo $itemsOptions; ?>
             </select>
           </div>
           <div class="col-md-5">
             <label for="quantity_${newIndex}">Quantity</label>
-            <input type="number" name="quantity[]" id="quantity_${newIndex}" class="form-control" required>
+            <input type="number" name="quantity[]" id="quantity_${newIndex}" class="form-control">
           </div>
           <div class="col-md-2 remove-container">
             <button type="button" class="remove-btn" title="Remove">&times;</button>
@@ -374,7 +386,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     });
 
-    // If success message exists, show success modal.
+    // Show modals based on PHP message variables
     <?php if (!empty($success)): ?>
       var successModal = new bootstrap.Modal(document.getElementById('successModal'));
       successModal.show();
@@ -387,6 +399,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     document.getElementById('okButton')?.addEventListener("click", function() {
       window.location.href = "tables-data.php";
     });
+
+    // If there's an error (like no record ID provided) before form submission,
+    // show the error modal on page load.
+    <?php if (!empty($error) && $_SERVER["REQUEST_METHOD"] != "POST"): ?>
+      var errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+      errorModal.show();
+    <?php endif; ?>
   </script>
 </body>
 </html>

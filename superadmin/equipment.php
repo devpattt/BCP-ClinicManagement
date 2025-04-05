@@ -66,6 +66,10 @@ include '../connection.php';
     .search-container {
       text-align: right;
     }
+    /* Make the Remarks column wider */
+    th.remarks-col, td.remarks-col {
+      width: 30%;
+    }
   </style>
 </head>
 <body>
@@ -116,8 +120,8 @@ include '../connection.php';
         <ul id="system-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
           <li><a href="clinic-dashboard.php"><i class="bi bi-circle"></i><span>Report and Analytics</span></a></li>
           <li><a href="forms-elements.php"><i class="bi bi-circle"></i><span>Patient Registration</span></a></li>
-          <li><a href="tables-data.php" class="active"><i class="bi bi-circle"></i><span>Patient Medical Records</span></a></li>
-          <li><a href="medical-supplies.php"><i class="bi bi-circle"></i><span>Medical Supplies</span></a></li>
+          <li><a href="tables-data.php" ><i class="bi bi-circle"></i><span>Patient Medical Records</span></a></li>
+          <li><a href="medical-supplies.php" class="active"><i class="bi bi-circle"></i><span>Medical Supplies</span></a></li>
           <li><a href="request.php"><i class="bi bi-circle"></i><span>Request Supply</span></a></li>
           <li><a href="SDforecastingai.php"><i class="bi bi-circle"></i><span>ForecastingAI</span></a></li>
           <li><a href="admission.php"><i class="bi bi-circle"></i><span>Student Data</span></a></li>
@@ -132,11 +136,11 @@ include '../connection.php';
   <main id="main" class="main mt-5 pt-5">
     <div class="container">
       <div class="pagetitle">
-        <h1>Finish Patient Medical Record</h1>
+        <h1>Medical Equipment Management</h1>
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="clinic-dashboard.php">Dashboard</a></li>
-            <li class="breadcrumb-item active">Finish Patient Medical Record</li>
+            <li class="breadcrumb-item active">Medical Equipment Management</li>
           </ol>
         </nav>
       </div><!-- End Page Title -->
@@ -145,8 +149,10 @@ include '../connection.php';
       <div class="row mb-3 align-items-center">
         <div class="col-md-6">
           <!-- Add Equipment button now opens the modal -->
-          <a href="#" class="btn btn-success btn-sm me-1" id="addEquipmentBtn">Add Equipment</a>
-          <a href="medical-supplies.php" class="btn btn-primary btn-sm">Supply Button</a>
+          <a href="#" class="btn btn-primary btn-sm" id="addEquipmentBtn">Add Equipment</a>
+          <!-- Generate Report button placed between Add Equipment and Supply -->
+          <a href="#" class="btn btn-primary btn-sm mx-2" id="generateReportBtn">Generate Report</a>
+          <a href="medical-supplies.php" class="btn btn-primary btn-sm">Supply</a>
         </div>
         <div class="col-md-6 text-end">
           <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search records..." style="width: 200px; display: inline-block;">
@@ -158,7 +164,7 @@ include '../connection.php';
           <div class="col-lg-12">
             <div class="card">
               <div class="card-body">
-                <h4 class="card-title fw-bold mb-3" style="color: #012970;">Patient Reports</h4>
+                <h4 class="card-title fw-bold mb-3" style="color: #012970;"></h4>
                 <div class="table-container">
                   <table class="table table-sm table-hover table-striped table-bordered align-middle text-center" id="patientTable">
                     <thead class="table-primary">
@@ -166,7 +172,7 @@ include '../connection.php';
                         <th>Item</th>
                         <th>Brand</th>
                         <th>Quantity</th>
-                        <th>Remarks</th>
+                        <th class="remarks-col">Remarks</th>
                         <th>Manage</th>
                       </tr>
                     </thead>
@@ -188,10 +194,11 @@ include '../connection.php';
                             echo "<td>{$item}</td>";
                             echo "<td>{$brand}</td>";
                             echo "<td>{$quantity}</td>";
-                            echo "<td>{$remarks}</td>";
+                            echo "<td class='remarks-col'>{$remarks}</td>";
                             echo "<td>";
-                            echo "<a href='edit_equipment.php?id={$id}' class='btn btn-primary btn-sm me-1'>Edit</a>";
-                            echo "<a href='delete_equipment.php?id={$id}' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure?\")'>Delete</a>";
+                            echo "<a href='#' data-id='{$id}' class='edit-btn btn btn-primary btn-sm me-1'>Edit</a>";
+                            echo "<a href='#' data-id='{$id}' class='delete-btn btn btn-danger btn-sm '>Delete</a>";
+
                             echo "</td>";
                             echo "</tr>";
                           }
@@ -329,6 +336,123 @@ include '../connection.php';
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/main.js"></script>
 
+  <!-- =================== EDIT EQUIPMENT MODAL =================== -->
+  <div class="modal fade" id="editEquipmentModal" tabindex="-1" aria-labelledby="editEquipmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #012970; color: #fff;">
+          <h5 class="modal-title" id="editEquipmentModalLabel">Edit Equipment</h5>
+          <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Edit Equipment form -->
+          <form id="editEquipmentForm">
+            <!-- Hidden input to store the record ID -->
+            <input type="hidden" id="editEquipId">
+            <div class="mb-3">
+              <label for="editItemName" class="form-label">Item Name</label>
+              <input type="text" class="form-control" id="editItemName" name="item">
+            </div>
+            <div class="mb-3">
+              <label for="editBrand" class="form-label">Brand</label>
+              <input type="text" class="form-control" id="editBrand" name="brand">
+            </div>
+            <div class="mb-3">
+              <label for="editQuantity" class="form-label">Quantity</label>
+              <input type="number" class="form-control" id="editQuantity" name="quantity">
+            </div>
+            <div class="mb-3">
+              <label for="editRemarks" class="form-label">Remarks</label>
+              <textarea class="form-control" id="editRemarks" name="remarks" rows="4"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="editSubmitBtn" class="btn btn-primary btn-sm">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== DELETE CONFIRMATION MODAL =================== -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #012970; color: #fff;">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to Delete this row?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="deleteSubmitBtn" class="btn btn-primary btn-sm">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== jsPDF and AutoTable for Report Generation =================== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script>
+    const fullname = "<?php echo $fullname; ?>";
+    function generateReport() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const logo = new Image();
+      logo.src = "../assets/img/bcp logo.png";
+      logo.onload = function () {
+        doc.addImage(logo, "PNG", 30, 10, 20, 24);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("Bestlink College of the Philippines", 105, 15, { align: "center" });
+        doc.setFontSize(12);
+        doc.text("Kaligayahan, Quirino Highway, Novaliches,", 105, 22, { align: "center" });
+        doc.text("Quezon City, Philippines, 1123.", 105, 29, { align: "center" });
+        doc.setFontSize(16);
+        doc.text("Medical Supplies Report", 105, 40, { align: "center" });
+        
+        // Get the table data (only the relevant columns: Item, Brand, Quantity, Remarks)
+        const table = document.querySelector("table");
+        const rows = Array.from(table.querySelectorAll("tbody tr")).map((row, index) => {
+          const cells = row.querySelectorAll("td");
+          return [
+            index + 1,
+            cells[0].innerText, 
+            cells[1].innerText,
+            cells[2].innerText,
+            cells[3].innerText
+          ];
+        });
+        
+        doc.autoTable({
+          head: [["#", "Item", "Brand", "Quantity", "Remarks"]],
+          body: rows,
+          startY: 45,
+          theme: "grid",
+        });
+        const finalY = doc.lastAutoTable.finalY || 50;
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        // Bottom left: Generated By full name
+        doc.text(`Generated By: ${fullname}`, 20, finalY + 10);
+        // Bottom right: Current Date/Time
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 140, finalY + 10);
+        doc.save("Medical_Supplies_Report.pdf");
+      };
+    }
+
+    // Attach event listener to the Generate Report button
+    document.getElementById("generateReportBtn").addEventListener("click", function(e) {
+      e.preventDefault();
+      generateReport();
+    });
+  </script>
+
+  <!-- =================== Main JS Code for Equipment Management =================== -->
   <script>
     // Helper function to show an alert using the Alert Modal
     function showAlert(message) {
@@ -346,9 +470,16 @@ include '../connection.php';
       });
     });
 
-    // Global modal instances
+    // Global modal instances for Add, Success, Edit, and Delete
     const addEquipmentModal = new bootstrap.Modal(document.getElementById('addEquipmentModal'));
     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    const editEquipmentModal = new bootstrap.Modal(document.getElementById('editEquipmentModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+    // Refresh page when the success modal is hidden
+    document.getElementById('successModal').addEventListener('hidden.bs.modal', function () {
+      window.location.reload();
+    });
 
     // Open Add Equipment Modal when clicking the button
     document.getElementById('addEquipmentBtn').addEventListener('click', function(e) {
@@ -356,24 +487,20 @@ include '../connection.php';
       addEquipmentModal.show();
     });
 
-    // Handle Add Equipment submission
+    // Handle Add Equipment submission (existing code)
     document.getElementById('addSubmitBtn').addEventListener('click', function() {
-      // Get form data
       const item = document.getElementById('itemName').value.trim();
       const brand = document.getElementById('brand').value.trim();
       const quantity = document.getElementById('quantity').value.trim();
       const remarks = document.getElementById('remarks').value.trim();
 
-      // Validate required fields using modal alert
       if (!item || !quantity) {
         showAlert("Please fill in all required fields.");
         return;
       }
 
-      // Prepare data to send
       const formData = { item, brand, quantity, remarks };
 
-      // Send data via fetch to add_equip.php endpoint.
       fetch('add_equip.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -399,60 +526,136 @@ include '../connection.php';
       });
     });
 
-    // Existing JS for Edit and Delete modals remains unchanged
-    let currentRecordId = '';
+    // ---------- EDIT FUNCTIONALITY ----------
+    // Global variable to store original values of the record for edit comparison
+    let originalEditData = {};
 
+    // When an Edit button is clicked, populate and show the Edit modal.
+    // Assumes that each edit button has a class "edit-btn" and a data attribute "data-id".
     document.querySelectorAll('.edit-btn').forEach(button => {
       button.addEventListener('click', function() {
-        currentRecordId = this.getAttribute('data-id');
-        new bootstrap.Modal(document.getElementById('editConfirmModal')).show();
+        const recordId = this.getAttribute('data-id');
+        // Retrieve existing values from the row.
+        const row = document.getElementById('row-' + recordId);
+        const cells = row.getElementsByTagName('td');
+
+        // Save original values for comparison
+        originalEditData = {
+          item: cells[0].innerText.trim(),
+          brand: cells[1].innerText.trim(),
+          quantity: cells[2].innerText.trim(),
+          remarks: cells[3].innerText.trim()
+        };
+
+        // Populate the edit modal form with the current values
+        document.getElementById('editEquipId').value = recordId;
+        document.getElementById('editItemName').value = originalEditData.item;
+        document.getElementById('editBrand').value = originalEditData.brand;
+        document.getElementById('editQuantity').value = originalEditData.quantity;
+        document.getElementById('editRemarks').value = originalEditData.remarks;
+
+        editEquipmentModal.show();
       });
     });
 
-    document.querySelectorAll('.delete-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        currentRecordId = this.getAttribute('data-id');
-        new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
-      });
-    });
+    // Handle Edit Equipment submission.
+    document.getElementById('editSubmitBtn').addEventListener('click', function() {
+      const recordId = document.getElementById('editEquipId').value;
+      const item = document.getElementById('editItemName').value.trim();
+      const brand = document.getElementById('editBrand').value.trim();
+      const quantity = document.getElementById('editQuantity').value.trim();
+      const remarks = document.getElementById('editRemarks').value.trim();
 
-    document.getElementById('editConfirmBtn').addEventListener('click', function() {
-      fetch('manage_patient.php', {
+      // Check if nothing was changed
+      if (
+        item === originalEditData.item &&
+        brand === originalEditData.brand &&
+        quantity === originalEditData.quantity &&
+        remarks === originalEditData.remarks
+      ) {
+        // Hide the Edit modal first so the alert won't appear behind it
+        editEquipmentModal.hide();
+        showAlert("You didn't change anything.");
+        return;
+      }
+
+      // Prepare data to send for editing
+      const formData = { id: recordId, item, brand, quantity, remarks };
+
+      fetch('edit_equip.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: currentRecordId, type: 'edit' })
+        body: JSON.stringify(formData)
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          new bootstrap.Modal(document.getElementById('editConfirmModal')).hide();
-          window.location.reload();
-        } else {
-          showAlert("Error updating record: " + data.error);
+      .then(response => response.text())
+      .then(text => {
+        try {
+          const data = JSON.parse(text);
+          if (data.success) {
+            editEquipmentModal.hide();
+            successModal.show();
+            // Optionally update the table row with new values.
+            const row = document.getElementById('row-' + recordId);
+            if (row) {
+              const cells = row.getElementsByTagName('td');
+              cells[0].innerText = item;
+              cells[1].innerText = brand;
+              cells[2].innerText = quantity;
+              cells[3].innerText = remarks;
+            }
+          } else {
+            editEquipmentModal.hide(); // Hide modal if there's an error too
+            showAlert("Error: " + data.error);
+          }
+        } catch (e) {
+          editEquipmentModal.hide(); // Hide modal if there's an error too
+          showAlert("An error occurred: " + text);
         }
       })
       .catch(error => {
         console.error("Error:", error);
+        editEquipmentModal.hide(); // Hide modal if there's an error too
         showAlert("An error occurred: " + error.message);
       });
     });
 
-    document.getElementById('deleteConfirmBtn').addEventListener('click', function() {
-      fetch('manage_patient.php', {
+    // ---------- DELETE FUNCTIONALITY ----------
+    let currentRecordId = '';
+
+    // When a Delete button is clicked, store the record ID and show the Delete modal.
+    // Assumes that each delete button has a class "delete-btn" and a data attribute "data-id".
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        currentRecordId = this.getAttribute('data-id');
+        deleteModal.show();
+      });
+    });
+
+    // Handle Delete confirmation.
+    document.getElementById('deleteSubmitBtn').addEventListener('click', function() {
+      // For deletion, send only the ID (without the 'item' field) to trigger deletion logic.
+      fetch('edit_equip.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: currentRecordId, type: 'delete' })
+        body: JSON.stringify({ id: currentRecordId })
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          new bootstrap.Modal(document.getElementById('deleteConfirmModal')).hide();
-          const row = document.getElementById('row-' + currentRecordId);
-          if (row) {
-            row.parentNode.removeChild(row);
+      .then(response => response.text())
+      .then(text => {
+        try {
+          const data = JSON.parse(text);
+          if (data.success) {
+            deleteModal.hide();
+            // Optionally remove the row from the table.
+            const row = document.getElementById('row-' + currentRecordId);
+            if (row) {
+              row.remove();
+            }
+            successModal.show();
+          } else {
+            showAlert("Error deleting record: " + data.error);
           }
-        } else {
-          showAlert("Error deleting record: " + data.error);
+        } catch (e) {
+          showAlert("An error occurred: " + text);
         }
       })
       .catch(error => {

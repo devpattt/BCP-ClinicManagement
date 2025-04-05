@@ -14,8 +14,26 @@ if (!isset($_GET['uid'])) {
 
 $unique_id = $_GET['uid'];
 
+// Use custom filename if provided via GET, otherwise default.
+if (isset($_GET['filename']) && trim($_GET['filename']) != "") {
+    // Use basename to avoid directory traversal and trim spaces.
+    $filename = basename(trim($_GET['filename']));
+    // Append .pdf if not provided.
+    if (strtolower(substr($filename, -4)) !== ".pdf") {
+        $filename .= ".pdf";
+    }
+    $pdf_filename = $filename;
+} else {
+    $pdf_filename = "Patient_Report_{$unique_id}.pdf";
+}
+
+// Define the folder where the PDF will be saved
+$pdf_folder = "../uploads/";
+$pdf_filepath = $pdf_folder . $pdf_filename;
+$pdf_url = "uploads/" . $pdf_filename; 
+
 // Fetch patient data
-$stmt = $conn->prepare("SELECT patient ,fullname, student_number, contact_number, sex, birthday, year_level, department_code, diagnostic, recommendation, meds, created_at FROM bcp_sms3_patients WHERE unique_id = ?");
+$stmt = $conn->prepare("SELECT patient, fullname, student_number, contact_number, sex, birthday, year_level, department_code, diagnostic, recommendation, meds, created_at FROM bcp_sms3_patients WHERE unique_id = ?");
 $stmt->bind_param("s", $unique_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -26,15 +44,6 @@ if ($result->num_rows === 0) {
 
 $row = $result->fetch_assoc();
 $stmt->close();
-
-// Set up PDF file naming and paths
-$pdf_filename = "Patient_Report_{$unique_id}.pdf";
-
-// Define the folder where the PDF will be saved
-// NOTE: $pdf_folder is the server path, and $pdf_url is the relative URL for downloads.
-$pdf_folder = "../uploads/";
-$pdf_filepath = $pdf_folder . $pdf_filename;
-$pdf_url = "uploads/" . $pdf_filename; 
 
 // Check if the uploads folder exists and is writable
 if (!is_dir($pdf_folder)) {
@@ -48,7 +57,7 @@ if (!is_writable($pdf_folder)) {
 // PDF GENERATION CODE
 // ------------------
 
-// Escape helper
+// Escape helper function for PDF content
 function pdfEscape($text) {
     return str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $text);
 }
