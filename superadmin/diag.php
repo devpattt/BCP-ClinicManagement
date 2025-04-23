@@ -18,21 +18,42 @@ $error = "";
 $diagnostic = "";
 $success = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $diagnostic = trim($_POST['diagnostic']);
-    if (empty($diagnostic)) {
-        $error = "Please enter a diagnostic message.";
-    } else {
-        $stmt = $conn->prepare("UPDATE bcp_sms3_patients SET diagnostic = ? WHERE id = ?");
-        $stmt->bind_param("si", $diagnostic, $id);
-        if ($stmt->execute()) {
-            // Instead of redirecting, we set a success message.
-            $success = "Diagnostic Submit Successfully!";
-        } else {
-            $error = "Error updating record: " . $stmt->error;
-        }
-        $stmt->close();
-    }
+  // grab & validate all three vitals plus diagnostic
+  $systolic    = isset($_POST['systolic'])    ? intval($_POST['systolic'])    : null;
+  $diastolic   = isset($_POST['diastolic'])   ? intval($_POST['diastolic'])   : null;
+  $temperature = isset($_POST['temperature']) ? floatval($_POST['temperature']) : null;
+  $diagnostic  = trim($_POST['diagnostic'] ?? '');
+
+  // simple validation
+  if ($systolic===null || $diastolic===null || $temperature===null || $diagnostic==='' ) {
+      $error = "All fields (systolic, diastolic, temperature, diagnostic) are required.";
+  } else {
+      // update all four columns in one statement
+      $stmt = $conn->prepare(
+        "UPDATE bcp_sms3_patients
+           SET systolic    = ?,
+               diastolic   = ?,
+               temperature = ?,
+               diagnostic  = ?
+         WHERE id = ?"
+      );
+      $stmt->bind_param(
+        "iidsi",
+        $systolic,
+        $diastolic,
+        $temperature,
+        $diagnostic,
+        $id
+      );
+      if ($stmt->execute()) {
+          $success = "Vitals and diagnostic submitted successfully!";
+      } else {
+          $error = "Error updating record: " . $stmt->error;
+      }
+      $stmt->close();
+  }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -157,16 +178,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="col-lg-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Enter Diagnostic Message</h5>
-              <!-- Optional inline error message (can be removed if using modals exclusively) -->
-              <?php
-              if (!empty($error)) {
-                  echo "<div class='alert alert-danger'>" . htmlspecialchars($error) . "</div>";
-              }
+              <!-- Card title with matching color -->
+              <h5 class="card-title" style="color: #1e3a8a;">Enter Diagnostic Message & Vitals</h5>
+              <!-- Optional inline error message -->
+              <?php if (!empty($error)) {
+                  echo "<div class='alert alert-danger'>" . htmlspecialchars($error) . "</div>"; }
               ?>
               <form method="POST" action="">
-                <div class="form-group">
-                  <label for="diagnostic">Diagnostic Message</label>
+                <!-- Blood Pressure Inputs -->
+                <div class="row mb-3">
+                  <label class="col-sm-2 col-form-label">Blood Pressure</label>
+                  <div class="col-sm-5">
+                    <input type="number" name="systolic" class="form-control" min="0" max="300" placeholder="Systolic (mmHg)" required>
+                    <small class="text-muted">Enter systolic as whole mmHg (e.g., 120)</small>
+                  </div>
+                  <div class="col-sm-5">
+                    <input type="number" name="diastolic" class="form-control" min="0" max="200" placeholder="Diastolic (mmHg)" required>
+                    <small class="text-muted">Enter diastolic as whole mmHg (e.g., 80)</small>
+                  </div>
+                </div>
+                <!-- Temperature Input -->
+                <div class="row mb-3">
+                  <label for="temperature" class="col-sm-2 col-form-label">Temperature (°C)</label>
+                  <div class="col-sm-10">
+                    <input type="number" name="temperature" step="0.1" class="form-control" placeholder="e.g., 36.7" required>
+                    <small class="text-muted">Enter temperature in °C with one decimal (e.g., 36.7)</small>
+                  </div>
+                </div>
+                <!-- Diagnostic Label updated -->
+                <div class="form-group mb-3">
+                  <label for="diagnostic">Diagnostic</label>
                   <textarea name="diagnostic" id="diagnostic" class="form-control" rows="8" required><?php echo htmlspecialchars($diagnostic); ?></textarea>
                 </div>
                 <button type="submit" class="btn btn-success mt-3">Submit Diagnostic</button>
@@ -215,15 +256,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
   
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
-    <i class="bi bi-arrow-up-short"></i>
-  </a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="../assets/js/main.js"></script>
   
-  <!-- Trigger the modal on page load based on the update result -->
+  <!-- Trigger modals -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       <?php if (!empty($success)): ?>
@@ -235,5 +274,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <?php endif; ?>
     });
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function(){
+    <?php if (!empty($success)): ?>
+      new bootstrap.Modal(document.getElementById('successModal')).show();
+    <?php elseif (!empty($error)): ?>
+      // you already echo $error above in an alert; if you want a modal:
+      new bootstrap.Modal(document.getElementById('errorModal')).show();
+    <?php endif; ?>
+  });
+</script>
+
 </body>
 </html>

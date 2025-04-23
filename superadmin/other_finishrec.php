@@ -38,36 +38,29 @@ include '../connection.php';
   <link href="../assets/css/forms.css" rel="stylesheet">
 
   <style>
-    /* Table container: smaller width & centered */
     .table-container {
       max-width: 90%;
       margin: 0 auto 1rem auto;
       overflow-x: auto;
     }
-    /* Slightly reduce overall table font size */
     .table-container table.table-sm {
       font-size: 0.85rem;
     }
-    /* Reduce cell padding */
     .table-sm td, .table-sm th {
       padding: 0.3rem;
       vertical-align: middle;
     }
-    /* Prevent wrapping in the Manage column */
     #patientTable td:last-child {
       white-space: nowrap;
     }
-    /* Make buttons smaller and inline */
     .btn-sm {
       font-size: 0.75rem;
       padding: 0.25rem 0.4rem;
     }
-    /* Search container aligned to the right */
     .search-container {
       text-align: right;
       margin-bottom: 1rem;
     }
-    /* Diagnosis Link style */
     .diagnosis-link {
       text-decoration: none;
       color: #fff;
@@ -81,6 +74,11 @@ include '../connection.php';
       background-color: #011d5c;
       color: #fff;
     }
+    .modal-header {
+  background-color: #012970;
+  color: #fff;
+}
+
   </style>
 </head>
 <body>
@@ -89,19 +87,16 @@ include '../connection.php';
   <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="header-left d-flex align-items-center">
       <i class="bi bi-list toggle-sidebar-btn"></i>
-      <!-- Link to records page -->
-      <a href="rec_diag.php" class="diagnosis-link">Back</a>
+      <a href="rec_diag_other.php" class="diagnosis-link">Back</a>
     </div>
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-        <!-- Profile Dropdown -->
         <li class="nav-item dropdown pe-3">
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="../assets/img/default profile.jpg" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($fullname); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header"></li>
             <li><hr class="dropdown-divider"></li>
             <li>
               <a class="dropdown-item d-flex align-items-center" href="../logout.php">
@@ -110,7 +105,7 @@ include '../connection.php';
               </a>
             </li>
           </ul>
-        </li><!-- End Profile Nav -->
+        </li>
       </ul>
     </nav>
   </header>
@@ -156,9 +151,8 @@ include '../connection.php';
             <li class="breadcrumb-item active">Finish Patient Medical Record</li>
           </ol>
         </nav>
-      </div><!-- End Page Title -->
+      </div>
 
-      <!-- Search input above table -->
       <div class="search-container">
         <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search records...">
       </div>
@@ -170,20 +164,19 @@ include '../connection.php';
               <div class="card-body">
                 <h4 class="card-title fw-bold mb-3" style="color: #012970;">Patient Reports</h4>
                 <div class="table-container">
-                  <table class="table table-sm table-hover table-striped table-bordered align-middle text-center" id="patientTable">
+                  <table
+                    class="table table-sm table-hover table-striped table-bordered align-middle text-center"
+                    id="patientTable"
+                  >
                     <thead class="table-primary">
                       <tr>
                         <th>Reference</th>
                         <th>Patient</th>
                         <th>Name</th>
-                        <th>Student Number</th>
                         <th>Contact Number</th>
                         <th>Sex</th>
                         <th>Birth Date</th>
-                        <th>Year Level</th>
                         <th>Dept Code</th>
-                        <th>Blood Pressure</th>
-                        <th>Temperature</th>
                         <th>Diagnostic</th>
                         <th>Recommendation</th>
                         <th>Meds Given</th>
@@ -194,59 +187,49 @@ include '../connection.php';
                     </thead>
                     <tbody>
                       <?php
-                        // Retrieve rows from patients table where action equals "Done"
-                        $stmt = $conn->prepare("SELECT unique_id, patient,fullname, student_number, contact_number, sex, birthday, year_level, department_code, systolic, diastolic, temperature, diagnostic, recommendation, meds, created_at, action FROM bcp_sms3_patients WHERE action = 'Done'");
+                        $stmt = $conn->prepare(
+                          "SELECT unique_id, patient, fullname, contact, sex, birthdate, department,
+                                  diagnostic, recommendation, meds, create_at, action
+                           FROM bcp_sms3_other_patients
+                           WHERE action = 'Done'"
+                        );
                         $stmt->execute();
                         $result = $stmt->get_result();
-                        
-                        
 
                         if ($result->num_rows > 0) {
                           while ($row = $result->fetch_assoc()) {
-                            // Ensure that action is exactly "Done"
-                            if (trim($row["action"]) !== "Done") {
-                              continue;
-                            }
-                            $uniqueId        = htmlspecialchars($row["unique_id"]);
-                            $patient        = htmlspecialchars($row["patient"]);
-                            $fullname        = htmlspecialchars($row["fullname"]);
-                            $studentNumber   = htmlspecialchars($row["student_number"]);
-                            $contactNumber   = htmlspecialchars($row["contact_number"]);
-                            $sex             = htmlspecialchars($row["sex"]);
-                            $birthday        = htmlspecialchars($row["birthday"]);
-                            $yearLevel       = htmlspecialchars($row["year_level"]);
-                            $deptCode        = htmlspecialchars($row["department_code"]);
-                            $bp              = htmlspecialchars($row["systolic"] . "/" . $row["diastolic"]);
-                            $temperature     = htmlspecialchars($row['temperature'] . " °C",);
-                            $diagnostic      = trim($row["diagnostic"]) ? htmlspecialchars($row["diagnostic"]) : "N/A";
-                            $recommendation  = trim($row["recommendation"]) ? htmlspecialchars($row["recommendation"]) : "N/A";
-                            $meds            = trim($row["meds"]) ? htmlspecialchars($row["meds"]) : "N/A";
-                            $createdAt       = htmlspecialchars($row["created_at"]);
-                            $action          = htmlspecialchars($row["action"]);
+                            if (trim($row["action"]) !== "Done") continue;
+                            $uid    = htmlspecialchars($row["unique_id"]);
+                            $pat    = htmlspecialchars($row["patient"]);
+                            $name   = htmlspecialchars($row["fullname"]);
+                            $cont   = htmlspecialchars($row["contact"]);
+                            $sex    = htmlspecialchars($row["sex"]);
+                            $bday   = htmlspecialchars($row["birthdate"]);
+                            $dept   = htmlspecialchars($row["department"]);
+                            $diag   = trim($row["diagnostic"]) ? htmlspecialchars($row["diagnostic"]) : "N/A";
+                            $reco   = trim($row["recommendation"]) ? htmlspecialchars($row["recommendation"]) : "N/A";
+                            $meds   = trim($row["meds"]) ? htmlspecialchars($row["meds"]) : "N/A";
+                            $created= htmlspecialchars($row["create_at"]);
+                            $act    = htmlspecialchars($row["action"]);
 
-                            echo "<tr id='row-{$uniqueId}'>";
-                            echo "<td>{$uniqueId}</td>";
-                            echo "<td>{$patient}</td>";
-                            echo "<td>{$fullname}</td>";
-                            echo "<td>{$studentNumber}</td>";
-                            echo "<td>{$contactNumber}</td>";
-                            echo "<td>{$sex}</td>";
-                            echo "<td>{$birthday}</td>";
-                            echo "<td>{$yearLevel}</td>";
-                            echo "<td>{$deptCode}</td>";
-                            echo "<td>{$bp}</td>";
-                            echo "<td>{$temperature}</td>";
-                            echo "<td>{$diagnostic}</td>";
-                            echo "<td>{$recommendation}</td>";
-                            echo "<td>{$meds}</td>";
-                            echo "<td>{$createdAt}</td>";
-                            echo "<td>{$action}</td>";
-                            // New Manage column with side-by-side Edit and Delete buttons
-                            echo "<td>";
-                            echo "<button type='button' class='btn btn-primary btn-sm me-1 edit-btn' data-id='{$uniqueId}'>Edit</button>";
-                            echo "<button type='button' class='btn btn-danger btn-sm delete-btn' data-id='{$uniqueId}'>Delete</button>";
-                            echo "</td>";
-                            echo "</tr>";
+                            echo "<tr id='row-{$uid}'>
+                                    <td>{$uid}</td>
+                                    <td>{$pat}</td>
+                                    <td>{$name}</td>
+                                    <td>{$cont}</td>
+                                    <td>{$sex}</td>
+                                    <td>{$bday}</td>
+                                    <td>{$dept}</td>
+                                    <td>{$diag}</td>
+                                    <td>{$reco}</td>
+                                    <td>{$meds}</td>
+                                    <td>{$created}</td>
+                                    <td>{$act}</td>
+                                    <td>
+                                      <button type='button' class='btn btn-primary btn-sm me-1 edit-btn' data-id='{$uid}'>Edit</button>
+                                      <button type='button' class='btn btn-danger btn-sm delete-btn' data-id='{$uid}'>Delete</button>
+                                    </td>
+                                  </tr>";
                           }
                         } else {
                           echo "<tr><td colspan='14' class='text-center'>No records found</td></tr>";
@@ -255,13 +238,13 @@ include '../connection.php';
                       ?>
                     </tbody>
                   </table>
-                </div><!-- End table-container -->
-              </div><!-- End card-body -->
-            </div><!-- End card -->
-          </div><!-- End col -->
-        </div><!-- End row -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
-    </div><!-- End container -->
+    </div>
   </main>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
@@ -316,8 +299,7 @@ include '../connection.php';
           <h5 class="modal-title" id="alertModalLabel">Message</h5>
           <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="alertModalBody">
-        </div>
+        <div class="modal-body" id="alertModalBody"></div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
         </div>
@@ -325,6 +307,32 @@ include '../connection.php';
     </div>
   </div>
   <!-- End Alert Modal -->
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+      <div class="modal-header bg-primary text-white">
+  <h5 class="modal-title" id="successModalLabel">Success</h5>
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+
+        <div class="modal-body">
+          Action completed successfully.
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="successModalOkBtn" class="btn btn-primary" data-bs-dismiss="modal">
+            OK
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- End Success Modal -->
 
   <!-- Vendor JS Files -->
   <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -334,87 +342,93 @@ include '../connection.php';
     // Search filter functionality
     document.getElementById('searchInput').addEventListener('keyup', function() {
       const filter = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#patientTable tbody tr');
-      rows.forEach(row => {
-        const rowText = row.textContent.toLowerCase();
-        row.style.display = rowText.indexOf(filter) > -1 ? '' : 'none';
+      document.querySelectorAll('#patientTable tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
       });
     });
 
-    // Global variable to store currently selected row id for editing or deletion
     let currentRecordId = '';
 
-    // Create global modal instances
-    const editModal = new bootstrap.Modal(document.getElementById('editConfirmModal'));
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    const alertModal = new bootstrap.Modal(document.getElementById('alertModal'));
+    // Modal instances
+    const editModal    = new bootstrap.Modal(document.getElementById('editConfirmModal'));
+    const deleteModal  = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const alertModal   = new bootstrap.Modal(document.getElementById('alertModal'));
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
 
-    // Helper function to display messages in the Alert Modal
     function showAlert(message) {
       document.getElementById('alertModalBody').innerText = message;
       alertModal.show();
     }
 
-    // Bind click event to Edit buttons
-    document.querySelectorAll('.edit-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        currentRecordId = this.getAttribute('data-id');
+    function showSuccess(message = 'Action completed successfully.') {
+      document.getElementById('successModalLabel').textContent = 'Success';
+      document.querySelector('#successModal .modal-body').textContent = message;
+      successModal.show();
+    }
+
+    // Reload page on OK
+    document.getElementById('successModalOkBtn')
+      .addEventListener('click', () => window.location.reload());
+
+    // Edit button click
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentRecordId = btn.getAttribute('data-id');
         editModal.show();
       });
     });
 
-    // Bind click event to Delete buttons
-    document.querySelectorAll('.delete-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        currentRecordId = this.getAttribute('data-id');
+    // Delete button click
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentRecordId = btn.getAttribute('data-id');
         deleteModal.show();
       });
     });
 
-    // Handle Edit confirmation using the combined endpoint
-    document.getElementById('editConfirmBtn').addEventListener('click', function() {
+    // Confirm Edit
+    document.getElementById('editConfirmBtn').addEventListener('click', () => {
       fetch('manage_patient.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentRecordId, type: 'edit' })
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
           editModal.hide();
-          window.location.reload();
+          showSuccess('Record updated successfully.');
         } else {
           showAlert("Error updating record: " + data.error);
         }
       })
-      .catch(error => {
-        console.error("Error:", error);
-        showAlert("An error occurred: " + error.message);
+      .catch(err => {
+        console.error(err);
+        showAlert("An error occurred: " + err.message);
       });
     });
 
-    // Handle Delete confirmation using the combined endpoint
-    document.getElementById('deleteConfirmBtn').addEventListener('click', function() {
+    // Confirm Delete
+    document.getElementById('deleteConfirmBtn').addEventListener('click', () => {
       fetch('manage_patient.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentRecordId, type: 'delete' })
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
           deleteModal.hide();
           const row = document.getElementById('row-' + currentRecordId);
-          if (row) {
-            row.parentNode.removeChild(row);
-          }
+          if (row) row.remove();
+          showSuccess('Record deleted successfully.');
         } else {
           showAlert("Error deleting record: " + data.error);
         }
       })
-      .catch(error => {
-        console.error("Error:", error);
-        showAlert("An error occurred: " + error.message);
+      .catch(err => {
+        console.error(err);
+        showAlert("An error occurred: " + err.message);
       });
     });
   </script>

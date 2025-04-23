@@ -140,8 +140,8 @@ if ($result) {
   <header id="header" class="header fixed-top d-flex align-items-center">
   <div class="header-left d-flex align-items-center gap-3">
     <i class="bi bi-list toggle-sidebar-btn"></i>
-    <a href="tables-data.php" class="diagnosis-link">Back</a>
-    <a href="finishrec.php" class="diagnosis-link">Finish Data's</a>
+    <a href="other_patient.php" class="diagnosis-link">Back</a>
+    <a href="other_finishrec.php" class="diagnosis-link">Processed Data's</a>
   </div>
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -224,13 +224,13 @@ if ($result) {
                         <th>Contact Number</th>
                         <th>Sex</th>
                         <th>Birth date</th>
-                        <th>Year Lvl</th>
                         <th>Dept Code</th>
+                        <th>Blood Pressure</th>
+                        <th>Temperature</th>
                         <th>Diagnostic</th>
                         <th>Recommendation</th>
                         <th>Meds Given</th>
                         <th>Actions</th>
-                        <th>Send</th>
                         <th>Created</th>
                         <th>Action</th>
                       </tr>
@@ -239,9 +239,9 @@ if ($result) {
                       <?php
                         $stmt = $conn->prepare("
                           SELECT 
-                            p.unique_id, p.patient, p.fullname, , p.contact_number, p.sex, p.birthday
-                            , p.department_code, p.diagnostic, p.recommendation, p.meds, p.action,
-                            DATE_FORMAT(p.created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at,
+                            p.unique_id, p.patient, p.fullname,  p.contact, p.sex, p.birthdate
+                            , p.department, p.systolic, p.diastolic, p.temperature, p.diagnostic, p.recommendation, p.meds, p.action,
+                            DATE_FORMAT(p.create_at, '%Y-%m-%d %h:%i %p') AS formatted_create_at,
                             (SELECT COUNT(*) FROM bcp_sms3_send_integ s WHERE s.unique_id = p.unique_id) AS sentCount
                           FROM bcp_sms3_other_patients p
                           WHERE p.diagnostic <> '' AND p.recommendation <> ''
@@ -258,16 +258,21 @@ if ($result) {
                             $diagnosticVal     = trim($row["diagnostic"])     ?: "N/A";
                             $recommendationVal = trim($row["recommendation"]) ?: "N/A";
                             $medsVal           = trim($row["meds"])           ?: "N/A";
+                            $sys       = trim($row["systolic"]);
+                            $dia       = trim($row["diastolic"]);
+                            $bp = ($sys && $dia) ? $sys . '/' . $dia : 'N/A';
                             $uid = htmlspecialchars($row["unique_id"]);
                             
                             echo '<tr id="row-'.$uid.'">';
                             echo '<td>' . $uid . '</td>';
                             echo '<td>' . htmlspecialchars($row["patient"]) . '</td>';
                             echo '<td>' . htmlspecialchars($row["fullname"]) . '</td>';
-                            echo '<td>' . htmlspecialchars($row["contact_number"]) . '</td>';
+                            echo '<td>' . htmlspecialchars($row["contact"]) . '</td>';
                             echo '<td>' . htmlspecialchars($row["sex"]) . '</td>';
-                            echo '<td>' . htmlspecialchars($row["birthday"]) . '</td>';
-                            echo '<td>' . htmlspecialchars($row["department_code"]) . '</td>';
+                            echo '<td>' . htmlspecialchars($row["birthdate"]) . '</td>';
+                            echo '<td>' . htmlspecialchars($row["department"]) . '</td>';
+                            echo '<td>' . htmlspecialchars($bp) . '</td>';
+                            echo '<td>' . htmlspecialchars($row["temperature"]) . '</td>';
                             echo '<td id="diagnostic-'.$uid.'">' . htmlspecialchars($diagnosticVal) . '</td>';
                             echo '<td id="recommendation-'.$uid.'">' . htmlspecialchars($recommendationVal) . '</td>';
                             echo '<td id="meds-'.$uid.'">' . htmlspecialchars($medsVal) . '</td>';
@@ -282,16 +287,16 @@ if ($result) {
                             echo '</td>';
                             
                             // Send column
-                            $sendUrl = "send1.php?uid=" . urlencode($uid);
-                            echo '<td>';
-                            if ($row["sentCount"] > 0) {
-                              echo '<button type="button" class="btn btn-secondary btn-sm w-100" disabled>Sent</button>';
-                            } else {
-                              echo '<button type="button" class="btn btn-primary btn-sm w-100 send-btn" data-href="' . $sendUrl . '">Send</button>';
-                            }
-                            echo '</td>';
+                    //        $sendUrl = "send1.php?uid=" . urlencode($uid);
+                    //        echo '<td>';
+                     //       if ($row["sentCount"] > 0) {
+                     //         echo '<button type="button" class="btn btn-secondary btn-sm w-100" disabled>Sent</button>';
+                      //      } else {
+                       //       echo '<button type="button" class="btn btn-primary btn-sm w-100 send-btn" data-href="' . $sendUrl . '">Send</button>';
+                      //      }
+                        //    echo '</td>';
                             
-                            echo '<td>' . htmlspecialchars($row["formatted_created_at"]) . '</td>';
+                            echo '<td>' . htmlspecialchars($row["formatted_create_at"]) . '</td>';
                             
                             // New Action column with "Done" button (same style as Edit)
                             echo '<td>';
@@ -481,9 +486,9 @@ if ($result) {
 
 
   <!-- Vendor JS Files -->
-  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/main.js"></script>
-  <script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/main.js"></script>
+<script>
   // Function to show a notification message (if needed)
   function showNotification(message, title = "Notification") {
     document.getElementById("notificationModalLabel").textContent = title;
@@ -509,8 +514,6 @@ if ($result) {
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    const customNameModal   = new bootstrap.Modal(document.getElementById("customNameModal"));
-    const sendModal         = new bootstrap.Modal(document.getElementById("sendModal")); // for PDF sending
     const editDetailsModal  = new bootstrap.Modal(document.getElementById("editDetailsModal"));
     const updateFieldModal  = new bootstrap.Modal(document.getElementById("updateFieldModal"));
     const clearConfirmModal = new bootstrap.Modal(document.getElementById("clearConfirmModal"));
@@ -518,23 +521,11 @@ if ($result) {
     const editDetailsDialog = document.getElementById("editDetailsDialog");
     const updateFieldsContainer = document.getElementById("updateFieldsContainer");
 
-    let currentSendUrl = '';
-    let customFileName = '';
-    let currentUID = ''; // Store the current patient's unique ID
-    let fieldToClear = null; // Will store the field name to clear
+    let currentUID = '';       // Store the current patient's unique ID
+    let fieldToClear = null;   // Will store the field name to clear
 
     // JS variable for meds options (populated by PHP)
     const medsOptions = `<?php echo $itemsOptions; ?>`;
-
-    // --- Bind Send button click (for PDF) ---
-    document.querySelectorAll(".send-btn").forEach(btn => {
-      btn.addEventListener("click", function(e) {
-        e.preventDefault();
-        currentSendUrl = this.getAttribute("data-href");
-        document.getElementById("customFileName").value = "report.pdf";
-        customNameModal.show();
-      });
-    });
 
     // --- When a table Edit button is clicked, show Modal 1 and store uid ---
     document.querySelectorAll(".btn-edit").forEach(btn => {
@@ -659,24 +650,29 @@ if ($result) {
       fieldToClear = null;
       clearConfirmModal.hide();
     });
+    
+    document
+  .getElementById("successModalOkBtn")
+  .addEventListener("click", function() {
+    // optional: successModal.hide(); // not needed, data-bs-dismiss handles it
+    window.location.reload();
+  });
 
     // --- Clear Confirmation Modal: Yes button ---
     document.getElementById("clearYesBtn").addEventListener("click", function() {
       if (fieldToClear && currentUID) {
-        // For diagnostic and recommendation, simply set to "N/A"
         const currentDiag = document.getElementById("currentDiagnostic").textContent.trim() || "N/A";
         const currentRec  = document.getElementById("currentRecommendation").textContent.trim() || "N/A";
         let medsUpdates = [];
+
         if (fieldToClear === "meds") {
-          // Parse current meds string and build updates with newQty = 0
           const medsText = document.getElementById("currentMeds").textContent.trim();
-          if(medsText !== "" && medsText !== "N/A") {
+          if (medsText !== "" && medsText !== "N/A") {
             medsText.split(",").forEach(pair => {
               let parts = pair.split("=");
-              if(parts.length === 2) {
+              if (parts.length === 2) {
                 let med = parts[0].trim();
-                let qty = parseInt(parts[1].trim(),10);
-                // When clearing, newQty becomes 0 so diff = 0 - oldQty.
+                let qty = parseInt(parts[1].trim(), 10);
                 medsUpdates.push({ med: med, oldQty: qty, newQty: 0, diff: (0 - qty) });
               }
             });
@@ -684,9 +680,11 @@ if ($result) {
         } else {
           medsUpdates = getMedsUpdates();
         }
+
         const newDiag = (fieldToClear === "diagnostic") ? "N/A" : currentDiag;
         const newRec  = (fieldToClear === "recommendation") ? "N/A" : currentRec;
-        fetch("update_meds.php", {
+
+        fetch("other_update_meds.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -697,14 +695,11 @@ if ($result) {
           })
         })
         .then(response => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
+          if (!response.ok) throw new Error("Network response was not ok");
           return response.json();
         })
         .then(data => {
           if (data.success) {
-            // Upon success, close modals and refresh the page.
             hideBothModals();
             window.location.reload();
           } else {
@@ -722,9 +717,7 @@ if ($result) {
 
     // --- Submit button for Modal 2: update diagnostic, recommendation, and meds ---
     document.getElementById("submitUpdateFieldsBtn").addEventListener("click", function() {
-      // Validate that all visible inputs are not blank
-
-      // For text inputs (diagnostic and recommendation)
+      // Validate text inputs
       const textInputs = updateFieldsContainer.querySelectorAll("input[type='text']");
       for (let input of textInputs) {
         if (input.value.trim() === "") {
@@ -733,7 +726,7 @@ if ($result) {
         }
       }
 
-      // For meds rows, if any exist
+      // Validate meds rows
       const medsFieldDiv = document.getElementById("field-meds");
       if (medsFieldDiv) {
         const medsRows = medsFieldDiv.querySelectorAll(".meds-row");
@@ -747,114 +740,76 @@ if ($result) {
         }
       }
 
-      // Only update the fields that are showing in Modal 2.
-      // For diagnostic:
+      // Gather new diagnostic/recommendation
       let newDiagnostic;
       const diagInput = updateFieldsContainer.querySelector("input[name='diagnostic']");
-      if (diagInput) {
-        newDiagnostic = diagInput.value.trim();
-      } else {
-        newDiagnostic = document.getElementById("currentDiagnostic").textContent;
-      }
+      newDiagnostic = diagInput ? diagInput.value.trim() : document.getElementById("currentDiagnostic").textContent;
 
-      // For recommendation:
       let newRecommendation;
       const recInput = updateFieldsContainer.querySelector("input[name='recommendation']");
-      if (recInput) {
-        newRecommendation = recInput.value.trim();
-      } else {
-        newRecommendation = document.getElementById("currentRecommendation").textContent;
-      }
+      newRecommendation = recInput ? recInput.value.trim() : document.getElementById("currentRecommendation").textContent;
 
-      // 1. Parse existing meds from the "currentMeds" span
+      // Parse old meds
       const currentMedsText = document.getElementById("currentMeds").textContent;
       let oldMeds = {};
       if (currentMedsText.trim() !== "" && currentMedsText.trim() !== "N/A") {
         currentMedsText.split(",").forEach(pair => {
           let parts = pair.split("=");
           if (parts.length === 2) {
-            let med = parts[0].trim();
-            let qty = parseInt(parts[1].trim(), 10);
-            oldMeds[med] = qty;
+            oldMeds[parts[0].trim()] = parseInt(parts[1].trim(), 10);
           }
         });
       }
 
-      // 2. Collect new meds input from Modal 2 if available
+      // Collect new meds
       let newMeds = {};
       const medsFieldDivUpdate = document.getElementById("field-meds");
       if (medsFieldDivUpdate) {
-        const medsRowsContainer = medsFieldDivUpdate.querySelector("#medsRowsContainer");
-        if (medsRowsContainer) {
-          const rows = medsRowsContainer.querySelectorAll(".meds-row");
-          rows.forEach(row => {
-            const selectEl = row.querySelector("select[name='meds[]']");
-            const qtyInput = row.querySelector("input[name='quantity[]']");
-            if (selectEl && qtyInput && selectEl.value.trim() !== "" && qtyInput.value.trim() !== "") {
-              let med = selectEl.value.trim();
-              let qty = parseInt(qtyInput.value.trim(), 10);
-              newMeds[med] = qty;
-            }
-          });
-        }
-      }
-
-      // Combine with old meds for any that might not have been updated
-      for (let med in oldMeds) {
-        if (!newMeds.hasOwnProperty(med)) {
-          newMeds[med] = oldMeds[med];
-        }
-      }
-
-      let combinedMedSet = new Set([...Object.keys(oldMeds), ...Object.keys(newMeds)]);
-      let updates = [];
-      combinedMedSet.forEach(med => {
-        let oldQtyVal = oldMeds[med] || 0;
-        let newQtyVal = newMeds[med] || 0;
-        let diffVal = oldQtyVal - newQtyVal;
-        updates.push({
-          med: med,
-          oldQty: oldQtyVal,
-          newQty: newQtyVal,
-          diff: diffVal
+        medsFieldDivUpdate.querySelectorAll(".meds-row").forEach(row => {
+          const med = row.querySelector("select[name='meds[]']").value.trim();
+          const qty = parseInt(row.querySelector("input[name='quantity[]']").value.trim(), 10);
+          if (med && !isNaN(qty)) newMeds[med] = qty;
         });
+      }
+
+      // Merge and compute diffs
+      const combined = new Set([...Object.keys(oldMeds), ...Object.keys(newMeds)]);
+      let updates = [];
+      combined.forEach(med => {
+        const oldQty = oldMeds[med] || 0;
+        const newQty = newMeds[med] || oldQty;
+        updates.push({ med, oldQty, newQty, diff: oldQty - newQty });
       });
 
-      fetch("update_meds.php", {
+      fetch("other_update_meds.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uid: currentUID,
-          updates: updates,
+          updates,
           diagnostic: newDiagnostic,
           recommendation: newRecommendation
         })
       })
       .then(response => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+        if (!response.ok) throw new Error("Network response was not ok");
         return response.json();
       })
       .then(data => {
         if (data.success) {
-          // Update current display and table cells
+          // Update UI
           document.getElementById("currentDiagnostic").textContent = newDiagnostic;
           document.getElementById("currentRecommendation").textContent = newRecommendation;
-          let medsDisplay = Object.keys(newMeds)
-            .filter(med => newMeds[med] > 0)
-            .map(med => med + " = " + newMeds[med])
-            .join(", ");
-          if (!medsDisplay) medsDisplay = "N/A";
+          const medsDisplay = Object.entries(newMeds)
+            .filter(([_, q]) => q > 0)
+            .map(([m, q]) => `${m} = ${q}`)
+            .join(", ") || "N/A";
           document.getElementById("currentMeds").textContent = medsDisplay;
-
           if (currentUID) {
-            document.getElementById("diagnostic-" + currentUID).textContent = newDiagnostic;
-            document.getElementById("recommendation-" + currentUID).textContent = newRecommendation;
-            document.getElementById("meds-" + currentUID).textContent = medsDisplay;
+            document.getElementById(`diagnostic-${currentUID}`).textContent = newDiagnostic;
+            document.getElementById(`recommendation-${currentUID}`).textContent = newRecommendation;
+            document.getElementById(`meds-${currentUID}`).textContent = medsDisplay;
           }
-
-          // Instead of showing the PDF send modal, we hide the Edit and Update modals and show the Success Modal.
           hideBothModals();
           successModal.show();
         } else {
@@ -867,69 +822,34 @@ if ($result) {
       });
     });
 
-    // --- Customize PDF Name Modal: Set button ---
-    document.getElementById("customSaveBtn").addEventListener("click", function() {
-      customFileName = encodeURIComponent(document.getElementById("customFileName").value.trim());
-      if (customFileName === "") {
-        showNotification("Please enter a file name.", "Warning");
-        return;
-      }
-      customNameModal.hide();
-      // Use the appropriate separator depending on whether the URL already has a query string.
-      let separator = currentSendUrl.indexOf('?') !== -1 ? '&' : '?';
-      window.location.href = currentSendUrl + separator + "filename=" + customFileName;
-    });
-
-    // --- Success Modal OK: close Success Modal and refresh the page ---
-    document.getElementById("successModalOkBtn").addEventListener("click", function() {
-      successModal.hide();
-      window.location.reload();
-    });
-
     // --- Bind "Done" Button Clicks ---
     document.querySelectorAll(".done-btn").forEach(btn => {
       btn.addEventListener("click", function() {
-        let uid = this.getAttribute("data-uid");
-        // Store the uid globally so it can be used after modal OK is clicked.
-        window.currentDoneUID = uid;
+        const uid = this.getAttribute("data-uid");
+        const diag = document.getElementById(`diagnostic-${uid}`)?.textContent.trim() || "N/A";
+        const rec  = document.getElementById(`recommendation-${uid}`)?.textContent.trim() || "N/A";
+        const medsText = document.getElementById(`meds-${uid}`)?.textContent.trim() || "N/A";
+        const updates = [];
 
-        // Get current values from the table cells; default to "N/A" if missing.
-        const diagEl = document.getElementById("diagnostic-" + uid);
-        const recEl = document.getElementById("recommendation-" + uid);
-        const medsEl = document.getElementById("meds-" + uid);
-        const diagnostic = diagEl ? diagEl.textContent.trim() : "N/A";
-        const recommendation = recEl ? recEl.textContent.trim() : "N/A";
-        const medsText = medsEl ? medsEl.textContent.trim() : "N/A";
-
-        let updates = [];
         if (medsText !== "" && medsText !== "N/A") {
           medsText.split(",").forEach(pair => {
-            let parts = pair.split("=");
-            if (parts.length === 2) {
-              let med = parts[0].trim();
-              let qty = parseInt(parts[1].trim(), 10);
-              updates.push({ med: med, oldQty: qty, newQty: qty, diff: 0 });
-            }
+            const [m, q] = pair.split("=").map(s => s.trim());
+            updates.push({ med: m, oldQty: +q, newQty: +q, diff: 0 });
           });
         }
 
-        fetch("update_meds.php", {
+        fetch("other_update_meds.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            uid: uid,
-            updates: updates,
-            diagnostic: diagnostic,
-            recommendation: recommendation,
+            uid,
+            updates,
+            diagnostic: diag,
+            recommendation: rec,
             action: "Done"
           })
         })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
         .then(data => {
           if (data.success) {
             successModal.show();
@@ -937,9 +857,9 @@ if ($result) {
             showNotification("Error updating action: " + data.error, "Error");
           }
         })
-        .catch(error => {
-          console.error("Error:", error);
-          showNotification("An error occurred: " + error.message, "Error");
+        .catch(err => {
+          console.error("Error:", err);
+          showNotification("An error occurred: " + err, "Error");
         });
       });
     });
@@ -952,9 +872,6 @@ if ($result) {
     if (updateField) updateField.hide();
   }
 </script>
-
-
-
 
 </body>
 </html>

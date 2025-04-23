@@ -294,8 +294,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </ul>
   </aside>
   
-  <!-- Main Content -->
-  <main id="main" class="main">
+   <!-- Main Content -->
+   <main id="main" class="main">
     <div class="pagetitle">
       <h1>Recommendation Entry</h1>
       <nav>
@@ -311,41 +311,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="row">
         <div class="col-lg-12">
           <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Enter Recommendation Message</h5>
-              <?php
-              if (!empty($error)) {
-                  echo "<div class='alert alert-danger'>" . htmlspecialchars($error) . "</div>";
-              }
-              ?>
-              <form method="POST" action="">
-                <div class="form-group mb-3">
-                  <label for="recommendation">Recommendation Message</label>
-                  <textarea name="recommendation" id="recommendation" class="form-control" rows="8" required><?php echo htmlspecialchars($recommendation); ?></textarea>
-                </div>
-                <!-- Container for Meds Given and Quantity sets -->
-                <div id="medsContainer">
-                  <div class="row mb-3 meds-row">
-                    <div class="col-md-5">
-                      <label for="meds_0">Meds Given</label>
-                      <select name="meds[]" id="meds_0" class="form-select" required>
-                        <?php echo $itemsOptions; ?>
-                      </select>
-                    </div>
-                    <div class="col-md-5">
-                      <label for="quantity_0">Quantity</label>
-                      <input type="number" name="quantity[]" id="quantity_0" class="form-control" required>
-                    </div>
-                    <!-- No remove button for the initial row -->
-                  </div>
-                </div>
-                <!-- Add Button -->
-                <button type="button" id="addButton" class="btn btn-secondary mb-3">Add</button>
-                <br>
-                <button type="submit" class="btn btn-success mt-3">Submit Recommendation</button>
-                <a href="other_patient.php" class="btn btn-secondary mt-3">Back to Records</a>
-              </form>
-            </div>
+          <div class="card-body">
+          <h5 class="card-title" style="color: #1e3a8a;">Enter Recommendation Message</h5>
+
+  <!-- Form without inline alerts -->
+  <form method="POST" action="">
+    <div class="form-group mb-3">
+      <label for="recommendation">Recommendation</label>
+      <textarea
+        name="recommendation"
+        id="recommendation"
+        class="form-control"
+        rows="8"
+        required
+      ><?php echo htmlspecialchars($recommendation); ?></textarea>
+      <small class="form-text text-muted">
+        <strong><em>Note: Please be as specific and detailed as possible.</em></strong>
+      </small>
+    </div>
+    <!-- Container for Meds Given and Quantity sets -->
+    <div id="medsContainer">
+      <div class="row mb-3 meds-row">
+        <div class="col-md-5">
+          <label for="meds_0">Meds Given</label>
+          <select name="meds[]" id="meds_0" class="form-select">
+            <?php echo $itemsOptions; ?>
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label for="quantity_0">Quantity</label>
+          <input type="number" name="quantity[]" id="quantity_0" class="form-control">
+        </div>
+        <!-- No remove button for the initial row -->
+      </div>
+    </div>
+    <!-- Add Button -->
+    <button type="button" id="addButton" class="btn btn-secondary mb-3">Add</button>
+    <br>
+    <button type="submit" class="btn btn-success mt-3">Submit Recommendation</button>
+    <a href="tables-data.php" class="btn btn-secondary mt-3">Back to Records</a>
+  </form>
+</div>
           </div>
         </div>
       </div>

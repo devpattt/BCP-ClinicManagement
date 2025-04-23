@@ -235,8 +235,8 @@ include '../connection.php';
         <!-- Modal body with larger, required remarks input -->
         <div class="modal-body">
           <div class="mb-3">
-            <label for="denyRemarks" class="form-label">Remarks</label>
-            <textarea id="denyRemarks" class="form-control" style="height: 200px;" placeholder="Enter your denial remarks here..." required></textarea>
+            <label for="denyRemarks" class="form-label">Reason</label>
+            <textarea id="denyRemarks" class="form-control" style="height: 200px;" placeholder="Enter your denial reason here..." required></textarea>
           </div>
         </div>
         <!-- Modal footer with Close and Submit buttons -->
@@ -289,20 +289,42 @@ include '../connection.php';
 
     // Function to accept a request
     function acceptRequest(id) {
-      $.ajax({
-        url: 'update_request.php',
-        type: 'POST',
-        data: { id: id, type: 'accept' },
-        success: function(response) {
-          // On success, remove the corresponding table row
-          $("#row_" + id).remove();
-          showMessageModal('Request accepted successfully!');
-        },
-        error: function(xhr, status, error) {
-          showMessageModal('An error occurred while accepting the request: ' + error);
+    // 1) grab the student-number from the table row
+    let studentNumber = $("#row_" + id + " td:first").text().trim();
+
+    // 2) first, ask check_patient.php if that student exists
+    $.ajax({
+      url: 'check_patient.php',
+      type: 'POST',
+      dataType: 'json',
+      data: { student_number: studentNumber },
+      success: function(checkResp) {
+        if (checkResp.exists) {
+          // 3a) if exists → call your existing update_request.php to mark Done
+          $.ajax({
+            url: 'update_request.php',
+            type: 'POST',
+            dataType: 'json',
+            data: { id: id, type: 'accept' },
+            success: function(updateResp) {
+              // remove row and show success
+              $("#row_" + id).remove();
+              showMessageModal('Request accepted successfully!');
+            },
+            error: function() {
+              showMessageModal('Error marking request done. Please try again.');
+            }
+          });
+        } else {
+          // 3b) if not exists → show “deny” message right away
+          showMessageModal("The request has been denied. This student doesn't have a Clinic Medical Record.");
         }
-      });
-    }
+      },
+      error: function() {
+        showMessageModal('Error checking student record. Please try again.');
+      }
+    });
+  }
 
     // Function to open the Deny modal
     function openDenyModal(id) {

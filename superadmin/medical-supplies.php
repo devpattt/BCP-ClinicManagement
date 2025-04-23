@@ -42,6 +42,7 @@ include '../fetchfname.php';
       border-color: #333;
       box-shadow: 0 0 5px rgba(51, 51, 51, 0.5);
     }
+    table.table { font-size: 0.9rem; }
   </style>
 </head>
 <body>
@@ -229,12 +230,19 @@ include '../fetchfname.php';
           <button class="btn btn-primary" style="background-color: #1e3a8a; border-color: #1e3a8a;" onclick="window.location.href='equipment.php';">
             Equipment
            </button>
+           <button class="btn btn-primary" 
+          style="background-color: #1e3a8a; border-color: #1e3a8a;" 
+          data-bs-toggle="modal" 
+          data-bs-target="#updateExpiryModal">
+    Update Expiration Date
+  </button>
 
         </div>
         <div class="col-auto ms-auto">
           <input type="text" id="searchInput" class="form-control" placeholder="Search...">
         </div>
       </div>
+      <div class="table-responsive">
 
       <table class="table table-bordered">
         <thead>
@@ -242,8 +250,10 @@ include '../fetchfname.php';
             <th>Code</th>
             <th>Brand Name</th>
             <th>Generic</th>
+            <th>Box</th>
             <th>Strip</th>
             <th>Quantity</th>
+            <th>Expiration Dates</th>
             <th>Date Added</th>
             <th>Actions</th>
           </tr>
@@ -252,6 +262,7 @@ include '../fetchfname.php';
           <!-- Supplies data will be injected here -->
         </tbody>
       </table>
+    </div>
     </div>
 
    <!-- Add Supply Modal -->
@@ -437,16 +448,20 @@ document.addEventListener("DOMContentLoaded", () => {
               <td>${supply.code}</td>
               <td>${supply.item_name}</td>
               <td>${supply.category || "N/A"}</td>
-              <td>${supply.unit || "N/A"}</td>
+              <td>${supply.box || "N/A"} (10 pcs. of Strip Per Box)</td>
+              <td>${supply.unit || "N/A"} (10 pcs. of tablet Per Strip)</td>
               <td>${supply.quantity}</td>
+              <td>${supply.expiration} "N/A"</td>
               <td>${supply.date_added}</td>
               <td>
                 <button class="btn btn-sm btn-warning edit-btn" 
                   data-code="${supply.code}" 
                   data-item_name="${supply.item_name}" 
                   data-category="${supply.category}" 
+                  data-box="${supply.box}" 
                   data-unit="${supply.unit}" 
-                  data-quantity="${supply.quantity}">
+                  data-quantity="${supply.quantity}"
+                  data-expiration="${supply.expiration}">
                   Edit
                 </button>
                 <button class="btn btn-sm btn-danger delete-btn" data-code="${supply.code}">

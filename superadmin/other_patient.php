@@ -78,7 +78,7 @@ include '../fetchfname.php';
       <i class="bi bi-list toggle-sidebar-btn"></i>
       <!-- Navigation links -->
       <a href="tables-data.php" class="diagnosis-link">Back</a>
-      <a href=".php" class="diagnosis-link">Medical Records With Diagnosis</a>
+      <a href="rec_diag_other.php" class="diagnosis-link">Medical Records With Diagnosis</a>
     </div>
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">

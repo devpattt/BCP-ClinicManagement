@@ -375,132 +375,166 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../assets/js/main.js"></script>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        var patientSelection = document.getElementById("patient_selection");
-        var studentNumberRow = document.getElementById("studentNumberRow");
-        var yearLevelRow = document.getElementById("yearLevelRow");
-        var departmentCodeRow = document.getElementById("departmentCodeRow");
+       document.addEventListener("DOMContentLoaded", function() {
+    var patientSelection = document.getElementById("patient_selection");
+    var studentNumberRow = document.getElementById("studentNumberRow");
+    var yearLevelRow   = document.getElementById("yearLevelRow");
+    var departmentCodeRow = document.getElementById("departmentCodeRow");
 
-        // Show/hide fields based on Patient selection
-        patientSelection.addEventListener("change", function() {
-          var selected = this.value;
-          if (selected === "Student") {
-            studentNumberRow.style.display = "flex";
-            yearLevelRow.style.display = "flex";
-            departmentCodeRow.style.display = "flex";
-          } else if (selected === "Teacher") {
-            studentNumberRow.style.display = "none";
-            yearLevelRow.style.display = "none";
-            departmentCodeRow.style.display = "flex";
-          } else {
-            studentNumberRow.style.display = "none";
-            yearLevelRow.style.display = "none";
-            departmentCodeRow.style.display = "none";
-          }
-        });
+    // the list of all fields that get auto‑filled
+    var autoFields = [
+      "first_name",
+      "middle_name",
+      "last_name",
+      "contact_number",
+      "birthday",
+      "year_level",
+      "sex",
+      "department_code"
+    ];
 
-        // Auto-suggestion on Student Number input
-        var studentNumberInput = document.getElementById("student_number");
-        var suggestionList = document.getElementById("studentSuggestions");
-        var recDiv = document.getElementById("recommendationMessage");
+    // helper to lock or unlock
+    function setAutoFieldsLocked(lock) {
+      autoFields.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (el.tagName === "SELECT") {
+          el.disabled = lock;
+        } else {
+          el.readOnly = lock;
+        }
+        // optionally gray it out so user sees it's disabled
+        el.classList.toggle("auto-locked", lock);
+      });
+    }
 
-        studentNumberInput.addEventListener("input", function() {
-          var query = this.value.trim();
-          recDiv.style.display = "none";
+    // Show/hide fields based on Patient selection
+    patientSelection.addEventListener("change", function() {
+      var selected = this.value;
 
-          // Only search if at least 2 characters
-          if(query.length < 2) {
-            suggestionList.style.display = "none";
-            return;
-          }
-          // Fetch suggestions from get_student.php (which queries the database)
-          fetch("get_student.php?student_number=" + encodeURIComponent(query))
-            .then(response => response.json())
-            .then(data => {
-              suggestionList.innerHTML = "";
-              if(data.length > 0) {
-                recDiv.style.display = "none";
-                data.forEach(function(student) {
-                  var li = document.createElement("li");
-                  li.textContent = student.student_number + " - " + student.first_name + " " + student.last_name;
-                  
-                  li.addEventListener("click", function() {
-                    // Fill form fields with the suggestion data
-                    studentNumberInput.value = student.student_number;
-                    document.getElementById("first_name").value = student.first_name || "";
-                    document.getElementById("middle_name").value = student.middle_name || "";
-                    document.getElementById("last_name").value = student.last_name || "";
-                    document.getElementById("contact_number").value = student.contact_number || "";
-                    
-                    // Format the birthday value correctly
-                    var rawDate = student.birthday || "";
-                    var birthdayValue = "";
-                    if (rawDate) {
-                      // Check if it's already in ISO format (YYYY-MM-DD)
-                      var isoMatch = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-                      if (isoMatch) {
-                        birthdayValue = rawDate;
-                      } else {
-                        // Try MM/DD/YYYY format
-                        var slashParts = rawDate.split("/");
-                        if (slashParts.length === 3) {
-                          var mm = slashParts[0].padStart(2, '0');
-                          var dd = slashParts[1].padStart(2, '0');
-                          var yyyy = slashParts[2];
-                          birthdayValue = yyyy + "-" + mm + "-" + dd;
-                        } else {
-                          // Fallback: use Date constructor
-                          var dateObj = new Date(rawDate);
-                          if (!isNaN(dateObj.getTime())) {
-                            var year = dateObj.getFullYear();
-                            var month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                            var day = String(dateObj.getDate()).padStart(2, '0');
-                            birthdayValue = year + "-" + month + "-" + day;
-                          }
-                        }
+      // whenever you change selection, make sure to unlock fields
+      setAutoFieldsLocked(false);
+
+      if (selected === "Student") {
+        studentNumberRow.style.display    = "flex";
+        yearLevelRow.style.display        = "flex";
+        departmentCodeRow.style.display   = "flex";
+      } else if (selected === "Teacher") {
+        studentNumberRow.style.display    = "none";
+        yearLevelRow.style.display        = "none";
+        departmentCodeRow.style.display   = "flex";
+      } else {
+        studentNumberRow.style.display    = "none";
+        yearLevelRow.style.display        = "none";
+        departmentCodeRow.style.display   = "none";
+      }
+    });
+
+    // Auto‑suggestion on Student Number input
+    var studentNumberInput = document.getElementById("student_number");
+    var suggestionList     = document.getElementById("studentSuggestions");
+    var recDiv             = document.getElementById("recommendationMessage");
+
+    studentNumberInput.addEventListener("input", function() {
+      var query = this.value.trim();
+      recDiv.style.display = "none";
+
+      // Unlock whenever they start typing a new query
+      setAutoFieldsLocked(false);
+
+      if (query.length < 2) {
+        suggestionList.style.display = "none";
+        return;
+      }
+
+      fetch("get_student.php?student_number=" + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(data => {
+          suggestionList.innerHTML = "";
+          if (data.length > 0) {
+            recDiv.style.display = "none";
+            data.forEach(function(student) {
+              var li = document.createElement("li");
+              li.textContent = student.student_number + " – " + student.first_name + " " + student.last_name;
+
+              li.addEventListener("click", function() {
+                // fill all the inputs
+                studentNumberInput.value                     = student.student_number || "";
+                document.getElementById("first_name").value   = student.first_name || "";
+                document.getElementById("middle_name").value  = student.middle_name || "";
+                document.getElementById("last_name").value    = student.last_name || "";
+                document.getElementById("contact_number").value = student.contact_number || "";
+                // birthday formatting (same as you had)…
+                var rawDate = student.birthday || "";
+                var birthdayValue = "";
+                if (rawDate) {
+                  var isoMatch = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                  if (isoMatch) {
+                    birthdayValue = rawDate;
+                  } else {
+                    var slashParts = rawDate.split("/");
+                    if (slashParts.length === 3) {
+                      var mm = slashParts[0].padStart(2, '0'),
+                          dd = slashParts[1].padStart(2, '0'),
+                          yyyy = slashParts[2];
+                      birthdayValue = yyyy + "-" + mm + "-" + dd;
+                    } else {
+                      var dateObj = new Date(rawDate);
+                      if (!isNaN(dateObj.getTime())) {
+                        var y = dateObj.getFullYear(),
+                            m = String(dateObj.getMonth() + 1).padStart(2,'0'),
+                            d = String(dateObj.getDate()).padStart(2,'0');
+                        birthdayValue = y + "-" + m + "-" + d;
                       }
                     }
-                    document.getElementById("birthday").value = birthdayValue;
-                    
-                    // Map the returned year_level to the select options if necessary.
-                    var yearMapping = {
-                      "shs": "shs",
-                      "1st": "1st_year",
-                      "1st_year": "1st_year",
-                      "2nd": "2nd_year",
-                      "2nd_year": "2nd_year",
-                      "3rd": "3rd_year",
-                      "3rd_year": "3rd_year",
-                      "4th": "4th_year",
-                      "4th_year": "4th_year"
-                    };
-                    if(document.getElementById("year_level")){
-                      var returnedYear = student.year_level;
-                      document.getElementById("year_level").value = yearMapping[returnedYear] || returnedYear || "";
-                    }
-                    if(document.getElementById("sex")){
-                      document.getElementById("sex").value = student.sex || "";
-                    }
-                    if(document.getElementById("department_code")){
-                      document.getElementById("department_code").value = student.department_code || "";
-                    }
-                    
-                    // Hide suggestions and recommendation message
-                    suggestionList.style.display = "none";
-                    recDiv.style.display = "none";
-                  });
-                  suggestionList.appendChild(li);
-                });
-                suggestionList.style.display = "block";
-              } else {
+                  }
+                }
+                document.getElementById("birthday").value = birthdayValue;
+
+                // map year level
+                var yearMapping = {
+                  "shs": "shs",
+                  "1st": "1st_year",
+                  "1st_year": "1st_year",
+                  "2nd": "2nd_year",
+                  "2nd_year": "2nd_year",
+                  "3rd": "3rd_year",
+                  "3rd_year": "3rd_year",
+                  "4th": "4th_year",
+                  "4th_year": "4th_year"
+                };
+                var yl = student.year_level;
+                if (document.getElementById("year_level")) {
+                  document.getElementById("year_level").value = yearMapping[yl] || yl || "";
+                }
+                if (document.getElementById("sex")) {
+                  document.getElementById("sex").value = student.sex || "";
+                }
+                if (document.getElementById("department_code")) {
+                  document.getElementById("department_code").value = student.department_code || "";
+                }
+
+                // hide suggestions and lock everything
                 suggestionList.style.display = "none";
-                recDiv.style.display = "block";
-                recDiv.querySelector(".alert").innerText = "No matching student found. Please verify your student number or create a new record.";
-              }
-            })
-            .catch(error => console.error("[DEBUG] Error fetching suggestions:", error));
-        });
-      });
+                recDiv.style.display = "none";
+                setAutoFieldsLocked(true);
+              });
+
+              suggestionList.appendChild(li);
+            });
+            suggestionList.style.display = "block";
+          } else {
+            suggestionList.style.display = "none";
+            recDiv.style.display = "block";
+            recDiv.querySelector(".alert").innerText =
+              "No matching student found. Please verify your student number or create a new record.";
+          }
+        })
+        .catch(error => console.error("Error fetching suggestions:", error));
+    });
+
+    // ... your validation & submit code unchanged ...
+  });
 
       // Validate only visible fields
   function areAllInputsFilled(form) {
@@ -582,6 +616,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     .catch(error => showValidationAlert('An error occurred: ' + error));
   });
     </script>
+
+    <style>
+  /* optional CSS to visually indicate locked fields */
+  .auto-locked[readonly],
+  .auto-locked[disabled] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+  }
+</style>
   </main>
 </body>
 </html>

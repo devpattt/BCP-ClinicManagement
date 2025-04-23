@@ -14,154 +14,157 @@ if (!isset($_GET['uid'])) {
 
 $unique_id = $_GET['uid'];
 
-// Use custom filename if provided via GET, otherwise default.
-if (isset($_GET['filename']) && trim($_GET['filename']) != "") {
-    // Use basename to avoid directory traversal and trim spaces.
+// Custom filename support
+if (!empty($_GET['filename'])) {
     $filename = basename(trim($_GET['filename']));
-    // Append .pdf if not provided.
-    if (strtolower(substr($filename, -4)) !== ".pdf") {
-        $filename .= ".pdf";
+    if (strtolower(substr($filename, -4)) !== '.pdf') {
+        $filename .= '.pdf';
     }
     $pdf_filename = $filename;
 } else {
     $pdf_filename = "Patient_Report_{$unique_id}.pdf";
 }
 
-// Define the folder where the PDF will be saved
-$pdf_folder = "../uploads/";
+$pdf_folder   = "../uploads/";
 $pdf_filepath = $pdf_folder . $pdf_filename;
-$pdf_url = "uploads/" . $pdf_filename; 
+$pdf_url      = "uploads/" . $pdf_filename;
 
 // Fetch patient data
-$stmt = $conn->prepare("SELECT patient, fullname, student_number, contact_number, sex, birthday, year_level, department_code, diagnostic, recommendation, meds, created_at FROM bcp_sms3_patients WHERE unique_id = ?");
+$stmt = $conn->prepare("
+    SELECT patient, fullname, student_number, contact_number,
+           sex, birthday, year_level, department_code,
+           systolic, diastolic, temperature,
+           diagnostic, recommendation, meds, created_at
+      FROM bcp_sms3_patients
+     WHERE unique_id = ?
+");
 $stmt->bind_param("s", $unique_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
 if ($result->num_rows === 0) {
-    die("No data found.");
+    die("No data found for UID: {$unique_id}");
 }
-
 $row = $result->fetch_assoc();
 $stmt->close();
 
-// Check if the uploads folder exists and is writable
-if (!is_dir($pdf_folder)) {
-    die("Uploads folder does not exist.");
-}
-if (!is_writable($pdf_folder)) {
-    die("Uploads folder is not writable by PHP.");
+// Ensure uploads folder exists
+if (!is_dir($pdf_folder) || !is_writable($pdf_folder)) {
+    die("Uploads folder missing or not writable: {$pdf_folder}");
 }
 
-// ------------------
-// PDF GENERATION CODE
-// ------------------
-
-// Escape helper function for PDF content
+// PDF‐escape helper
 function pdfEscape($text) {
-    return str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $text);
+    return str_replace(['\\','(',')'], ['\\\\','\\(','\\)'], $text);
 }
 
 // -----------------------------------------------------------------------------
-// 1) READ LOGO IMAGE DATA
+// 1) READ & PREPARE LOGO IMAGE
 // -----------------------------------------------------------------------------
-$imagePath = "../assets/img/bcp logo.png";
+$imagePath = "../assets/img/bcp logo.jpg";
+if (!file_exists($imagePath) || !is_readable($imagePath)) {
+    die("Logo not found/readable at: {$imagePath}");
+}
 $imageData = file_get_contents($imagePath);
 list($imgWidth, $imgHeight, $imgType) = getimagesize($imagePath);
 
-// -----------------------------------------------------------------------------
-// 2) HEADER CONTENT (LOGO + HEADER TEXT)
-// -----------------------------------------------------------------------------
-$headerContent = "";
-$headerContent .= "q\n";                   // Save graphics state
-$headerContent .= "20 0 0 24 30 805 cm\n";   // Scale & translate: width=20, height=24 at (30,805)
-$headerContent .= "/Im1 Do\n";               // Paint the image
-$headerContent .= "Q\n";                     // Restore graphics state
-
-// Header Text 1 (Bold, 22pt)
-$headerContent .= "BT\n";
-$headerContent .= "/F2 22 Tf\n";
-$headerContent .= "1 0 0 1 130 775 Tm\n";  
-$headerContent .= "(Bestlink College of the Philippines) Tj\n";
-$headerContent .= "ET\n";
-
-// Header Text 2 (Bold, 20pt)
-$headerContent .= "BT\n";
-$headerContent .= "/F2 20 Tf\n";
-$headerContent .= "1 0 0 1 165 750 Tm\n";  
-$headerContent .= "(College of Computer Studies) Tj\n";
-$headerContent .= "ET\n";
-
-// Real-Time Date (Upper Right)
-$currentDate = date("F d, Y H:i:s");
-$headerContent .= "BT\n";
-$headerContent .= "/F2 12 Tf\n";
-$headerContent .= "1 0 0 1 450 815 Tm\n";
-$headerContent .= "(" . pdfEscape($currentDate) . ") Tj\n";
-$headerContent .= "ET\n";
-
-// -----------------------------------------------------------------------------
-// 3) MAIN CONTENT (PATIENT DATA)
-// -----------------------------------------------------------------------------
-$startY = 630;
-$lineHeight = 20;
-$curY = $startY;
-
-$mainContent = "";
-
-// Title: Patient Report
-$mainContent .= sprintf("BT\n1 0 0 1 50 %d Tm\n", $curY);
-$mainContent .= "/F2 19 Tf\n";
-$mainContent .= "(Patient Report) Tj\nET\n";
-$curY -= $lineHeight;
-
-// Separator
-$mainContent .= sprintf("BT\n1 0 0 1 50 %d Tm\n", $curY);
-$mainContent .= "/F2 12 Tf\n";
-$mainContent .= "(----------------------------) Tj\nET\n";
-$curY -= $lineHeight;
-
-// Data Lines
-$dataLines = [
-    "Patient: "           => $row['patient'],
-    "Name: "              => $row['fullname'],
-    "Student Number: "    => $row['student_number'],
-    "Contact: "           => $row['contact_number'],
-    "Sex: "               => $row['sex'],
-    "Birth date: "        => $row['birthday'],
-    "Year Level: "        => $row['year_level'],
-    "Department Code: "   => $row['department_code'],
-    "Diagnostic: "        => $row['diagnostic'],
-    "Recommendation: "    => $row['recommendation'],
-    "Medications Given: " => $row['meds']
-];
-
-foreach ($dataLines as $label => $value) {
-    $mainContent .= sprintf("BT\n1 0 0 1 50 %d Tm\n", $curY);
-    $mainContent .= "/F2 12 Tf\n";
-    $mainContent .= "(" . pdfEscape($label) . ") Tj\n";
-    $mainContent .= "/F1 12 Tf\n";
-    $mainContent .= "(" . pdfEscape($value) . ") Tj\nET\n";
-    $curY -= $lineHeight;
+// choose correct PDF filter
+if ($imgType === IMAGETYPE_JPEG) {
+    $filter = '/DCTDecode';
+} elseif ($imgType === IMAGETYPE_PNG) {
+    $filter = '/FlateDecode';
+} else {
+    die("Unsupported image type (#{$imgType}).");
 }
 
-// Footer Lines (bottom of page)
-$sentByY = 50;
-$mainContent .= sprintf("BT\n1 0 0 1 50 %d Tm\n", $sentByY);
-$mainContent .= "/F2 12 Tf\n";
-$mainContent .= "(Generated By: ) Tj\n";
-$mainContent .= "/F1 12 Tf\n";
-$mainContent .= "(" . $fullname . ") Tj\nET\n";
+// compute display size (max 100×50 pts)
+$maxW = 150;
+$maxH = 80;
+$scale = min($maxW / $imgWidth, $maxH / $imgHeight);
+$dispW = $imgWidth * $scale;
+$dispH = $imgHeight * $scale;
 
-// Reference ID on bottom right
-$refX = 400;
-$mainContent .= sprintf("BT\n1 0 0 1 %d %d Tm\n", $refX, $sentByY);
-$mainContent .= "/F2 12 Tf\n";
-$mainContent .= "(Reference ID: ) Tj\n";
-$mainContent .= "/F1 12 Tf\n";
-$mainContent .= "(" . pdfEscape($unique_id) . ") Tj\nET\n";
+// -----------------------------------------------------------------------------
+// 2) BUILD HEADER CONTENT (LOGO + TEXT)
+// -----------------------------------------------------------------------------
+$headerContent = "";
 
-// Combine header and main content
+// place logo at (30, pageTop‑dispH)
+$yPos = 842 - 50 - $dispH;
+$headerContent .= "q\n";
+$headerContent .= sprintf(
+    "%F 0 0 %F 45 %F cm\n",
+    $dispW,
+    $dispH,
+    $yPos
+);
+$headerContent .= "/Im1 Do\n";
+$headerContent .= "Q\n";
+
+// College name line 1
+$headerContent .= "BT\n/F2 17 Tf\n1 0 0 1 150 770 Tm\n";
+$headerContent .= "(Bestlink College of the Philippines) Tj\nET\n";
+
+// Address line 1
+$headerContent .= "BT\n/F2 15 Tf\n1 0 0 1 136 750 Tm\n";
+$headerContent .= "(Kaligayahan, Quirino Highway, Novaliches,) Tj\nET\n";
+
+// Address line 2
+$headerContent .= "BT\n/F2 15 Tf\n1 0 0 1 176 730 Tm\n";
+$headerContent .= "(Quezon City, Philippines, 1123.) Tj\nET\n";
+
+// current date (upper right)
+$currentDate = date("F d, Y H:i:s");
+$headerContent .= "BT\n/F2 12 Tf\n1 0 0 1 450 815 Tm\n";
+$headerContent .= "(" . pdfEscape($currentDate) . ") Tj\nET\n";
+
+// -----------------------------------------------------------------------------
+// 3) MAIN CONTENT (Patient Data)
+// -----------------------------------------------------------------------------
+$startY = 630; $lineH = 20; $curY = $startY;
+$mainContent  = "";
+// Title
+$mainContent .= sprintf("BT\n/F2 19 Tf\n1 0 0 1 50 %d Tm\n", $curY)
+             . "(Patient Report) Tj\nET\n";
+$curY -= $lineH;
+// Separator
+$mainContent .= sprintf("BT\n/F2 12 Tf\n1 0 0 1 50 %d Tm\n", $curY)
+             . "(----------------------------) Tj\nET\n";
+$curY -= $lineH;
+
+// Data lines
+$dataLines = [
+    "Patient: "        => $row['patient'],
+    "Name: "           => $row['fullname'],
+    "Student Number: " => $row['student_number'],
+    "Contact: "        => $row['contact_number'],
+    "Sex: "            => $row['sex'],
+    "Birth date: "     => $row['birthday'],
+    "Year Level: "     => $row['year_level'],
+    "Department Code: "=> $row['department_code'],
+    "Blood Pressure: " => $row['systolic'] . "/" . $row['diastolic'],
+    "Temperature: "    => $row['temperature'] . " °C",
+    "Diagnostic: "     => $row['diagnostic'],
+    "Recommendation: " => $row['recommendation'],
+    "Medications Given:"=> $row['meds'],
+];
+foreach ($dataLines as $label => $value) {
+    $mainContent .= sprintf("BT\n/F2 12 Tf\n1 0 0 1 50 %d Tm\n", $curY)
+                 . "(" . pdfEscape($label) . ") Tj\n"
+                 . "/F1 12 Tf\n"
+                 . "(" . pdfEscape($value) . ") Tj\nET\n";
+    $curY -= $lineH;
+}
+
+// Footer with Generated By & Reference ID
+$sentY = 50;
+$mainContent .= sprintf("BT\n/F2 12 Tf\n1 0 0 1 50 %d Tm\n", $sentY)
+             . "(Generated By: ) Tj\n/F1 12 Tf\n"
+             . "(" . pdfEscape($_SESSION['username']) . ") Tj\nET\n";
+$mainContent .= sprintf("BT\n/F2 12 Tf\n1 0 0 1 400 %d Tm\n", $sentY)
+             . "(Reference ID: ) Tj\n/F1 12 Tf\n"
+             . "(" . pdfEscape($unique_id) . ") Tj\nET\n";
+
+// combine
 $pdf_text_content = $headerContent . $mainContent;
 
 // -----------------------------------------------------------------------------
@@ -170,109 +173,90 @@ $pdf_text_content = $headerContent . $mainContent;
 $contentLength = mb_strlen($pdf_text_content, '8bit');
 $objects = [];
 
-// Object 1: Catalog
-$objects[] = "1 0 obj
-<< /Type /Catalog /Pages 2 0 R >>
-endobj
-";
-
-// Object 2: Pages
-$objects[] = "2 0 obj
-<< /Type /Pages /Kids [3 0 R] /Count 1 >>
-endobj
-";
-
-// Object 3: Page (include fonts and image XObject)
+// 1: Catalog
+$objects[] = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n";
+// 2: Pages
+$objects[] = "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n";
+// 3: Page
 $objects[] = "3 0 obj
 << /Type /Page
    /Parent 2 0 R
    /MediaBox [0 0 595 842]
    /Contents 4 0 R
    /Resources <<
-       /Font << /F1 5 0 R /F2 6 0 R >>
-       /XObject << /Im1 7 0 R >>
+      /Font << /F1 5 0 R /F2 6 0 R >>
+      /XObject << /Im1 7 0 R >>
    >>
 >>
 endobj
 ";
+// 4: Content stream
+$objects[] = "4 0 obj\n<< /Length {$contentLength} >>\nstream\n"
+           . $pdf_text_content . "\nendstream\nendobj\n";
+// 5: Helvetica
+$objects[] = "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n";
+// 6: Helvetica-Bold
+$objects[] = "6 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n";
 
-// Object 4: Content Stream
-$objects[] = "4 0 obj
-<< /Length " . $contentLength . " >>
-stream
-" . $pdf_text_content . "
-endstream
-endobj
-";
-
-// Object 5: Normal Font (Helvetica)
-$objects[] = "5 0 obj
-<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
-endobj
-";
-
-// Object 6: Bold Font (Helvetica-Bold)
-$objects[] = "6 0 obj
-<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
-endobj
-";
-
-// Object 7: Image XObject (logo)
+// 7: Image XObject (logo)
 $objects[] = "7 0 obj
-<< /Type /XObject
+<<
+   /Type /XObject
    /Subtype /Image
-   /Width $imgWidth
-   /Height $imgHeight
+   /Width {$imgWidth}
+   /Height {$imgHeight}
    /ColorSpace /DeviceRGB
    /BitsPerComponent 8
-   /Filter /FlateDecode
-   /Length " . strlen($imageData) . " >>
+   /Filter {$filter}
+   /Length " . strlen($imageData) . "
+>>
 stream
 " . $imageData . "
 endstream
 endobj
 ";
 
-// -----------------------------------------------------------------------------
-// 5) ASSEMBLE THE PDF
-// -----------------------------------------------------------------------------
-$pdf = "%PDF-1.4\n";
+// assemble PDF
+$pdf   = "%PDF-1.4\n";
 $offsets = [];
 foreach ($objects as $obj) {
     $offsets[] = mb_strlen($pdf, '8bit');
     $pdf .= $obj;
 }
 
-// Build the cross-reference table
-$objectCount = count($objects) + 1;
-$xref = "xref\n0 $objectCount\n";
+// xref
+$objCount = count($objects) + 1;
+$xref  = "xref\n0 {$objCount}\n";
 $xref .= "0000000000 65535 f \n";
-foreach ($offsets as $offset) {
-    $xref .= sprintf("%010d 00000 n \n", $offset);
+foreach ($offsets as $off) {
+    $xref .= sprintf("%010d 00000 n \n", $off);
 }
 
-// Build the trailer
-$trailer = "trailer
-<< /Size $objectCount /Root 1 0 R >>
-";
-$startxref = mb_strlen($pdf, '8bit'); // offset where xref starts
+// trailer
+$trailer = "trailer\n<< /Size {$objCount} /Root 1 0 R >>\n";
+$startxref = mb_strlen($pdf, '8bit');
+$pdf .= $xref . $trailer . "startxref\n{$startxref}\n%%EOF";
 
-$pdf .= $xref . $trailer . "startxref\n" . $startxref . "\n%%EOF";
-
-// Write the PDF to file
+// write file
 if (file_put_contents($pdf_filepath, $pdf) === false) {
-    die("Failed to write PDF file.");
+    die("Failed to save PDF to {$pdf_filepath}");
 }
 
-// Optionally log the PDF generation in the database
-$stmt = $conn->prepare("INSERT INTO bcp_sms3_send_integ (unique_id, request, date) VALUES (?, ?, ?)");
+// log into DB (use ON DUPLICATE KEY UPDATE if needed)
+$stmt = $conn->prepare("
+    INSERT INTO bcp_sms3_send_integ (unique_id, request, date)
+    VALUES (?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      request = VALUES(request),
+      date    = VALUES(date)
+");
 $stmt->bind_param("sss", $unique_id, $pdf_url, $row['created_at']);
 $stmt->execute();
 $stmt->close();
 
-// Serve the PDF inline to the user
+// serve PDF
 header("Content-Type: application/pdf");
-header("Content-Disposition: inline; filename=\"$pdf_filename\"");
+header("Content-Disposition: inline; filename=\"{$pdf_filename}\"");
 echo $pdf;
 exit();
 ?>

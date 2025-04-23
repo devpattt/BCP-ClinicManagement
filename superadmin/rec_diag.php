@@ -141,7 +141,7 @@ if ($result) {
   <div class="header-left d-flex align-items-center gap-3">
     <i class="bi bi-list toggle-sidebar-btn"></i>
     <a href="tables-data.php" class="diagnosis-link">Back</a>
-    <a href="finishrec.php" class="diagnosis-link">Finish Data's</a>
+    <a href="finishrec.php" class="diagnosis-link">Processed Data's</a>
   </div>
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
@@ -227,6 +227,8 @@ if ($result) {
                         <th>Birth date</th>
                         <th>Year Lvl</th>
                         <th>Dept Code</th>
+                        <th>Blood Pressure</th>
+                        <th>Temperature</th>
                         <th>Diagnostic</th>
                         <th>Recommendation</th>
                         <th>Meds Given</th>
@@ -241,7 +243,7 @@ if ($result) {
                         $stmt = $conn->prepare("
                           SELECT 
                             p.unique_id, p.patient, p.fullname, p.student_number, p.contact_number, p.sex, p.birthday,
-                            p.year_level, p.department_code, p.diagnostic, p.recommendation, p.meds, p.action,
+                            p.year_level, p.department_code, p.systolic, p.diastolic, p.temperature, p.diagnostic, p.recommendation, p.meds, p.action,
                             DATE_FORMAT(p.created_at, '%Y-%m-%d %h:%i %p') AS formatted_created_at,
                             (SELECT COUNT(*) FROM bcp_sms3_send_integ s WHERE s.unique_id = p.unique_id) AS sentCount
                           FROM bcp_sms3_patients p
@@ -259,6 +261,11 @@ if ($result) {
                             $diagnosticVal     = trim($row["diagnostic"])     ?: "N/A";
                             $recommendationVal = trim($row["recommendation"]) ?: "N/A";
                             $medsVal           = trim($row["meds"])           ?: "N/A";
+                            $sys       = trim($row["systolic"]);
+                            $dia       = trim($row["diastolic"]);
+                            $bp = ($sys && $dia) ? $sys . '/' . $dia : 'N/A';
+                            $temp       = trim($row["temperature"]);
+                            $temperature = $temp ? $temp . ' °C' : 'N/A';
                             $uid = htmlspecialchars($row["unique_id"]);
                             
                             echo '<tr id="row-'.$uid.'">';
@@ -271,6 +278,8 @@ if ($result) {
                             echo '<td>' . htmlspecialchars($row["birthday"]) . '</td>';
                             echo '<td>' . htmlspecialchars($row["year_level"]) . '</td>';
                             echo '<td>' . htmlspecialchars($row["department_code"]) . '</td>';
+                            echo '<td>' . htmlspecialchars($bp) . '</td>';
+                            echo '<td>' . htmlspecialchars($temperature) . '</td>';
                             echo '<td id="diagnostic-'.$uid.'">' . htmlspecialchars($diagnosticVal) . '</td>';
                             echo '<td id="recommendation-'.$uid.'">' . htmlspecialchars($recommendationVal) . '</td>';
                             echo '<td id="meds-'.$uid.'">' . htmlspecialchars($medsVal) . '</td>';

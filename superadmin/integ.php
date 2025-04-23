@@ -173,7 +173,6 @@ include '../connection.php';
                 <div class="table-header mb-3">
                   <h4 class="card-title fw-bold" style="color: #012970;">Sent Reports to Student Affair</h4>
                   <button type="button" onclick="window.location.href='done.php'" class="btn btn-primary">Processed Files</button>
-
                 </div>
                 <!-- Compact table for sent reports -->
                 <table class="table table-sm table-hover table-striped table-bordered align-middle text-center">
@@ -188,8 +187,8 @@ include '../connection.php';
                   </thead>
                   <tbody>
                     <?php
-                      // Retrieve records from bcp_sms3_send_integ table excluding those with status 'Done'
-                      $stmt = $conn->prepare("SELECT unique_id, request, date FROM bcp_sms3_send_integ WHERE status <> 'Done'");
+                      // Retrieve records from bcp_sms3_send_integ table where status is NULL or empty (blank)
+                      $stmt = $conn->prepare("SELECT unique_id, request, date FROM bcp_sms3_send_integ WHERE status IS NULL OR status = ''");
                       $stmt->execute();
                       $result = $stmt->get_result();
 
@@ -207,7 +206,6 @@ include '../connection.php';
                           echo "<td>" . $date . "</td>";
 
                           // Actions column with View and Send buttons.
-                          // Passing both uniqueId and pdfFile to the sendPdf function.
                           echo "<td>";
                           echo "<button type='button' class='btn btn-primary btn-sm btn-responsive' onclick='viewPdf(\"$pdfFile\")'>View</button> ";
                           echo "<button type='button' class='btn btn-primary btn-sm btn-responsive' onclick='sendPdf(\"$uniqueId\", \"$pdfFile\")'>Send</button>";
